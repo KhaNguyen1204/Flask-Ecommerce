@@ -1,4 +1,5 @@
-__pycache__/
-.vscode/
-myenv/
-instance/
+__pycache__
+.vscode
+myenv
+instance
+tgdd-img
