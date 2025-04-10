@@ -1,5 +1,8 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
+import os
+from flask import current_app
+import json
 
 views = Blueprint('views', __name__)
 
@@ -17,13 +20,24 @@ def cart():
 def search():
     return '<h1>Tim kiem khong ra</h1>'
 
-@views.route('/smartphone', methods=['GET', 'POST'])
+@views.route('/smartphone')
+@views.route('/smartphone')
 def smartphone():
-    return '<h1>List dien thoai</h1>'
+    file_path = os.path.join(current_app.root_path, 'static', 'products_smartphone.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        products = json.load(file)
+
+    return render_template("product_list.html", title='Smartphone', products=products, customer=current_user)
+
 
 @views.route('/laptop', methods=['GET', 'POST'])
 def laptop():
-    return '<h1>List laptop</h1>'
+    file_path = os.path.join(current_app.root_path, 'static', 'products_laptop.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        products = json.load(file)
+
+    return render_template("product_list.html", title='Laptop', products=products, customer=current_user)
+
 
 @views.route('/tablet', methods=['GET', 'POST'])
 def tablet():
@@ -32,7 +46,3 @@ def tablet():
 @views.route('/smartwatch', methods=['GET', 'POST'])
 def smartwatch():
     return '<h1>List dong ho thong minh</h1>'
-
-@views.route('/watch', methods=['GET', 'POST'])
-def watch():
-    return '<h1>List watch</h1>'
