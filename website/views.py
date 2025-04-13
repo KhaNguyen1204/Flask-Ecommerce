@@ -1,11 +1,29 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
+import os
+from flask import current_app
+import json
 
 views = Blueprint('views', __name__)
 
 @views.route('/')
 def home():
-    return render_template("home.html", customer=current_user)
+    """
+    Chọn một số sản phâm từ các category để hiển thị ở thư mục home.html
+    :return: home.html
+    """
+    featured_products = []
+
+    categories = ['Smartphone', 'Laptop', 'Tablet', 'SmartWatch']
+    for category in categories:
+        file_path = os.path.join(current_app.root_path, 'static/json', f'products_{category.lower()}.json')
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                products = json.load(file)
+                featured_products.extend(products[:2]) # Lấy 2 sản phẩm
+        except FileNotFoundError:
+            pass
+    return render_template("home.html", products=featured_products, customer=current_user)
 
 
 @views.route('/cart')
@@ -17,22 +35,36 @@ def cart():
 def search():
     return '<h1>Tim kiem khong ra</h1>'
 
-@views.route('/smartphone', methods=['GET', 'POST'])
+@views.route('/smartphone')
 def smartphone():
-    return '<h1>List dien thoai</h1>'
+    file_path = os.path.join(current_app.root_path, 'static/json', 'products_smartphone.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        products = json.load(file)
 
-@views.route('/laptop', methods=['GET', 'POST'])
+    return render_template("product_list.html", title='Smartphone', products=products, customer=current_user)
+
+
+@views.route('/laptop')
 def laptop():
-    return '<h1>List laptop</h1>'
+    file_path = os.path.join(current_app.root_path, 'static/json', 'products_laptop.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        products = json.load(file)
 
-@views.route('/tablet', methods=['GET', 'POST'])
+    return render_template("product_list.html", title='Laptop', products=products, customer=current_user)
+
+
+@views.route('/tablet')
 def tablet():
-    return '<h1>List tablet</h1>'
+    file_path = os.path.join(current_app.root_path, 'static/json', 'products_tablet.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        products = json.load(file)
 
-@views.route('/smartwatch', methods=['GET', 'POST'])
+    return render_template("product_list.html", title='Tablets', products=products, customer=current_user)
+
+@views.route('/smartwatch')
 def smartwatch():
-    return '<h1>List dong ho thong minh</h1>'
+    file_path = os.path.join(current_app.root_path, 'static/json', 'products_smartwatch.json')
+    with open(file_path, 'r', encoding='utf-8') as file:
+        products = json.load(file)
 
-@views.route('/watch', methods=['GET', 'POST'])
-def watch():
-    return '<h1>List watch</h1>'
+    return render_template("product_list.html", title='Smart Watchs', products=products, customer=current_user)

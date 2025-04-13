@@ -4,67 +4,29 @@
 
 {% block content %}
 
-<div class="container">
-    <div class="row">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/product_list.css') }}">
 
-
-        <div class="col">
-            
-            <img src="../static/images/asus-vivobook-14-a1405va-i3-ly097w-170225-102753-517-600x600.jpg" style="width: 185px;">
-
-            <div class="row mt-1">
-                <h6>Asus Vivobook 14 A1405VA</h6>
+<h1>Sản phẩm nổi bật</h1>
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="price">{{ product.price }}</p>
+            <div class="specs">
+                {% if product.ram is defined and product.ram %}
+                    <p><strong>RAM:</strong> {{ product.ram }}</p>
+                {% endif %}
+                {% if product.rom is defined and product.rom %}
+                    <p><strong>ROM:</strong> {{ product.rom }}</p>
+                {% endif %}
             </div>
-
+            <p class="description">{{ product.description }}</p>
+            <button class="add-to-cart">Thêm vào giỏ hàng</button>
         </div>
-        <div class="col">
-            
-            <img src="../static/images/asus-vivobook-14-a1405va-i3-ly097w-170225-102753-517-600x600.jpg" style="width: 185px;">
-
-            <div class="row mt-1">
-                <h6>Asus Vivobook 14 A1405VA</h6>
-            </div>
-
-        </div><div class="col">
-            
-            <img src="../static/images/asus-vivobook-14-a1405va-i3-ly097w-170225-102753-517-600x600.jpg" style="width: 185px;">
-
-            <div class="row mt-1">
-                <h6>Asus Vivobook 14 A1405VA</h6>
-            </div>
-
-        </div><div class="col">
-            
-            <img src="../static/images/asus-vivobook-14-a1405va-i3-ly097w-170225-102753-517-600x600.jpg" style="width: 185px;">
-
-            <div class="row mt-1">
-                <h6>Asus Vivobook 14 A1405VA</h6>
-            </div>
-
-        </div>
-        <div class="col">
-            
-            <img src="../static/images/asus-vivobook-14-a1405va-i3-ly097w-170225-102753-517-600x600.jpg" style="width: 185px;">
-
-            <div class="row mt-1">
-                <h6>Asus Vivobook 14 A1405VA</h6>
-            </div>
-
-        </div>
-        <div class="col">
-            
-            <img src="../static/images/asus-vivobook-14-a1405va-i3-ly097w-170225-102753-517-600x600.jpg" style="width: 185px;">
-
-            <div class="row mt-1">
-                <h6>Asus Vivobook 14 A1405VA</h6>
-            </div>
-
-        </div>
-
-
-
-        
     </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

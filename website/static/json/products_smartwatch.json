@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Vòng tay thông minh Samsung Galaxy Fit3",
+        "price": "1,190,000 VND",
+        "image": "images/smartwatchs/samsung-galaxy-fit3-hong-thumb-1-600x600.jpg",
+        "description": "Dài 42.9 mm - Ngang 28.8 mm - Dày 9.9 mm - Nặng 36.8 g"
+    },
+    {
+        "name": "Đồng hồ thông minh Garmin Instinct 3 Solar 50mm",
+        "price": "12,290,000 VND",
+        "image": "images/smartwatchs/garmin-instinct-3-solar-50mm-xam-tb-600x600.jpg",
+        "description": "Dài 50 mm - Ngang 50 mm - Dày 14.4 mm - Nặng 58 g"
+    },
+    {
+        "name": "Đồng hồ thông minh Garmin Instinct 3 45mm",
+        "price": "12,290,000 VND",
+        "image": "images/smartwatchs/garmin-instinct-3-45mm-den-tb-600x600.jpg",
+        "description": "Dài 45 mm - Ngang 45 mm - Dày 14.9 mm - Nặng 53 g"
+    },
+    {
+        "name": "Đồng hồ thông minh Amazfit T-Rex 3 47.1mm",
+        "price": "5,990,000 VND",
+        "image": "images/smartwatchs/amazfit-t-rex-3-cam-tb-600x600.jpg",
+        "description": "Dài 48.5 mm - Ngang 48.5 mm - Dày 13.75 mm - Nặng 68.3 g"
+    },
+    {
+        "name": "Vòng đeo tay thông minh Mi Band 8",
+        "price": "690,000 VND",
+        "image": "images/smartwatchs/mi-band-8-thumb-den-30-600x600.jpg",
+        "description": "Dài 48 mm - Ngang 22.5 mm - Dày 11 mm - Nặng 27 g"
+    },
+    {
+        "name": "Đồng hồ thông minh Garmin Lily 2 Classic 34mm dây da",
+        "price": "7,640,000 VND",
+        "image": "images/smartwatchs/garmin-lily-2-classic-day-da-nau-tb-600x600.jpg",
+        "description": "Dài 35.4 mm - Ngang 35.4 mm - Dày 10.1 mm - Nặng 24.4 g"
+    },
+    {
+        "name": "Apple Watch Series 10 GPS + Cellular 42mm viền Titanium dây Milan",
+        "price": "20,090,000 VND",
+        "image": "images/smartwatchs/apple-watch-s10-lte-42mm-vien-titanium-day-thep-thumb-2-600x600.jpg",
+        "description": "Dài 42 mm - Ngang 36 mm - Dày 9.7 mm - Nặng 34.4 g"
+    },
+    {
+        "name": "Apple Watch Series 10 GPS + Cellular 42mm viền nhôm dây thể thao",
+        "price": "12,590,000 VND",
+        "image": "images/smartwatchs/apple-watch-s10-lte-day-silicone-den-bong-tb-1-600x600.jpg",
+        "description": "Dài 42 mm - Ngang 36 mm - Dày 9.7 mm - Nặng 29.3 g"
+    },
+    {
+        "name": "Đồng hồ thông minh Amazfit Active 42.3mm",
+        "price": "1,890,000 VND",
+        "image": "images/smartwatchs/amazfit-active-den-tb-1-600x600.jpg",
+        "description": "Dài 42.36 mm - Ngang 35.9 mm - Dày 10.75 mm - Nặng 24 g"
+    },
+    {
+        "name": "Đồng hồ thông minh Garmin Lily 34.5mm",
+        "price": "4,490,000 VND",
+        "image": "images/smartwatchs/garmin-lily-day-silicone-trang-tn-2-600x600.jpg",
+        "description": "Dài 34.5 mm - Ngang 34.5 mm - Dày 10.15 mm - Nặng 24 g"
+    }
+]

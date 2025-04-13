@@ -3,3 +3,5 @@ __pycache__
 myenv
 instance
 tgdd-img
+.venv
+.idea
