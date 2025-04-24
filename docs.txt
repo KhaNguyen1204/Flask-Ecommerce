@@ -1,0 +1,9 @@
+1. Để sửa lỗi flask_upload không còn hỗ trợ: trong file flask_upload trong thư viện:
+    Sửa from werkzeug import secure_filename, FileStorage
+    Sửa thành:
+    from werkzeug.utils import secure_filename
+    from werkzeug.datastructures import FileStorage
+2. Flask-Migrate: dùng để sửa db khi cần thay đổi các cột --> tạo ra thư mục migration
+    Lệnh khởi tạo: flask --app main db init
+    Lệnh commit: flask --app main db migrate -m "Initial migration"
+    Sửa: flask --app main db upgrade

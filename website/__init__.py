@@ -1,44 +1,28 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
-from flask_login import LoginManager
-
-db = SQLAlchemy()
-DB_NAME = "database.db"
-
-
-def create_database(app):
-    if not path.exists('website/' + DB_NAME):
-        with app.app_context():
-            db.create_all()
-        print('Created database!')
+from flask_bcrypt import Bcrypt
+from flask_uploads import UploadSet, IMAGES, configure_uploads
+import os
+from flask_migrate import Migrate
 
 
-def create_app():
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'u9G7lDa/YXjbrV4/pyO+/Q=='
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
-    
-    db.init_app(app)
-
-    from .views import views
-    from .auth import auth
-
-    app.register_blueprint(views, url_prefix='/')
-    app.register_blueprint(auth, url_prefix='/')
-
-    create_database(app)
-
-    from .models import Customer
-
-    login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
-    login_manager.init_app(app)
-
-    @login_manager.user_loader
-    def load_user(id):
-        return Customer.query.get(int(id))
-
-    return app
+# Thư mục hiện tại
+basedir = os.path.abspath(os.path.dirname(__file__))
+# Khởi tạo Flask app
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Pak123!!!@localhost/shop'
+app.config['SECRET_KEY'] = 'fkshfkhwoe8ww0590fmw050'
+app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/images')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16MB Limit
 
 
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, photos)
+
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app) # Bâm app
+migrate = Migrate(app, db)
+
+
+from website.admin import routes
+from website.products import routes

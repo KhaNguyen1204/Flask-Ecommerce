@@ -11,3 +11,10 @@ MarkupSafe==3.0.2
 SQLAlchemy==2.0.39
 typing_extensions==4.12.2
 Werkzeug==3.1.3
+wtforms
+flask-bcrypt
+flask_uploads
+pymysql
+flask_wtf
+email_validator
+Flask-Migrate

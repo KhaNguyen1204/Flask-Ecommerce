@@ -1,7 +1,8 @@
-from website import create_app
+from website import app, db
 
-app = create_app()
+# Tạo db
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
-    

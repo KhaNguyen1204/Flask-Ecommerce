@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center h1 text-danger">REGISTER</div>
+<div class="container">
+    {% include '_messages.html' %}
+    {% from "_formhelpers.html" import render_field %}
+    <form method="post" enctype="multipart/form-data">
+      <dl>
+        {{ render_field(form.username, class_="form-control") }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.confirm) }}
+          <input type="file" name="photo" >
+      </dl>
+        <p><input type=submit value=Register class="btn btn-info"></p>
+</form>
+</div>
+{% endblock content %}
