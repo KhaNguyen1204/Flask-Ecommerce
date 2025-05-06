@@ -11,6 +11,7 @@
         <div class="col-md-4">
             {% include '_messages.html' %}
     <form method="post" enctype="multipart/form-data">
+            {{ form.csrf_token }}
       <div>
         {{ render_field(form.email, class="form-control") }}
         {{ render_field(form.password, class="form-control") }}

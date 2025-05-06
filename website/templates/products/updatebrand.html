@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% block title %}
+{% if title %} {{ title }} {% else %} Update Brand or Category {% endif %}
+{% endblock title %}
 {% block content %}
 {% include '_messages.html' %}
-
-<title>Add Brand</title>
 <div class="container">
     <div class="row">
         <div class="col-md-3"></div>

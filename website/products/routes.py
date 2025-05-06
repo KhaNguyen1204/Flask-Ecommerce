@@ -1,9 +1,46 @@
 from flask import redirect, render_template, url_for, request, flash, session, current_app
-from website import app, db, photos
+from website import app, db, photos, search
 from .models import Brand, Category, AddProduct
 from .forms import AddProducts
 import secrets, os # Băm ảnh để không trùng lặp
 
+def brands():
+    brands = Brand.query.join(AddProduct, (Brand.id == AddProduct.brand_id)).all()
+    return brands
+
+def categories():
+    categories = Category.query.join(AddProduct, (AddProduct.category_id == Category.id)).all()
+    return categories
+@app.route('/')
+def home():
+    page = request.args.get('page', 1, type=int)
+    products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=4)
+    return render_template('products/index.html', products=products, brands=brands(), categories=categories())
+
+@app.route('/result')
+def result():
+    searchword = request.args.get('q')
+    products = AddProduct.query.msearch(searchword, fields=['name', 'description'], limit=6)
+    return render_template('products/result.html', products=products, brands=brands(), categories=categories())
+
+@app.route('/product/<int:id>')
+def single_page(id):
+    product = AddProduct.query.get_or_404(id)
+    return render_template('products/single_page.html', product=product, brands=brands(), categories=categories())
+
+@app.route('/brand/<int:id>')
+def get_brand(id):
+    page = request.args.get('page', 1, type=int)
+    get_b = AddProduct.query.filter_by(id=id).first_or_404()
+    brand = AddProduct.query.filter_by(brand=get_b).paginate(page=page, per_page=4)
+    return render_template('products/index.html', brand=brand, brands=brands(), categories=categories(), get_b=get_b)
+
+@app.route('/categories/<int:id>')
+def get_categories(id):
+    page = request.args.get('page', 1, type=int)
+    get_cat = Category.query.filter_by(id=id).first_or_404()
+    get_cat_prod = AddProduct.query.filter_by(category=get_cat).paginate(page=page, per_page=4)
+    return render_template('products/index.html', get_cat_prod=get_cat_prod, brands=brands(), categories=categories(), get_cat=get_cat)
 @app.route('/addbrand', methods=['GET', 'POST'])
 def addbrand():
     if 'email' not in session:
@@ -85,6 +122,7 @@ def deletecat(id):
         db.session.commit()
     flash(f'Category {category.name} deleted successfully!', 'success')
     return redirect(url_for('categories'))
+
 @app.route('/addproduct', methods=['GET', 'POST'])
 def addproduct():
     if 'email' not in session:
@@ -167,3 +205,20 @@ def updateproduct(id):
     form.colors.data = product.colors
 
     return render_template('products/updateproduct.html', title='Update Product', form=form, brands=brands, categories=categories, product=product)
+
+@app.route('/deleteproduct/<int:id>', methods=['POST'])
+def deleteproduct(id):
+    product = AddProduct.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            os.unlink(os.path.join(current_app.root_path, 'static/images/' + product.image_1))
+            os.unlink(os.path.join(current_app.root_path, 'static/images/' + product.image_2))
+            os.unlink(os.path.join(current_app.root_path, 'static/images/' + product.image_3))
+        except Exception as e:
+            print(e)
+        db.session.delete(product)
+        db.session.commit()
+        flash(f'Product {product} deleted successfully!', 'success')
+        return redirect(url_for('admin'))
+    flash(f'Can not delete this product {product}!', 'danger')
+    return redirect(url_for('admin'))

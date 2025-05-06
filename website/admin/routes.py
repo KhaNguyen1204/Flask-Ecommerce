@@ -4,13 +4,13 @@ from .form import RegistrationForm, LoginForm
 from website.products.models import AddProduct, Brand, Category
 from .models import Admin
 # Trang chủ
-@app.route('/')
-def home():
-    if 'email' not in session:
-        flash('Please login to access this page.', 'danger')
-        return redirect(url_for('login'))
-    products = AddProduct.query.all()
-    return render_template('admin/index.html', title='Admin Page', products=products)
+# @app.route('/')
+# def home():
+#     if 'email' not in session:
+#         flash('Please login to access this page.', 'danger')
+#         return redirect(url_for('login'))
+#     products = AddProduct.query.all()
+#     return render_template('admin/index.html', title='Admin Page', products=products)
 
 @app.route('/admin')
 def admin():

@@ -18,3 +18,7 @@ pymysql
 flask_wtf
 email_validator
 Flask-Migrate
+flask_msearch
+whoosh
+flask-login
+cryptography

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}
+{% if title %} {{ title }} {% else %} Register {% endif %}
+{% endblock title %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+{% include '_messages.html' %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+      <h1 class="bg-info text-center">Register</h1>
+    </div>
+    <div class="col-md-2"></div>
+  </div>
+  <form action="" method="post">
+      {{ form.csrf_token }}
+    <div class="row">
+      <div class="col-md-2"></div>
+        <div class="col-md-4">
+            {{ render_field(form.name, class_="form-control", placeholder="Name") }}
+            {{ render_field(form.username, class_="form-control", placeholder="Username") }}
+            {{ render_field(form.email, class_="form-control", placeholder="Email") }}
+            {{ render_field(form.password, class_="form-control", placeholder="Password") }}
+            {{ render_field(form.confirm, class_="form-control", placeholder="Confirm Password") }}
+            {{ form.profile() }}
+        </div>
+        <div class="col-md-4">
+            {{ render_field(form.country, class_="form-control", placeholder="Country") }}
+            {{ render_field(form.city, class_="form-control", placeholder="City") }}
+            {{ render_field(form.contact, class_="form-control", placeholder="Contact") }}
+            {{ render_field(form.address, class_="form-control", placeholder="Address") }}
+            {{ render_field(form.zipcode, class_="form-control", placeholder="Zipcode") }}
+            {{ form.submit(class_="btn btn-info") }}
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+  </form>
+</div>
+
+
+{% endblock content %}
+

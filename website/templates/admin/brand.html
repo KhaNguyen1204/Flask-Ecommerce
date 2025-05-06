@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}
+{% if title %} {{ title }} {% else %} Brand or Category {% endif %}
+{% endblock title %}
 {% block content %}
 {% include '_messages.html' %}
 <div class="container">
@@ -14,10 +17,10 @@
               <a class="nav-link active" aria-current="page" href="/admin">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/admin">Brand</a>
+              <a class="nav-link" href="/brands">Brand</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/admin">Category</a>
+              <a class="nav-link" href="/categories">Category</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
