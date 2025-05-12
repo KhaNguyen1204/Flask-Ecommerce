@@ -7,3 +7,9 @@
     Lệnh khởi tạo: flask --app main db init
     Lệnh commit: flask --app main db migrate -m "Initial migration"
     Sửa: flask --app main db upgrade
+
+3. Để tạo pdf ngoài thư viện pdfkit còn phải cài đặt wkhtmltopdf
+- Tải wkhtmltopdf về máy tính thông qua đường link: https://wkhtmltopdf.org/downloads.html
+- Sau khi tải về, giải nén và copy đường dẫn đến thư mục bin
+- Sau đó đưa đường dẫn vào biến môi trường PATH
+- Kiểm tra: mở cmd gõ lệnh wkhtmltopdf --version

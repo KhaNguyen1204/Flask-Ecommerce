@@ -22,3 +22,4 @@ flask_msearch
 whoosh
 flask-login
 cryptography
+pdfkit
