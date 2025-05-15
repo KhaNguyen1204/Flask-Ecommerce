@@ -3,14 +3,6 @@ from website import app, db, bcrypt
 from .form import RegistrationForm, LoginForm
 from website.products.models import AddProduct, Brand, Category
 from .models import Admin
-# Trang chủ
-# @app.route('/')
-# def home():
-#     if 'email' not in session:
-#         flash('Please login to access this page.', 'danger')
-#         return redirect(url_for('login'))
-#     products = AddProduct.query.all()
-#     return render_template('admin/index.html', title='Admin Page', products=products)
 
 @app.route('/admin')
 def admin():
@@ -38,14 +30,11 @@ def categories():
 
 @app.route('/admin/register', methods=['GET', 'POST'])
 def register():
-    if 'email' not in session:
-        flash('Please login to access this page.', 'danger')
-        return redirect(url_for('login'))
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
-        user = Admin(username = form.username.data, email = form.email.data,
-                    password=hashed_password)
+        user = Admin(username=form.username.data, email=form.email.data,
+                     password=hashed_password)
         db.session.add(user)
         db.session.commit()
         flash(f'Welcome {form.username.data}! Thank you for registering.', 'success')
@@ -54,9 +43,6 @@ def register():
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def login():
-    if 'email' not in session:
-        flash('Please login to access this page.', 'danger')
-        return redirect(url_for('login'))
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         user = Admin.query.filter_by(email=form.email.data).first()
