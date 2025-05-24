@@ -1,61 +1,619 @@
 <!--Navbar Start-->
-<div class="contaiter">
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">Home</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/">All products</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Brands
-          </a>
-          <div class="dropdown-menu">
-            {% for brand in brands %}
-              <a class="dropdown-item" href="{{url_for('get_brand', id=brand.id)}}">{{brand.name}}</a>
-            {% endfor %}
-        </div>
-        </li>
+<style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css');
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Categories
-          </a>
-          <div class="dropdown-menu">
-            {% for category in categories %}
-              <a class="dropdown-item" href="{{url_for('get_categories', id=category.id)}}">{{category.name}}</a>
-            {% endfor %}
+    /* Modern Navbar Styling */
+    .custom-navbar {
+        background: linear-gradient(135deg, #ebf707 0%, #b6f5404f 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+        padding: 16px 0;
+        border-radius: 0 0 20px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .custom-navbar.scrolled {
+        padding: 12px 0;
+        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+    }
+    
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #ffffff;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 8px 20px;
+        border-radius: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .navbar-brand:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
+    }
+    
+    .navbar-brand i {
+        background: linear-gradient(45deg, #ff6b6b, #feca57);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 8px;
+        font-size: 1.6rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .nav-item {
+        margin: 0 8px;
+        position: relative;
+    }
+    
+    .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        padding: 12px 18px;
+        border-radius: 60px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+    }
+    
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: all 0.6s;
+    }
+    
+    .nav-link:hover::before {
+        left: 100%;
+    }
+    
+    .nav-link:hover, .nav-link:focus {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .nav-link.active {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
+    }
+    
+    .nav-link i {
+        margin-right: 6px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover i {
+        transform: scale(1.2) rotate(5deg);
+    }
+    
+    /* Dropdown styling */
+    .dropdown-menu {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        padding: 15px;
+        margin-top: 15px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        animation: dropdownSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: 220px;
+    }
+    
+    @keyframes dropdownSlide {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .dropdown-item {
+        padding: 12px 18px;
+        border-radius: 12px;
+        margin-bottom: 4px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: #4a5568;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+        background: rgba(102, 126, 234, 0.02);
+    }
+    
+    .dropdown-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: all 0.5s;
+    }
+    
+    .dropdown-item:hover::before {
+        left: 100%;
+    }
+    
+    .dropdown-item:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        color: #667eea;
+        transform: translateX(8px) scale(1.02);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Search bar styling */
+    .search-form {
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 60px;
+        padding: 4px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .search-form:hover {
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+    }
+    
+    .search-input {
+        border-radius: 60px;
+        padding: 12px 20px;
+        padding-right: 50px;
+        border: none;
+        background: transparent;
+        color: #ffffff;
+        font-weight: 500;
+        width: 280px;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .search-input:focus {
+        outline: none;
+        box-shadow: none;
+        background: rgba(255, 255, 255, 0.1);
+        width: 320px;
+    }
+    
+    .search-btn {
+        border-radius: 50px;
+        padding: 10px 15px;
+        background: linear-gradient(45deg, #ff6b6b, #feca57);
+        border: none;
+        color: white;
+        font-weight: 600;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+    
+    .search-btn:hover {
+        background: linear-gradient(45deg, #ff5252, #ffb300);
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+    }
+    
+    /* Cart item indicator */
+    .cart-link {
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        padding: 12px 20px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 60px;
+    }
+    
+    .cart-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.15);
+    }
+    
+    .cart-link i {
+        font-size: 1.2rem;
+        z-index: 1;
+        position: relative;
+    }
+    
+    .cart-counter {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        animation: cartBounce 2s infinite;
+        z-index: 2;
+    }
+    
+    @keyframes cartBounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-3px); }
+        60% { transform: translateY(-2px); }
+    }
+    
+    .cart-link:hover .cart-counter {
+        transform: scale(1.2);
+        background: linear-gradient(45deg, #ff5252, #ff7043);
+        animation: none;
+    }
+    
+    /* User authentication buttons */
+    .auth-link {
+        padding: 12px 20px;
+        font-weight: 600;
+        border-radius: 60px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-link.signin {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+    
+    .auth-link.signin:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+    }
+    
+    .auth-link.login {
+        color: #667eea;
+        background: linear-gradient(135deg, #ffffff, #f8f9ff);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+    
+    .auth-link.login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: all 0.6s;
+    }
+    
+    .auth-link.login:hover::before {
+        left: 100%;
+    }
+    
+    .auth-link.login:hover {
+        background: linear-gradient(135deg, #f0f2ff, #ffffff);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(255, 255, 255, 0.4);
+        color: #5a67d8;
+    }
+    
+    .auth-link.logout {
+        color: #ffffff;
+        background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+    }
+    
+    .auth-link.logout:hover {
+        background: linear-gradient(135deg, #ff5252, #ff7043);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
+    }
+    
+    .auth-link.username {
+        font-weight: 600;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+    
+    .auth-link.username:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 992px) {
+        .navbar-collapse {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-item {
+            margin: 8px 0;
+        }
+        
+        .dropdown-menu {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.98);
+        }
+        
+        .search-form {
+            margin: 15px 0;
+        }
+        
+        .search-input {
+            width: 100%;
+        }
+        
+        .search-input:focus {
+            width: 100%;
+        }
+    }
+    
+    /* Additional modern touches */
+    .navbar-toggler {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .navbar-toggler:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    
+    /* Hover effects for all interactive elements */
+    .nav-link, .dropdown-item, .auth-link, .cart-link {
+        cursor: pointer;
+    }
+    
+    /* Smooth transitions for all elements */
+    * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+</style>
+
+<div class="container-fluid px-0">
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-shop"></i>Thế giới di động
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-grid"></i>All Products
+                        </a>
+                    </li>
+                        <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-folder"></i>Brand
+                        </a>
+                        <div class="dropdown-menu">
+                            {% for brand in brands %}
+                                <a class="dropdown-item" href="{{url_for('get_brand', id=brand.id)}}">
+                                    <i class="bi bi-collection me-2"></i>{{brand.name}}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-folder"></i>Categories
+                        </a>
+                        <div class="dropdown-menu">
+                            {% for category in categories %}
+                                <a class="dropdown-item" href="{{url_for('get_categories', id=category.id)}}">
+                                    <i class="bi bi-collection me-2"></i>{{category.name}}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center ms-auto">
+                    <form class="search-form d-flex me-3" role="search" action="{{url_for('result')}}">
+                        <input class="form-control search-input" type="search" placeholder="Search products..." aria-label="Search" name="q">
+                        <button class="btn search-btn" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                    
+                    <div class="nav-item me-3">
+                        <a class="nav-link cart-link" href="{{url_for('getCart')}}">
+                            <i class="bi bi-cart3"></i>
+                            <span class="cart-counter">{{session['ShopCart']|length}}</span>
+                        </a>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <div class="nav-item me-2">
+                        <a class="nav-link auth-link username" href="#">
+                            <i class="bi bi-person-circle"></i>{{current_user.name}}
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link auth-link logout" href="{{url_for('customer_logout')}}">
+                            <i class="bi bi-box-arrow-right"></i>Logout
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="nav-item me-2">
+                        <a class="nav-link auth-link signin" href="{{url_for('customer_register')}}">
+                            <i class="bi bi-person-plus"></i>Sign Up
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link auth-link login" href="{{url_for('customer_login')}}">
+                            <i class="bi bi-box-arrow-in-right"></i>Login
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        </li>
-        {% if current_user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('customer_logout')}}">{{current_user.name}}</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('customer_logout')}}">Logout</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('customer_register')}}">Sign in</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('customer_login')}}">Login</a>
-        </li>
-        {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" href="{{url_for('getCart')}}">Cart ({{session['ShopCart']|length}})</a>
-        </li>
-      </ul>
-      <form class="d-flex" role="search" action="{{url_for('result')}}">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-</nav>
+    </nav>
 </div>
+
+<script>
+    // Add scrolled class to navbar when scrolling
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.custom-navbar');
+        if (window.scrollY > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+    
+    // Add active class to current page
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLocation = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === currentLocation) {
+                link.classList.add('active');
+            }
+        });
+    });
+    
+    // Enhanced dropdown interactions
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const dropdownToggle = dropdown.querySelector('.dropdown-toggle');
+        const dropdownMenu = dropdown.querySelector('.dropdown-menu');
+        let timeout;
+        
+        dropdown.addEventListener('mouseenter', function() {
+            if (window.innerWidth >= 992) {
+                clearTimeout(timeout);
+                dropdownMenu.classList.add('show');
+            }
+        });
+        
+        dropdown.addEventListener('mouseleave', function() {
+            if (window.innerWidth >= 992) {
+                timeout = setTimeout(() => {
+                    dropdownMenu.classList.remove('show');
+                }, 200);
+            }
+        });
+    });
+    
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Add loading animation to search
+    const searchForm = document.querySelector('.search-form');
+    const searchBtn = document.querySelector('.search-btn');
+    
+    searchForm.addEventListener('submit', function() {
+        const originalContent = searchBtn.innerHTML;
+        searchBtn.innerHTML = '<i class="bi bi-arrow-clockwise" style="animation: spin 1s linear infinite;"></i>';
+        
+        // Reset after a short delay (in case of quick navigation)
+        setTimeout(() => {
+            searchBtn.innerHTML = originalContent;
+        }, 2000);
+    });
+    
+    // Add CSS for spin animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+<!--Navbar End-->

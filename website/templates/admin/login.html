@@ -3,22 +3,249 @@
 {% if title %} {{ title }} {% else %} Login {% endif %}
 {% endblock title %}
 {% block content %}
-<div class="text-center h1 text-danger">LOGIN</div>
-<div class="container">
-    {% from "_formhelpers.html" import render_field %}
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-            {% include '_messages.html' %}
-    <form method="post" enctype="multipart/form-data">
-      <div>
-        {{ render_field(form.email, class="form-control") }}
-        {{ render_field(form.password, class="form-control") }}
-      </div>
-        <p><input type=submit value=Login class="btn btn-info"></p>
-    </form>
+{% from "_formhelpers.html" import render_field %}
+
+<!-- CSS cho animations -->
+<style>
+  /* Animation keyframes */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  /* Login card styling */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 40px 0;
+  }
+  
+  .login-card {
+    animation: fadeIn 0.8s ease-out;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 450px;
+    width: 100%;
+    border: none;
+  }
+  
+  .login-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 123, 255, 0.2);
+    transform: translateY(-5px);
+  }
+  
+  .login-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+    padding: 30px 20px;
+    text-align: center;
+    animation: fadeIn 0.6s ease-out 0.2s both;
+  }
+  
+  .login-title {
+    color: white;
+    margin: 0;
+    font-size: 2.2rem;
+    letter-spacing: 1px;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .login-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 10px;
+  }
+  
+  .login-body {
+    padding: 40px 30px;
+    background-color: #fff;
+    animation: slideInUp 0.7s ease-out 0.3s both;
+  }
+  
+  .form-control {
+    height: 50px;
+    font-size: 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+  }
+  
+  .form-control:focus {
+    border-color: #4c9be8;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    transform: translateY(-3px);
+  }
+  
+  .login-btn {
+    background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+    color: white;
+    border: none;
+    height: 50px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+  }
+  
+  .login-footer {
+    text-align: center;
+    margin-top: 25px;
+    animation: fadeIn 0.8s ease-out 0.8s both;
+  }
+  
+  .register-link {
+    color: #0d6efd;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .register-link:hover {
+    color: #0056b3;
+    transform: translateY(-2px);
+    display: inline-block;
+  }
+  
+  .input-icon {
+    position: relative;
+  }
+  
+  .input-icon i {
+    position: absolute;
+    left: 13px;
+    top: 17px;
+    color: #aaa;
+    transition: all 0.3s ease;
+  }
+  
+  .input-icon input {
+    padding-left: 40px;
+  }
+  
+  .input-icon input:focus + i {
+    color: #0d6efd;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .login-card {
+      margin: 0 15px;
+    }
+    
+    .login-body {
+      padding: 30px 20px;
+    }
+  }
+</style>
+
+<div class="container login-container">
+  <div class="card login-card">
+    <div class="login-header">
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Sign in to continue to your account</p>
     </div>
-        <div class="col-md-4"></div>
+    
+    <div class="login-body">
+      {% include '_messages.html' %}
+      
+      <form method="post" enctype="multipart/form-data">
+        <div class="input-icon">
+          {{ render_field(form.email, class="form-control", placeholder="Email Address") }}
+          <i class="fa fa-envelope"></i>
+        </div>
+        
+        <div class="input-icon">
+          {{ render_field(form.password, class="form-control", placeholder="Password") }}
+          <i class="fa fa-lock"></i>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember-me">
+            <label class="form-check-label" for="remember-me">Remember me</label>
+          </div>
+          <a href="#" class="register-link">Forgot Password?</a>
+        </div>
+        
+        <button type="submit" class="btn login-btn">LOGIN</button>
+        
+        <div class="login-footer">
+          <p>Don't have an account? <a href=""{{ url_for('register') }}"" class="register-link">Register Now</a></p>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
+
+<!-- JavaScript cho animations -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Hiệu ứng cho các field khi được focus
+    const formInputs = document.querySelectorAll('.form-control');
+    
+    formInputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.style.transform = 'translateY(-3px)';
+        this.style.boxShadow = '0 5px 15px rgba(0, 123, 255, 0.1)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+      });
+    });
+    
+    // Hiệu ứng cho button login
+    const loginBtn = document.querySelector('.login-btn');
+    if (loginBtn) {
+      loginBtn.addEventListener('mouseover', function() {
+        this.style.animation = 'pulse 0.8s ease-in-out infinite';
+      });
+      
+      loginBtn.addEventListener('mouseout', function() {
+        this.style.animation = 'none';
+      });
+    }
+    
+    // Thêm icon nếu chưa có FontAwesome
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      const iconPlaceholders = document.querySelectorAll('.input-icon i');
+      iconPlaceholders.forEach(icon => {
+        icon.style.display = 'none';
+      });
+      
+      const inputs = document.querySelectorAll('.input-icon input');
+      inputs.forEach(input => {
+        input.style.paddingLeft = '15px';
+      });
+    }
+  });
+</script>
 {% endblock content %}

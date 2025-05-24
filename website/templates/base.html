@@ -4,15 +4,624 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <title>{% block title %} My Shop {% endblock title %} </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #10b981;
+        --accent-color: #f59e0b;
+        --dark-color: #1e293b;
+        --light-bg: #f8fafc;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --elevated-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        scroll-behavior: smooth;
+      }
+      
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--light-bg);
+        display: flex;
+        flex-direction: column;
+        color: #334155;
+      }
+      
+      .content-wrapper {
+        flex: 1 0 auto;
+      }
+      
+      .brand-highlight {
+        color: var(--accent-color);
+        font-weight: 700;
+      }
+      
+      /* Navigation Cards */
+      .nav-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .nav-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--elevated-shadow);
+      }
+      
+      .nav-card::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary-color);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.3s ease;
+      }
+      
+      .nav-card:hover::before {
+        transform: scaleX(1);
+        transform-origin: left;
+      }
+      
+      .nav-card-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+      }
+      
+      /* Modern Footer */
+      .modern-footer {
+        background: var(--dark-color);
+        color: white;
+        position: relative;
+        padding: 3rem 0 1.5rem;
+        flex-shrink: 0;
+      }
+      
+      .modern-footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      }
+      
+      .footer-logo {
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      
+      .footer-logo i {
+        color: var(--accent-color);
+        margin-right: 8px;
+      }
+      
+      .social-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+      }
+      
+      .social-icon:hover {
+        background: var(--accent-color);
+        transform: translateY(-3px);
+      }
+      
+      .footer-link {
+        position: relative;
+        padding-bottom: 4px;
+        display: inline-block;
+        transition: color 0.2s ease;
+      }
+      
+      .footer-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--accent-color);
+        transition: width 0.3s ease;
+      }
+      
+      .footer-link:hover {
+        color: white !important;
+      }
+      
+      .footer-link:hover::after {
+        width: 100%;
+      }
+      
+      .contact-info i {
+        color: var(--accent-color);
+        margin-right: 8px;
+        font-size: 1rem;
+      }
+
+        /* Promo Banner Carousel */
+  .promo-banner {
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    color: white;
+    height: 0;
+    padding-bottom: 31.58%; /* 6/19 ≈ 31.58% */
+  }
+
+  .promo-banner-content {
+    position: absolute;
+    z-index: 2;
+    padding: 2rem;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .promo-banner-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .promo-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+      
+      /* Section Headings */
+      .section-heading {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+      }
+      
+      .section-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 50%;
+        height: 3px;
+        background: var(--accent-color);
+        border-radius: 3px;
+      }
+      
+      /* Newsletter Form */
+      .newsletter-input {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+      }
+      
+      .newsletter-input::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+      
+      .newsletter-btn {
+        background: var(--accent-color) !important;
+        border-color: var(--accent-color) !important;
+        transition: all 0.3s ease;
+      }
+      
+      .newsletter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Carousel Indicators */
+      .carousel-indicators [data-bs-target] {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin: 0 5px;
+        border: none;
+        background-color: rgba(255,255,255,0.5);
+      }
+      
+      .carousel-indicators .active {
+        background-color: var(--accent-color);
+      }
+      
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .promo-banner {
+          height: auto;
+        }
+        
+        .promo-banner-content {
+          padding: 1.5rem;
+        }
+        
+        .promo-banner-bg {
+          opacity: 0.4;
+        }
+        
+        .nav-card-icon {
+          width: 40px;
+          height: 40px;
+          margin-bottom: 0.75rem;
+        }
+        
+        .modern-footer {
+          padding: 2rem 0 1rem;
+        }
+      }
+    </style>
+    <title>{% block title %} <span class="brand-highlight">Thế giới di động</span> {% endblock title %}</title>
   </head>
   <body>
-  {% block content %}
+    <div class="content-wrapper">
+      <!-- Promotional Banner Carousel - Only on Homepage -->
+      {% if request.endpoint == 'home' or request.endpoint == 'index' %}
+      <section class="py-4">
+        <div class="container">
+          <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner rounded-3 overflow-hidden">
+                        <!-- Slide 1 -->
+          <div class="carousel-item active">
+            <div class="promo-banner" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));">
+              <div class="row h-100 align-items-center">
+                <div class="col-md-6">
+                  <div class="promo-banner-content">
+                    <a href="/" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">Mua ngay <i class="bi bi-arrow-right ms-2"></i></a>
+                  </div>
+                </div>
+                <div class="col-md-6 d-none d-md-block h-100">
+                  <img src="{{ url_for('static', filename='images/banner/banner0.png') }}" alt="iPhone Banner" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                </div>
+              </div>
+            </div>
+          </div>
 
-  {% endblock content %}
+          <!-- Slide 2 with s24edge.jpg -->
+          <div class="carousel-item">
+            <div class="promo-banner" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">
+              <div class="row h-100 align-items-center">
+                <div class="col-md-6">
+                  <div class="promo-banner-content">
+                    <a href="/products" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">View Deal <i class="bi bi-arrow-right ms-2"></i></a>
+                  </div>
+                </div>
+                <div class="col-md-6 d-none d-md-block h-100">
+                  <img src="{{ url_for('static', filename='images/banner/banner1.png') }}" alt="Samsung S24 Edge" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="carousel-item">
+            <div class="promo-banner" style="background: linear-gradient(135deg, #059669, #10b981);">
+              <div class="row h-100 align-items-center">
+                <div class="col-md-6">
+                  <div class="promo-banner-content">
+                    <a href="/" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">Learn More <i class="bi bi-arrow-right ms-2"></i></a>
+                  </div>
+                </div>
+                <div class="col-md-6 d-none d-md-block h-100">
+                  <img src="{{ url_for('static', filename='images/banner/banner2.png') }}" alt="MacBook Banner" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                </div>
+              </div>
+            </div>
+          </div>
+                        <!-- Slide 4 - New Banner -->
+              <div class="carousel-item">
+                <div class="promo-banner" style="background: linear-gradient(135deg, #d946ef, #a855f7);">
+                  <div class="row h-100 align-items-center">
+                    <div class="col-md-6">
+                      <div class="promo-banner-content">
+                        <a href="/products" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">Explore <i class="bi bi-arrow-right ms-2"></i></a>
+                      </div>
+                    </div>
+                    <div class="col-md-6 d-none d-md-block h-100">
+                      <img src="{{ url_for('static', filename='images/banner/banner3.png') }}" alt="iPhone 15 Banner" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Slide 5 - New Banner -->
+              <div class="carousel-item">
+                <div class="promo-banner" style="background: linear-gradient(135deg, #f97316, #f59e0b);">
+                  <div class="row h-100 align-items-center">
+                    <div class="col-md-6">
+                      <div class="promo-banner-content">
+                        <a href="/products" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">Buy Now <i class="bi bi-arrow-right ms-2"></i></a>
+                      </div>
+                    </div>
+                    <div class="col-md-6 d-none d-md-block h-100">
+                      <img src="{{ url_for('static', filename='images/banner/banner4.png') }}" alt="Oppo Banner" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Slide 6 - New Banner -->
+              <div class="carousel-item">
+                <div class="promo-banner" style="background: linear-gradient(135deg, #0ea5e9, #3b82f6);">
+                  <div class="row h-100 align-items-center">
+                    <div class="col-md-6">
+                      <div class="promo-banner-content">
+                        <a href="/products" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">Discover <i class="bi bi-arrow-right ms-2"></i></a>
+                      </div>
+                    </div>
+                    <div class="col-md-6 d-none d-md-block h-100">
+                      <img src="{{ url_for('static', filename='images/bannerbannerbanner5.png') }}" alt="OnePlus Banner" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Slide 7 - New Banner -->
+              <div class="carousel-item">
+                <div class="promo-banner" style="background: linear-gradient(135deg, #64748b, #475569);">
+                  <div class="row h-100 align-items-center">
+                    <div class="col-md-6">
+                      <div class="promo-banner-content">
+                        <a href="/products" class="btn btn-light btn-lg rounded-pill px-4 align-self-start">Shop All <i class="bi bi-arrow-right ms-2"></i></a>
+                      </div>
+                    </div>
+                    <div class="col-md-6 d-none d-md-block h-100">
+                      <img src="{{ url_for('static', filename='images/banner/banner6.png') }}" alt="Accessories Banner" class="h-100 w-100 object-fit-cover promo-banner-bg">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators position-relative mt-3">
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active"></button>
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1"></button>
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2"></button>
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="3"></button>
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="4"></button>
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="5"></button>
+              <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="6"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+      {% endif %}
+
+      {% block content %}
+        <!-- Quick Access Section -->
+        <section class="py-5">
+          <div class="container">
+            <h2 class="section-heading fw-bold">Quick Access</h2>
+            <div class="row g-4">
+              <div class="col-md-3 col-6">
+                <a href="/" class="text-decoration-none">
+                  <div class="nav-card bg-white p-4 h-100">
+                    <div class="nav-card-icon bg-primary bg-opacity-10 text-primary">
+                      <i class="bi bi-house-door-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2">Home</h5>
+                    <p class="text-muted small mb-0">Back to homepage</p>
+                  </div>
+                </a>
+              </div>
+              
+              <div class="col-md-3 col-6">
+                <a href="/products" class="text-decoration-none">
+                  <div class="nav-card bg-white p-4 h-100">
+                    <div class="nav-card-icon bg-success bg-opacity-10 text-success">
+                      <i class="bi bi-box-seam-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2">Products</h5>
+                    <p class="text-muted small mb-0">Browse our collection</p>
+                  </div>
+                </a>
+              </div>
+              
+              <div class="col-md-3 col-6">
+                <a href="/about" class="text-decoration-none">
+                  <div class="nav-card bg-white p-4 h-100">
+                    <div class="nav-card-icon bg-info bg-opacity-10 text-info">
+                      <i class="bi bi-info-circle-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2">About Us</h5>
+                    <p class="text-muted small mb-0">Our story and mission</p>
+                  </div>
+                </a>
+              </div>
+              
+              <div class="col-md-3 col-6">
+                <a href="/contact" class="text-decoration-none">
+                  <div class="nav-card bg-white p-4 h-100">
+                    <div class="nav-card-icon bg-warning bg-opacity-10 text-warning">
+                      <i class="bi bi-headset fs-4"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2">Contact</h5>
+                    <p class="text-muted small mb-0">Get in touch with us</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      {% endblock content %}
+    </div>
+
+    <!-- Modern Footer -->
+    <footer class="modern-footer">
+      <div class="container">
+        <div class="row g-4">
+          <!-- Brand Column -->
+          <div class="col-lg-4 col-md-6">
+            <div class="footer-logo">
+              <i class="bi bi-shop"></i>
+              <span>Thế giới di động</span>
+            </div>
+<p class="text-white-80 mb-4">
+  Chuyên cung cấp điện thoại thông minh mới nhất, giá cả cạnh tranh và bảo hành uy tín.<br>
+  Trải nghiệm mua sắm an tâm với dịch vụ hỗ trợ tận tình.<br><br>
+  🛡️ <strong>Cam kết chất lượng</strong><br>
+  ✔️ 100% hàng chính hãng<br>
+  ✔️ Bảo hành minh bạch
+</p>
+
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <i class="bi bi-shield-check text-accent fs-5"></i>
+              </div>
+              <div>
+                <h6 class="text-white mb-1">Authentic Products</h6>
+                <p class="text-white-80 small mb-0">100% genuine with manufacturer warranty</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Links Column -->
+          <div class="col-lg-2 col-md-6">
+            <h5 class="text-white fs-5 mb-3">Quick Links</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Home</a></li>
+              <li class="mb-2"><a href="/products" class="text-white-80 footer-link text-decoration-none">Products</a></li>
+              <li class="mb-2"><a href="/about" class="text-white-80 footer-link text-decoration-none">About Us</a></li>
+              <li class="mb-2"><a href="/contact" class="text-white-80 footer-link text-decoration-none">Contact</a></li>
+              <li class="mb-2"><a href="#" class="text-white-80 footer-link text-decoration-none">FAQ</a></li>
+            </ul>
+          </div>
+
+          <!-- Contact Column -->
+          <div class="col-lg-3 col-md-6">
+            <h5 class="text-white fs-5 mb-3">Contact Info</h5>
+            <div class="contact-info">
+              <div class="d-flex mb-3">
+                <i class="bi bi-geo-alt-fill"></i>
+                <div>
+                  <h6 class="text-white mb-0">Our Location</h6>
+                  <p class="text-white-80 small mb-0">123 Tech Street, District 9, HCMC</p>
+                </div>
+              </div>
+              <div class="d-flex mb-3">
+                <i class="bi bi-envelope-fill"></i>
+                <div>
+                  <h6 class="text-white mb-0">Email Us</h6>
+                  <p class="text-white-80 small mb-0">contact@tgdd.com</p>
+                </div>
+              </div>
+              <div class="d-flex">
+                <i class="bi bi-telephone-fill"></i>
+                <div>
+                  <h6 class="text-white mb-0">Call Us</h6>
+                  <p class="text-white-80 small mb-0">+84 123 456 789</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Newsletter Column -->
+          <div class="col-lg-3 col-md-6">
+            <h5 class="text-white fs-5 mb-3">Newsletter</h5>
+            <p class="text-white-80 mb-3">Hãy để lại email để nhận thông báo sớm nhất về khuyến mãi, sản phẩm mới và ưu đãi dành riêng cho bạn.</p>
+            <form class="mb-4">
+              <div class="input-group mb-3">
+                <input type="email" class="form-control newsletter-input rounded-start" placeholder="Your email" required>
+                <button class="btn newsletter-btn rounded-end" type="submit">
+                  <i class="bi bi-send-fill"></i>
+                </button>
+              </div>
+            </form>
+            <h5 class="text-white fs-5 mb-3">Follow Us</h5>
+            <div class="social-links">
+              <a href="https://www.facebook.com/duy.luongvan.204" class="social-icon me-2 text-white">
+                <i class="bi bi-facebook"></i>
+              </a>
+              <a href="https://x.com/X." class="social-icon me-2 text-white">
+                <i class="bi bi-twitter"></i>
+              </a>
+              <a href="https://www.instagram.com/duy.luongvan.204/" class="social-icon me-2 text-white">
+                <i class="bi bi-instagram"></i>
+              </a>
+              <a href="https://www.youtube.com/" class="social-icon me-2 text-white">
+                <i class="bi bi-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div class="text-center pt-4 mt-4 border-top border-secondary">
+          <p class="text-white-70 mb-0">&copy; 2025 <span class="text-accent">AZPhone</span>. Luôn đồng hành cùng bạn trên từng bước công nghệ.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
     <script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/popper.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Initialize carousel with 3 second interval
+      document.addEventListener('DOMContentLoaded', function() {
+        const promoCarousel = document.getElementById('promoCarousel');
+        if (promoCarousel) {
+          const carousel = new bootstrap.Carousel(promoCarousel, {
+            interval: 3000, //
+            wrap: true,
+            pause: 'hover'
+          });
+        }
+
+        // Animation for elements when they come into view
+        const animateOnScroll = function() {
+          const elements = document.querySelectorAll('.nav-card, .carousel-item');
+          
+          elements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
+            
+            if (elementPosition < windowHeight - 100) {
+              element.classList.add('animate__animated', 'animate__fadeIn');
+            }
+          });
+        };
+        
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll();
+      });
+    </script>
   </body>
 </html>

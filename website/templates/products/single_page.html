@@ -2,61 +2,578 @@
 {% block content %}
 {% include 'navbar.html' %}
 
-<!--Navbar End-->
-<div class="container">
+<style>
+    /* Glowing gradient background */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #f8f9fa 100%);
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    body::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,111,97,0.08) 0%, rgba(255,255,255,0) 70%);
+        z-index: -1;
+        animation: float 15s infinite alternate ease-in-out;
+    }
+    
+    @keyframes float {
+        0% { transform: translate(0, 0); }
+        50% { transform: translate(5%, 5%); }
+        100% { transform: translate(-5%, -5%); }
+    }
+    
+    /* Main container with glass morphism effect */
+    .product-container {
+        margin: 50px auto;
+        max-width: 1200px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 25px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        padding: 40px;
+        border: 1px solid rgba(255,255,255,0.2);
+        transform: translateY(20px);
+        opacity: 0;
+        animation: fadeInUp 0.8s 0.3s forwards;
+    }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Product image with floating effect */
+    #b_image {
+        position: relative;
+        perspective: 1500px;
+        transform-style: preserve-3d;
+    }
+    
+    #b_image img {
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        transform: rotateY(-5deg) rotateX(2deg);
+        animation: floatImage 8s infinite alternate ease-in-out;
+    }
+    
+    @keyframes floatImage {
+        0% { transform: rotateY(-5deg) rotateX(2deg) translateY(0); }
+        50% { transform: rotateY(-8deg) rotateX(4deg) translateY(-15px); }
+        100% { transform: rotateY(-2deg) rotateX(0deg) translateY(0); }
+    }
+    
+    #b_image img:hover {
+        transform: rotateY(0deg) rotateX(0deg) scale(1.03);
+        box-shadow: 0 30px 60px -10px rgba(255,111,97,0.4);
+    }
+    
+    /* Product info section with animated elements */
+    .product-info {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .product-info::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: linear-gradient(to bottom, #ff6f61, #ffcc5c);
+        border-radius: 3px;
+    }
+    
+    .product-info h4 {
+        font-weight: 800;
+        color: #2b2d42;
+        margin-bottom: 20px;
+        font-size: 2.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(45deg, #ff6f61, #ff3b2e);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        position: relative;
+        display: inline-block;
+        transform: translateX(-20px);
+        opacity: 0;
+        animation: slideIn 0.6s 0.5s forwards;
+    }
+    
+    @keyframes slideIn {
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .product-info .price-tag {
+        display: inline-block;
+        background: linear-gradient(45deg, #ff6f61, #ff3b2e);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.5rem;
+        box-shadow: 0 10px 20px rgba(255,111,97,0.3);
+        transform: scale(0);
+        animation: popIn 0.6s 0.8s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin-bottom: 20px;
+    }
+    
+    @keyframes popIn {
+        to {
+            transform: scale(1);
+        }
+    }
+    
+    .product-info .discount-badge {
+        display: inline-block;
+        background: #28a745;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-left: 15px;
+        position: relative;
+        top: -5px;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    .product-info .description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #4a4a4a;
+        margin-bottom: 30px;
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .product-info .description::before {
+        content: '»';
+        position: absolute;
+        left: 0;
+        color: #ff6f61;
+        font-size: 1.5rem;
+    }
+    
+    /* Form elements with modern styling */
+    .add-to-cart-form {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.05);
+        transform: translateY(20px);
+        opacity: 0;
+        animation: fadeInUp 0.6s 1s forwards;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #5a5a5a;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.8);
+    }
+    
+    .form-control:focus {
+        border-color: #ff6f61;
+        box-shadow: 0 0 0 3px rgba(255,111,97,0.2);
+        outline: none;
+    }
+    
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        background: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+        width: fit-content;
+    }
+    
+    .quantity-selector button {
+        background: #e9ecef;
+        border: none;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-selector button:hover {
+        background: #dee2e6;
+    }
+    
+    .quantity-selector input {
+        width: 60px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    /* Add to cart button with pulse animation */
+    .add-to-cart-btn {
+        background: linear-gradient(45deg, #ff6f61, #ff3b2e);
+        border: none;
+        padding: 15px 30px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(255,111,97,0.3);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255,111,97,0.7); }
+        70% { box-shadow: 0 0 0 15px rgba(255,111,97,0); }
+        100% { box-shadow: 0 0 0 0 rgba(255,111,97,0); }
+    }
+    
+    .add-to-cart-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255,111,97,0.4);
+        animation: none;
+    }
+    
+    .add-to-cart-btn:active {
+        transform: translateY(1px);
+    }
+    
+    .add-to-cart-btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255,255,255,0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+    
+    .add-to-cart-btn:focus:not(:active)::after {
+        animation: ripple 1s ease-out;
+    }
+    
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 0.5;
+        }
+        100% {
+            transform: scale(20, 20);
+            opacity: 0;
+        }
+    }
+    
+    /* Thumbnail images with hover effect */
+    #s_image {
+        margin-top: 40px;
+        position: relative;
+    }
+    
+    #s_image::before {
+        content: 'VIEW MORE ANGLES';
+        position: absolute;
+        top: -25px;
+        left: 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        letter-spacing: 1px;
+    }
+    
+    #s_image .thumbnail-container {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255,255,255,0.7);
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+    
+    #s_image .thumbnail-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    #s_image img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        scroll-snap-align: start;
+        flex-shrink: 0;
+        border: 3px solid transparent;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    #s_image img:hover {
+        transform: scale(1.1) rotate(2deg);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    #s_image img.active {
+        border-color: #8661ff;
+        box-shadow: 0 10px 25px rgba(255,111,97,0.5);
+        transform: scale(1.15);
+    }
+    
+    /* Floating decorative elements */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        background: rgba(255,111,97,0.1);
+        border-radius: 50%;
+        animation: floatAround 15s infinite linear;
+    }
+    
+    @keyframes floatAround {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(50px, 50px) rotate(90deg); }
+        50% { transform: translate(100px, 0) rotate(180deg); }
+        75% { transform: translate(50px, -50px) rotate(270deg); }
+        100% { transform: translate(0, 0) rotate(360deg); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .product-container {
+            padding: 20px;
+        }
+        
+        .product-info {
+            padding-left: 0;
+            margin-top: 30px;
+        }
+        
+        .product-info::before {
+            display: none;
+        }
+        
+        #b_image img {
+            height: 350px;
+        }
+    }
+</style>
+
+<div class="floating-elements">
+    <div class="floating-element" style="width: 100px; height: 100px; top: 10%; left: 5%;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+    <div class="floating-element" style="width: 60px; height: 60px; top: 30%; left: 90%; animation-delay: -10s;"></div>
+</div>
+
+<div class="container product-container">
     <div class="row">
         <div class="col-md-6" id="b_image">
-            <img src="{{url_for('static', filename='images/' + product.image_1)}}" alt="{{product.name}}" class="img-fluid" style="height: 500px; width: 500px" alt="{{product.name}}">
+            <img src="{{ url_for('static', filename='images/' + product.image_1) }}" alt="{{ product.name }}" class="img-fluid" />
         </div>
 
-        <div class="col-md-6">
-            <h4>Product name: {{product.name}}</h4>
-            <hr>
-            <p>Product price: {{product.price}}$</p>
-            {% if product.discount > 0 %}
-                <p>Product discount: {{product.discount}}%</p>
-            {% endif %}
-            <hr>
-            <b>Product description</b>
-            <p>{{product.description|truncate(1024)}}</p>
-            <form action="{{url_for('AddCart')}}" method="post">
-                <input type="hidden" name="product_id" value="{{product.id}}">
-                <button type="submit" class="btn btn-warning">Add to Cart</button>
-                <label for="">Quantity: </label>
-                <input type="number" name="quantity" value="1" min="1" max="{{product.stock}}">
-                {% set colors = product.colors.split(',') %}
-                <label for="colors">Colors: </label>
-                <select name="colors" id="">
-                    {% for color in colors %}
-                        {% set col = color.split(':') %}
-                        <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
-                    {% endfor %}
-                </select>
+        <div class="col-md-6 product-info">
+            <h4>{{ product.name }}</h4>
+            
+            <div class="price-tag">
+                {{ product.price }}$
+                {% if product.discount > 0 %}
+                    <span class="discount-badge">{{ product.discount }}% OFF</span>
+                {% endif %}
+            </div>
+            
+            <p class="description">{{ product.description|truncate(1024) }}</p>
+
+            <form action="{{ url_for('AddCart') }}" method="post" class="add-to-cart-form">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                
+                <div class="form-group">
+                    <label for="quantity">QUANTITY</label>
+                    <div class="quantity-selector">
+                        <button type="button" class="decrement-btn">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}" readonly>
+                        <button type="button" class="increment-btn">+</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="colors">COLOR</label>
+                    {% set colors = product.colors.split(',') %}
+                    <select name="colors" id="colors" class="form-control">
+                        {% for color in colors %}
+                            {% set col = color.split(':') %}
+                            <option value="{{ col[0] }}">{{ col[0]|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="add-to-cart-btn">ADD TO CART</button>
             </form>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12 mt-3" id="s_image">
-            <hr>
-            <img src="{{url_for('static', filename='images/' + product.image_1)}}" alt="{{product.name}}" class="p-3" style="height: 120px; width: 120px" alt="{{product.name}}">
-            <img src="{{url_for('static', filename='images/' + product.image_2)}}" alt="{{product.name}}" class="p-3" style="height: 120px; width: 120px" alt="{{product.name}}">
-            <img src="{{url_for('static', filename='images/' + product.image_3)}}" alt="{{product.name}}" class="p-3" style="height: 120px; width: 120px" alt="{{product.name}}">
+    <div class="row" id="s_image">
+        <div class="col-12">
+            <div class="thumbnail-container">
+                <img src="{{ url_for('static', filename='images/' + product.image_1) }}" alt="{{ product.name }}" class="active" />
+                {% if product.image_2 %}
+                    <img src="{{ url_for('static', filename='images/' + product.image_2) }}" alt="{{ product.name }}"class="active" />
+                {% endif %}
+                {% if product.image_3 %}
+                    <img src="{{ url_for('static', filename='images/' + product.image_3) }}" alt="{{ product.name }}"class="active" />
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    var b_image = document.getElementById('b_image');
-    var s_image = document.getElementById('s_image').getElementsByTagName('img')
-    for (var i = 0; i < s_image.length; i++)
-    {
-        s_image[i].addEventListener('click', full_image);
+    // Thumbnail image click handler
+    const b_image = document.getElementById('b_image');
+    const s_images = document.querySelectorAll('#s_image img');
+    const mainImage = b_image.querySelector('img');
+
+    s_images.forEach(img => {
+        img.addEventListener('click', function() {
+            // Animate the main image change
+            mainImage.style.opacity = '0';
+            mainImage.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                mainImage.src = this.src;
+                mainImage.style.opacity = '1';
+                mainImage.style.transform = 'scale(1)';
+            }, 300);
+            
+            // Update active thumbnail
+            s_images.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Add a subtle bounce effect to the clicked thumbnail
+            this.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1.15)';
+            }, 300);
+        });
+    });
+
+    // Quantity selector buttons
+    const quantityInput = document.querySelector('.quantity-selector input');
+    const incrementBtn = document.querySelector('.increment-btn');
+    const decrementBtn = document.querySelector('.decrement-btn');
+    
+    incrementBtn.addEventListener('click', () => {
+        let value = parseInt(quantityInput.value);
+        if (value < parseInt(quantityInput.max)) {
+            quantityInput.value = value + 1;
+            animateButton(incrementBtn);
+        }
+    });
+    
+    decrementBtn.addEventListener('click', () => {
+        let value = parseInt(quantityInput.value);
+        if (value > parseInt(quantityInput.min)) {
+            quantityInput.value = value - 1;
+            animateButton(decrementBtn);
+        }
+    });
+    
+    function animateButton(btn) {
+        btn.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            btn.style.transform = 'scale(1)';
+        }, 200);
     }
-    function full_image()
-    {
-        var ImageSRC = this.getAttribute('src');
-        b_image.innerHTML = "<img src="+ ImageSRC +" width='500px' height='500px' alt='{{product.name}}' class='img-fluid'>";
+
+    // Add floating particles
+    const floatingContainer = document.querySelector('.floating-elements');
+    for (let i = 0; i < 5; i++) {
+        const element = document.createElement('div');
+        element.classList.add('floating-element');
+        const size = Math.random() * 80 + 20;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        element.style.top = `${Math.random() * 100}%`;
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.animationDelay = `-${Math.random() * 15}s`;
+        element.style.animationDuration = `${Math.random() * 10 + 10}s`;
+        floatingContainer.appendChild(element);
     }
+
+    // Add hover effect to main image
+    mainImage.addEventListener('mouseenter', () => {
+        mainImage.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1.03)';
+        mainImage.style.boxShadow = '0 30px 60px -10px rgba(255,111,97,0.4)';
+    });
+
+    mainImage.addEventListener('mouseleave', () => {
+        mainImage.style.transform = 'rotateY(-5deg) rotateX(2deg)';
+        mainImage.style.boxShadow = '0 25px 50px -12px rgba(0,0,0,0.25)';
+    });
 </script>
+
 {% endblock content %}

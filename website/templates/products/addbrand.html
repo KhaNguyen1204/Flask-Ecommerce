@@ -1,29 +1,346 @@
 {% extends 'base.html' %}
 {% block title %}
-{% if title %} {{ title }} {% else %} Add Brand or Category {% endif %}
+  {% if title %} {{ title }} {% else %} Thêm Thương Hiệu/Danh Mục {% endif %}
 {% endblock title %}
 {% block content %}
 {% include '_messages.html' %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-8">
-            {% if brands %}
-            <h1 class="text-center mt-5">Add a Brand</h1>
-            <form action="" method="POST">
-                <input type="text" name="brand" placeholder="Brand Name" class="form-control">
-                <input type="submit" value="Add brand" class="btn btn-info mt-2">
-        </form>
-            {% else %}
-            <h1 class="text-center mt-5">Add a category</h1>
-            <form action="" method="POST">
-                <input type="text" name="category" placeholder="Category Name" class="form-control">
-                <input type="submit" value="Add Category" class="btn btn-info mt-2">
-        </form>
-            {% endif %}
+
+<style>
+    /* Improved overall styling */
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        position: relative;
+        overflow-x: hidden;
+        font-family: 'Roboto', sans-serif;
+    }
+    
+    /* Enhanced background effects */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        background: rgba(23, 162, 184, 0.08);
+        border-radius: 50%;
+        animation: floatAround 20s infinite linear;
+    }
+    
+    @keyframes floatAround {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(50px, 100px) rotate(120deg); }
+        66% { transform: translate(100px, 30px) rotate(240deg); }
+        100% { transform: translate(0, 0) rotate(360deg); }
+    }
+    
+    /* Main container with improved animation */
+    .add-container {
+        margin-top: 80px;
+        margin-bottom: 80px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s 0.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+    
+    @keyframes fadeInUp {
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Enhanced card styling */
+    .add-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 40px;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .add-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(to right, #17a2b8, #138496, #17a2b8);
+        background-size: 200% 100%;
+        animation: gradientMove 3s infinite linear;
+    }
+    
+    @keyframes gradientMove {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 200% 0%; }
+    }
+    
+    .add-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+    
+    /* Improved title styling */
+    .add-title {
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2b2d42;
+        position: relative;
+        padding-bottom: 15px;
+        font-size: 1.8rem;
+    }
+    
+    .add-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(to right, #17a2b8, #138496);
+        border-radius: 2px;
+    }
+    
+    /* Enhanced form elements */
+    .form-input {
+        background: rgba(255,255,255,0.9);
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    }
+    
+    .form-input:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+        outline: none;
+        transform: translateY(-2px);
+    }
+    
+    .input-container {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input-icon {
+        padding-left: 45px;
+    }
+    
+    /* Enhanced submit button */
+    .btn-submit {
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        border: none;
+        padding: 14px 30px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(23, 162, 184, 0.3);
+        transition: all 0.3s ease;
+        color: white;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-submit::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: all 0.6s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(23, 162, 184, 0.4);
+        background: linear-gradient(45deg, #138496, #17a2b8);
+    }
+    
+    .btn-submit:hover::before {
+        left: 100%;
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+        box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+    }
+    
+    /* Card subtle background pattern */
+    .pattern {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(rgba(23, 162, 184, 0.1) 2px, transparent 2px);
+        background-size: 30px 30px;
+        opacity: 0.3;
+        pointer-events: none;
+    }
+    
+    /* Improved responsive styling */
+    @media (max-width: 768px) {
+        .add-container {
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+        
+        .add-card {
+            padding: 30px 25px;
+        }
+        
+        .add-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="floating-elements">
+    <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+    <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
+    <div class="floating-element" style="width: 120px; height: 120px; top: 15%; left: 75%; animation-delay: -7s;"></div>
+    <div class="floating-element" style="width: 80px; height: 80px; top: 60%; left: 5%; animation-delay: -12s;"></div>
+</div>
+
+<div class="container add-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="add-card">
+                <div class="pattern"></div>
+                {% if brands %}
+                <h1 class="add-title">THÊM THƯƠNG HIỆU MỚI</h1>
+                <form action="" method="POST">
+                    <div class="input-container">
+                        <i class="bi bi-briefcase input-icon"></i>
+                        <input type="text" 
+                               name="brand" 
+                               class="form-input form-input-icon" 
+                               placeholder="Nhập tên thương hiệu"
+                               required>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-plus-circle me-2"></i> THÊM THƯƠNG HIỆU
+                    </button>
+                </form>
+                {% else %}
+                <h1 class="add-title">THÊM DANH MỤC MỚI</h1>
+                <form action="" method="POST">
+                    <div class="input-container">
+                        <i class="bi bi-folder-plus input-icon"></i>
+                        <input type="text" 
+                               name="category" 
+                               class="form-input form-input-icon" 
+                               placeholder="Nhập tên danh mục"
+                               required>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-plus-circle me-2"></i> THÊM DANH MỤC
+                    </button>
+                </form>
+                {% endif %}
+            </div>
         </div>
-        <div class="col-md-3"></div>
     </div>
 </div>
+
+<script>
+    // Enhanced floating elements
+    const floatingContainer = document.querySelector('.floating-elements');
+    for (let i = 0; i < 5; i++) {
+        const element = document.createElement('div');
+        element.classList.add('floating-element');
+        const size = Math.random() * 80 + 20;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        element.style.top = `${Math.random() * 100}%`;
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.animationDelay = `-${Math.random() * 15}s`;
+        element.style.animationDuration = `${Math.random() * 10 + 15}s`;
+        floatingContainer.appendChild(element);
+    }
+
+    // Enhanced input field interactions
+    const formInputs = document.querySelectorAll('.form-input');
+    formInputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.borderColor = '#17a2b8';
+            const iconParent = this.parentElement;
+            const icon = iconParent.querySelector('.input-icon');
+            if (icon) {
+                icon.style.color = '#17a2b8';
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.style.borderColor = '#e9ecef';
+                const iconParent = this.parentElement;
+                const icon = iconParent.querySelector('.input-icon');
+                if (icon) {
+                    icon.style.color = '#adb5bd';
+                }
+            }
+        });
+    });
+    
+    // Button ripple effect
+    const buttons = document.querySelectorAll('.btn-submit');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            const btnRect = this.getBoundingClientRect();
+            this.style.setProperty('--x', '0%');
+            this.style.setProperty('--y', '0%');
+        });
+    });
+
+    // Card subtle animation
+    const card = document.querySelector('.add-card');
+    if (card) {
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            
+            this.style.transform = `translateY(-5px) perspective(1000px) rotateX(${(y - 0.5) * 2}deg) rotateY(${(x - 0.5) * -2}deg)`;
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+    }
+</script>
 
 {% endblock content %}

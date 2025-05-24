@@ -2,20 +2,108 @@
 {% block title %}
 {% if title %} {{ title }} {% else %} Register {% endif %}
 {% endblock title %}
+
 {% block content %}
-<div class="text-center h1 text-danger">REGISTER</div>
-<div class="container">
-    {% include '_messages.html' %}
-    {% from "_formhelpers.html" import render_field %}
-    <form method="post" enctype="multipart/form-data">
-      <dl>
-        {{ render_field(form.username, class_="form-control") }}
-        {{ render_field(form.email) }}
-        {{ render_field(form.password) }}
-        {{ render_field(form.confirm) }}
-          <input type="file" name="photo" >
-      </dl>
-        <p><input type=submit value=Register class="btn btn-info"></p>
-</form>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg border-0 rounded-lg animate__animated animate__fadeIn">
+        <div class="card-header bg-primary text-white text-center py-4">
+          <h2 class="mb-0">REGISTER</h2>
+        </div>
+        <div class="card-body">
+          {% include '_messages.html' %}
+          {% from "_formhelpers.html" import render_field %}
+          
+          <form method="post" enctype="multipart/form-data" class="animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="mb-3">
+              {{ render_field(form.username, class_="form-control rounded-pill border-primary") }}
+            </div>
+            
+            <div class="mb-3">
+              {{ render_field(form.email, class_="form-control rounded-pill border-primary") }}
+            </div>
+            
+            <div class="mb-3">
+              {{ render_field(form.password, class_="form-control rounded-pill border-primary") }}
+            </div>
+            
+            <div class="mb-3">
+              {{ render_field(form.confirm, class_="form-control rounded-pill border-primary") }}
+            </div>
+            
+            <div class="mb-4">
+              <label for="photo" class="form-label text-primary">Profile Photo</label>
+              <div class="input-group">
+                <input type="file" name="photo" id="photo" class="form-control border-primary">
+              </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg rounded-pill animate__animated animate__pulse animate__infinite animate__slower">
+                Register
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card-footer text-center py-3 bg-light">
+          <div class="small">
+            <a href="{{ url_for('login') }}" class="text-primary">Have an account? Sign in!</a>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Add Animate.css for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<!-- Custom styles -->
+<style>
+  .card {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 123, 255, 0.2) !important;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%) !important;
+  }
+  
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+  }
+  
+  /* Input field animations */
+  .form-control {
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus {
+    transform: translateY(-2px);
+  }
+  
+  /* Add a subtle blue glow to the form on hover */
+  form:hover {
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.1);
+  }
+</style>
 {% endblock content %}

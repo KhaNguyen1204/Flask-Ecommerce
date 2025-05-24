@@ -1,66 +1,407 @@
 {% extends "base.html" %}
-{% block title %}My Cart{% endblock title %}
+{% block title %}Giỏ Hàng Của Tôi{% endblock title %}
+{% block content %}
+
 {% include 'navbar.html' %}
 {% include '_messages.html' %}
-{% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-        <table class="table table-sm">
+
+<style>
+    /* Phong cách tổng thể */
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* Hiệu ứng nền */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        background: rgba(13, 110, 253, 0.08);
+        border-radius: 50%;
+        animation: floatAround 20s infinite linear;
+    }
+    
+    @keyframes floatAround {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(100px, 50px) rotate(360deg); }
+    }
+    
+    /* Container chính */
+    .cart-container {
+        margin: 80px auto;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s 0.3s forwards;
+    }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Tiêu đề */
+    .cart-title {
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-align: center;
+        margin-bottom: 40px;
+        color: #0d6efd;
+        text-shadow: 0 2px 5px rgba(13, 110, 253, 0.1);
+        position: relative;
+    }
+    
+    .cart-title i {
+        font-size: 1.8rem;
+        margin-right: 15px;
+        vertical-align: middle;
+        transition: transform 0.3s ease;
+    }
+    
+    /* Bảng giỏ hàng */
+    .cart-table {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    
+    .cart-table:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+    
+    .cart-table thead {
+        background: linear-gradient(45deg, #0d6efd, #0b5ed7);
+        color: white;
+    }
+    
+    .cart-table th {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 15px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    .cart-table td {
+        padding: 12px;
+        vertical-align: middle;
+        transition: background-color 0.3s ease;
+    }
+    
+    .cart-table tbody tr:hover td {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    
+    /* Hình ảnh sản phẩm */
+    .product-image {
+        width: 80px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .product-image:hover {
+        transform: scale(1.1);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    /* Các nút điều khiển */
+    .btn-action {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-update {
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        border: 1px solid rgba(13, 110, 253, 0.3);
+    }
+    
+    .btn-update:hover {
+        background: rgba(13, 110, 253, 0.2);
+        transform: rotate(90deg);
+    }
+    
+    .btn-delete {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-delete:hover {
+        background: rgba(220, 53, 69, 0.2);
+        transform: scale(1.1);
+    }
+    
+    .btn-clear {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-clear:hover {
+        background: rgba(220, 53, 69, 0.2);
+        transform: scale(1.1);
+    }
+    
+    /* Nút đặt hàng */
+    .btn-order {
+        background: linear-gradient(45deg, #198754, #157347);
+        border: none;
+        padding: 12px 25px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+        transition: all 0.3s ease;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .btn-order:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(25, 135, 84, 0.4);
+        background: linear-gradient(45deg, #157347, #198754);
+    }
+    
+    .btn-order i {
+        margin-right: 10px;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-order:hover i {
+        transform: scale(1.2);
+    }
+    
+    /* Input số lượng */
+    .quantity-input {
+        width: 70px;
+        text-align: center;
+        padding: 8px;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+        outline: none;
+    }
+    
+    /* Select màu sắc */
+    .color-select {
+        padding: 8px;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .color-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+        outline: none;
+    }
+    
+    /* Dòng tổng kết */
+    .summary-row {
+        background: rgba(248, 249, 250, 0.9) !important;
+        font-weight: 600;
+    }
+    
+    .summary-row td {
+        padding: 15px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .cart-container {
+            margin: 40px auto;
+        }
+        
+        .cart-table th, .cart-table td {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .product-image {
+            width: 60px;
+            height: 50px;
+        }
+    }
+</style>
+
+<div class="floating-elements">
+    <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+    <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
+</div>
+
+<div class="container cart-container">
+    <h2 class="cart-title">
+        <i class="bi bi-cart-fill"></i>GIỎ HÀNG CỦA TÔI
+    </h2>
+
+    <div class="cart-table">
+        <table class="table table-hover align-middle">
             <thead>
-                <th>Sr</th>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Color</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Discount</th>
-                <th>Subtotal</th>
-                <th>Update</th>
-                <th>Delete</th>
+                <tr>
+                    <th>#</th>
+                    <th>Hình Ảnh</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Màu Sắc</th>
+                    <th>Giá</th>
+                    <th>Số Lượng</th>
+                    <th>Giảm Giá</th>
+                    <th>Tổng</th>
+                    <th>Cập Nhật</th>
+                    <th>Xóa</th>
+                </tr>
             </thead>
             <tbody>
                 {% for key, product in session['ShopCart'].items() %}
-                {% set discount = "%0.2f"|format((product.discount/100) * product.price|float) %}
-                <tr>
-                    <td>{{loop.index}}</td>
-                    <td><img src="{{url_for('static', filename='images/' + product.image)}}" alt="{{product.name}}" width="50px" height="45px"></td>
-                    <td>{{product.name}}</td>
-                    <form action="{{url_for('updateCart', code=key)}}" method="post">
+                  {% set discount = "%0.2f"|format((product.discount / 100) * product.price|float) %}
+                  {% set subtotal = product.quantity|int * product.price|float %}
+                  {% set final_subtotal = "%0.2f"|format((subtotal|float) - discount|float) %}
+                  <tr>
+                    <td>{{ loop.index }}</td>
                     <td>
-                        {% set colors = product.color.split(',') %}
-                        <select name="colors" id="colors">
-                            <option value="{{product.colors}}" style="display: none;">{{product.colors|capitalize}}</option>
-                            {% for color in colors %}
-                                {% set col = color.split(':') %}
-                                <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
-                            {% endfor %}
-                        </select>
+                        <img src="{{ url_for('static', filename='images/' + product.image) }}" 
+                             alt="{{ product.name }}" 
+                             class="product-image">
                     </td>
-                    <td>{{product.price}}$</td>
-                    <td> <input type="number" name="quantity" min="1" max="10" value="{{product.quantity}}"></td>
-                    {% if product.discount > 0 %}
-                    <td>{{product.discount}}% is {{discount}}</td>
-                    {% else %}
-                    <td></td>
-                    {% endif %}
-                    {% set subtotal = product.quantity|int * product.price|float %}
-                    <td>{{"%0.2f"|format((subtotal|float) - discount|float)}}$</td>
-                    <td><button type="submit" class="btn btn-sm btn-info">Update</button></td>
+                    <td>{{ product.name }}</td>
+                    <form action="{{ url_for('updateCart', code=key) }}" method="post">
+                      <td>
+                        {% set colors = product.color.split(',') %}
+                        <select name="colors" class="color-select">
+                          <option value="{{ product.colors }}" style="display: none;">{{ product.colors|capitalize }}</option>
+                          {% for color in colors %}
+                            {% set col = color.split(':') %}
+                            <option value="{{ col[0] }}">{{ col[0]|capitalize }}</option>
+                          {% endfor %}
+                        </select>
+                      </td>
+                      <td>{{ product.price }}$</td>
+                      <td>
+                        <input type="number" 
+                               name="quantity" 
+                               min="1" 
+                               max="10" 
+                               value="{{ product.quantity }}" 
+                               class="quantity-input">
+                      </td>
+                      <td>
+                        {% if product.discount > 0 %}
+                          {{ product.discount }}% <br><small>({{ discount }}$)</small>
+                        {% else %}
+                          –
+                        {% endif %}
+                      </td>
+                      <td><strong>{{ final_subtotal }}$</strong></td>
+                      <td>
+                        <button type="submit" class="btn-action btn-update">
+                          <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                      </td>
                     </form>
-                    <td><a href="{{url_for('deleteItem', code=key)}}" class="btn btn-sm btn-danger">Delete</a></td>
-                </tr>
+                    <td>
+                      <a href="{{ url_for('deleteItem', code=key) }}" class="btn-action btn-delete">
+                        <i class="bi bi-trash-fill"></i>
+                      </a>
+                    </td>
+                  </tr>
                 {% endfor %}
-                <tr>
-                    <td><a href="{{url_for('get_order')}}" class="btn btn-success">Order now!</a> </td>
-                    <td></td>
-                    <td colspan="3"><h4>Tax : {{tax}}$</h4></td>
-                    <td colspan="4"><h4>Total : {{grandtotal}}$</h4></td>
-                    <td><a href="{{url_for('clearCart')}}" class="btn btn-sm btn-danger">Clear Cart</a> </td>
+                <tr class="summary-row">
+                  <td colspan="3">
+                    <a href="{{ url_for('get_order') }}" class="btn-order">
+                      <i class="bi bi-cash-coin me-2"></i> ĐẶT HÀNG NGAY
+                    </a>
+                  </td>
+                  <td colspan="3"><h5 class="text-start">Thuế: {{ tax }}$</h5></td>
+                  <td colspan="3"><h5 class="text-start">Tổng Cộng: {{ grandtotal }}$</h5></td>
+                  <td>
+                    <a href="{{ url_for('clearCart') }}" class="btn-clear">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </a>
+                  </td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
-</div>
+
+<script>
+    // Thêm hiệu ứng nổi
+    const floatingContainer = document.querySelector('.floating-elements');
+    for (let i = 0; i < 5; i++) {
+        const element = document.createElement('div');
+        element.classList.add('floating-element');
+        const size = Math.random() * 80 + 20;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        element.style.top = `${Math.random() * 100}%`;
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.animationDelay = `-${Math.random() * 15}s`;
+        element.style.animationDuration = `${Math.random() * 10 + 10}s`;
+        floatingContainer.appendChild(element);
+    }
+
+    // Hiệu ứng icon tiêu đề
+    const cartIcon = document.querySelector('.cart-title i');
+    cartIcon.addEventListener('mouseenter', () => {
+        cartIcon.style.transform = 'rotate(15deg) scale(1.1)';
+    });
+    
+    cartIcon.addEventListener('mouseleave', () => {
+        cartIcon.style.transform = 'rotate(0) scale(1)';
+    });
+
+    // Hiệu ứng khi hover vào hàng sản phẩm
+    const tableRows = document.querySelectorAll('.cart-table tbody tr:not(.summary-row)');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.transform = 'translateX(5px)';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            row.style.transform = 'translateX(0)';
+        });
+    });
+</script>
+
 {% endblock content %}
