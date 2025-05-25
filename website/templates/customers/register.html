@@ -1,43 +1,89 @@
 {% extends 'base.html' %}
+
 {% block title %}
-{% if title %} {{ title }} {% else %} Register {% endif %}
+  {% if title %}
+    {{ title }}
+  {% else %}
+    Register
+  {% endif %}
 {% endblock title %}
+
 {% block content %}
-{% from "_formhelpers.html" import render_field %}
-{% include '_messages.html' %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-      <h1 class="bg-info text-center">Register</h1>
+  {% from "_formhelpers.html" import render_field %}
+  {% include '_messages.html' %}
+  
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-lg">
+          <div class="card-header bg-primary text-white p-4">
+            <h2 class="text-center mb-0">Create Your Account</h2>
+          </div>
+          <div class="card-body p-4">
+            <form action="" method="post">
+              {{ form.csrf_token }}
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    {{ render_field(form.name, class_="form-control form-control-lg", placeholder="Full Name") }}
+                  </div>
+                  <div class="mb-3">
+                    {{ render_field(form.username, class_="form-control form-control-lg", placeholder="Username") }}
+                  </div>
+                  <div class="mb-3">
+                    {{ render_field(form.email, class_="form-control form-control-lg", placeholder="Email Address") }}
+                  </div>
+                  <div class="mb-3">
+                    {{ render_field(form.password, class_="form-control form-control-lg", placeholder="Password") }}
+                  </div>
+                  <div class="mb-4">
+                    {{ render_field(form.confirm, class_="form-control form-control-lg", placeholder="Confirm Password") }}
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    {{ render_field(form.country, class_="form-control form-control-lg", placeholder="Country") }}
+                  </div>
+                  <div class="mb-3">
+                    {{ render_field(form.city, class_="form-control form-control-lg", placeholder="City") }}
+                  </div>
+                  <div class="mb-3">
+                    {{ render_field(form.contact, class_="form-control form-control-lg", placeholder="Phone Number") }}
+                  </div>
+                  <div class="mb-3">
+                    {{ render_field(form.address, class_="form-control form-control-lg", placeholder="Address") }}
+                  </div>
+                  <div class="mb-4">
+                    {{ render_field(form.zipcode, class_="form-control form-control-lg", placeholder="Zipcode") }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row mt-2">
+                <div class="col-md-6">
+                  <div class="mb-4">
+                    <label class="form-label fw-bold">Profile Picture</label>
+                    <div class="input-group">
+                      {{ form.profile(class_="form-control") }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 d-flex align-items-end justify-content-end">
+                  {{ form.submit(class_="btn btn-primary btn-lg px-5") }}
+                </div>
+              </div>
+              
+              <div class="row mt-3">
+                <div class="col-12 text-center">
+                  <p class="text-muted">Already have an account? <a href="#" class="text-primary fw-bold">Sign In</a></p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-2"></div>
   </div>
-  <form action="" method="post">
-      {{ form.csrf_token }}
-    <div class="row">
-      <div class="col-md-2"></div>
-        <div class="col-md-4">
-            {{ render_field(form.name, class_="form-control", placeholder="Name") }}
-            {{ render_field(form.username, class_="form-control", placeholder="Username") }}
-            {{ render_field(form.email, class_="form-control", placeholder="Email") }}
-            {{ render_field(form.password, class_="form-control", placeholder="Password") }}
-            {{ render_field(form.confirm, class_="form-control", placeholder="Confirm Password") }}
-            {{ form.profile() }}
-        </div>
-        <div class="col-md-4">
-            {{ render_field(form.country, class_="form-control", placeholder="Country") }}
-            {{ render_field(form.city, class_="form-control", placeholder="City") }}
-            {{ render_field(form.contact, class_="form-control", placeholder="Contact") }}
-            {{ render_field(form.address, class_="form-control", placeholder="Address") }}
-            {{ render_field(form.zipcode, class_="form-control", placeholder="Zipcode") }}
-            {{ form.submit(class_="btn btn-info") }}
-        </div>
-        <div class="col-md-2"></div>
-    </div>
-  </form>
-</div>
-
-
 {% endblock content %}
-

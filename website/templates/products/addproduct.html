@@ -1,52 +1,359 @@
 {% extends 'base.html' %}
+
 {% block title %}
-{% if title %} {{ title }} {% else %} Add Product {% endif %}
+  {% if title %} {{ title }} {% else %} Thêm Sản Phẩm {% endif %}
 {% endblock title %}
+
 {% block content %}
-{% include '_messages.html' %}
-<div class="container">
-    <div class="row">
-  <div class="col-md-2"></div>
-  <div class="col-md-8">
-    <h2 class="text-center bg-info p-2 ">Add a Product</h2>
-    {% from "_formhelpers.html" import render_field %}
-    <form method="post" enctype="multipart/form-data">
-        {{render_field(form.name, class_="form-control", placeholder="Product Name")}}
-        {{render_field(form.price, class_="form-control", placeholder="Product Price")}}
-        {{render_field(form.discount, class_="form-control", placeholder="Product Discount")}}
-        {{render_field(form.stock, class_="form-control", placeholder="Product Stock")}}
+  {% include '_messages.html' %}
 
-        <label for="brand">Add a brand</label>
-        <select name="brand" id="brand" class="form-control" required>
-            <option value="">Select A brand</option>
-            {% for brand in brands %}
-            <option value="{{brand.id}}">{{brand.name}}</option>
-            {% endfor %}
-        </select>
+<style>
+    /* Phong cách tổng thể */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #f8f9fa 100%);
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* Hiệu ứng nền */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        background: rgba(23, 162, 184, 0.08);
+        border-radius: 50%;
+        animation: floatAround 20s infinite linear;
+    }
+    
+    @keyframes floatAround {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(100px, 50px) rotate(360deg); }
+    }
+    
+    /* Container chính */
+    .form-container {
+        margin: 80px auto;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s 0.3s forwards;
+    }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Card form */
+    .form-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 25px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    
+    .form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+    
+    /* Header */
+    .form-header {
+        padding: 30px;
+        text-align: center;
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .form-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+        animation: float 15s infinite alternate ease-in-out;
+    }
+    
+    .form-header i {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: inline-block;
+        transition: transform 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .form-header h2 {
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    /* Form body */
+    .form-body {
+        padding: 40px;
+    }
+    
+    /* Input fields */
+    .form-control, .form-select {
+        background: rgba(255,255,255,0.8);
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 15px;
+        transition: all 0.3s ease;
+        box-shadow: none;
+        height: auto;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    /* File input custom */
+    .form-control[type="file"] {
+        padding: 10px;
+    }
+    
+    .form-control[type="file"]::file-selector-button {
+        background: #e9ecef;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control[type="file"]::file-selector-button:hover {
+        background: #dee2e6;
+    }
+    
+    /* Submit button */
+    .submit-btn {
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        border: none;
+        padding: 15px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(23, 162, 184, 0.3);
+        transition: all 0.3s ease;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        font-size: 1.1rem;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(23, 162, 184, 0.4);
+        background: linear-gradient(45deg, #138496, #17a2b8);
+    }
+    
+    .submit-btn:active {
+        transform: translateY(1px);
+    }
+    
+    .submit-btn i {
+        transition: transform 0.3s ease;
+    }
+    
+    .submit-btn:hover i {
+        transform: scale(1.2);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-container {
+            margin: 40px auto;
+        }
+        
+        .form-body {
+            padding: 30px;
+        }
+        
+        .form-header {
+            padding: 25px;
+        }
+    }
+</style>
 
-        <label for="category">Add a category</label>
-        <select name="category" id="category" class="form-control" required>
-            <option value="">Select A category</option>
-            {% for category in categories %}
-            <option value="{{category.id}}">{{category.name}}</option>
-            {% endfor %}
-        </select>
+<div class="floating-elements">
+    <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+    <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
+</div>
 
-        {{render_field(form.colors, class_="form-control", placeholder="Product Colors")}}
-        {{render_field(form.description, class_="form-control", placeholder="Product Description", rows=10)}}
+<div class="container form-container">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="bi bi-box-seam-fill"></i>
+                    <h2>Thêm Sản Phẩm Mới</h2>
+                </div>
+                
+                <div class="form-body">
+                    {% from "_formhelpers.html" import render_field %}
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        <!-- Tên sản phẩm -->
+                        <div class="mb-4">
+                            <label class="form-label">Tên Sản Phẩm</label>
+                            {{ render_field(form.name, class_="form-control", placeholder="Nhập tên sản phẩm") }}
+                        </div>
 
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4">{{render_field(form.image_1, class_="form-control", required=True)}}</div>
-          <div class="col-md-4">{{render_field(form.image_2, class_="form-control", required=True)}}</div>
-          <div class="col-md-4">{{render_field(form.image_3, class_="form-control", required=True)}}</div>
+                        <!-- Giá, giảm giá, tồn kho -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Giá</label>
+                                {{ render_field(form.price, class_="form-control", placeholder="VNĐ") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Giảm Giá (%)</label>
+                                {{ render_field(form.discount, class_="form-control", placeholder="0-100") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Số Lượng</label>
+                                {{ render_field(form.stock, class_="form-control", placeholder="Tồn kho") }}
+                            </div>
+                        </div>
+
+                        <!-- Brand và Category -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Thương Hiệu</label>
+                                <select name="brand" id="brand" class="form-select" required>
+                                    <option value="">Chọn thương hiệu</option>
+                                    {% for brand in brands %}
+                                        <option value="{{ brand.id }}">{{ brand.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Danh Mục</label>
+                                <select name="category" id="category" class="form-select" required>
+                                    <option value="">Chọn danh mục</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Màu sắc -->
+                        <div class="mb-4">
+                            <label class="form-label">Màu Sắc (phân cách bằng dấu phẩy)</label>
+                            {{ render_field(form.colors, class_="form-control", placeholder="Ví dụ: Đỏ,Xanh,Vàng") }}
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="mb-4">
+                            <label class="form-label">Mô Tả Sản Phẩm</label>
+                            {{ render_field(form.description, class_="form-control", placeholder="Mô tả chi tiết sản phẩm...", rows=6) }}
+                        </div>
+
+                        <!-- Hình ảnh -->
+                        <div class="mb-4">
+                            <label class="form-label mb-3">Hình Ảnh Sản Phẩm</label>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Ảnh Chính</label>
+                                    {{ render_field(form.image_1, class_="form-control", required=True) }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ảnh Phụ 1</label>
+                                    {{ render_field(form.image_2, class_="form-control") }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ảnh Phụ 2</label>
+                                    {{ render_field(form.image_3, class_="form-control") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nút submit -->
+                        <div class="mt-5">
+                            <button type="submit" class="submit-btn">
+                                <i class="bi bi-upload me-2"></i> Thêm Sản Phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
+</div>
 
-      <button type="submit" class="btn btn-outline-info mt-4">Add Product</button>
-    </form>
-  </div>
-  <div class="col-md-2"></div>
-</div>
-</div>
+<script>
+    // Thêm hiệu ứng nổi
+    const floatingContainer = document.querySelector('.floating-elements');
+    for (let i = 0; i < 5; i++) {
+        const element = document.createElement('div');
+        element.classList.add('floating-element');
+        const size = Math.random() * 80 + 20;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        element.style.top = `${Math.random() * 100}%`;
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.animationDelay = `-${Math.random() * 15}s`;
+        element.style.animationDuration = `${Math.random() * 10 + 10}s`;
+        floatingContainer.appendChild(element);
+    }
+
+    // Hiệu ứng icon khi hover
+    const headerIcon = document.querySelector('.form-header i');
+    headerIcon.addEventListener('mouseenter', () => {
+        headerIcon.style.transform = 'rotate(15deg) scale(1.1)';
+    });
+    
+    headerIcon.addEventListener('mouseleave', () => {
+        headerIcon.style.transform = 'rotate(0) scale(1)';
+    });
+
+    // Hiệu ứng khi focus vào input
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.style.borderColor = '#17a2b8';
+            input.previousElementSibling.style.color = '#17a2b8';
+        });
+        
+        input.addEventListener('blur', () => {
+            input.style.borderColor = '#e9ecef';
+            if (!input.value) {
+                input.previousElementSibling.style.color = '#495057';
+            }
+        });
+    });
+</script>
+
 {% endblock content %}

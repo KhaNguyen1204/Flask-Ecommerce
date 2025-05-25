@@ -3,23 +3,314 @@
 {% if title %} {{ title }} {% else %} Login {% endif %}
 {% endblock title %}
 {% block content %}
-<div class="text-center h1 text-danger">LOGIN</div>
+{% from "_formhelpers.html" import render_field %}
+
+<!-- CSS cho animations -->
+<style>
+  /* Animation keyframes */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  /* Form styling */
+  .page-heading {
+    color: #0d6efd;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    animation: fadeIn 0.6s ease-out;
+    text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.07);
+  }
+  
+  .login-wrapper {
+    margin: 30px auto;
+    max-width: 450px;
+    animation: slideInUp 0.7s ease-out;
+  }
+  
+  .login-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .login-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 123, 255, 0.2);
+    transform: translateY(-5px);
+  }
+  
+  .login-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+  }
+  
+  .login-header h2 {
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: 1px;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .login-form {
+    padding: 30px 25px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .form-control {
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    font-size: 16px;
+    padding-left: 45px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #4c9be8;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    transform: translateY(-3px);
+  }
+  
+  .input-icon {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .input-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    font-size: 18px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus + i {
+    color: #0d6efd;
+  }
+  
+  .btn-login {
+    background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+    border: none;
+    color: white;
+    height: 50px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .btn-login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+  }
+  
+  .btn-login:active {
+    transform: translateY(-1px);
+  }
+  
+  .login-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+  }
+  
+  .login-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  
+  .forgot-password {
+    color: #0d6efd;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .forgot-password:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+  
+  .register-link {
+    color: #0d6efd;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .register-link:hover {
+    color: #0056b3;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .login-wrapper {
+      padding: 0 15px;
+    }
+  }
+  
+  /* Form icon fix for when FontAwesome is unavailable */
+  .icon-email::before {
+    content: "✉️";
+  }
+  
+  .icon-password::before {
+    content: "🔒";
+  }
+</style>
+
 <div class="container">
-    {% from "_formhelpers.html" import render_field %}
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-            {% include '_messages.html' %}
-    <form method="post" enctype="multipart/form-data">
-            {{ form.csrf_token }}
-      <div>
-        {{ render_field(form.email, class="form-control") }}
-        {{ render_field(form.password, class="form-control") }}
+  <h1 class="page-heading">LOGIN TO YOUR ACCOUNT</h1>
+  
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Please enter your credentials to continue</p>
       </div>
-        <p><input type=submit value=Login class="btn btn-info"></p>
-    </form>
+      
+      <div class="login-form">
+        {% include '_messages.html' %}
+        
+        <form method="post" enctype="multipart/form-data">
+          {{ form.csrf_token }}
+          
+          <div class="input-icon">
+            {{ render_field(form.email, class="form-control", placeholder="Email Address") }}
+            <i class="fa fa-envelope icon-email"></i>
+          </div>
+          
+          <div class="input-icon">
+            {{ render_field(form.password, class="form-control", placeholder="Password") }}
+            <i class="fa fa-lock icon-password"></i>
+          </div>
+          
+          <div class="login-options">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="remember">
+              <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+            <a href="#" class="forgot-password">Forgot Password?</a>
+          </div>
+          
+          <button type="submit" class="btn btn-login">LOGIN</button>
+        </form>
+        
+        <div class="login-footer">
+          <p>Don't have an account? <a href=" register" class="register-link">Register Now</a></p>
+        </div>
+      </div>
     </div>
-        <div class="col-md-4"></div>
-    </div>
+  </div>
 </div>
+
+<!-- JavaScript cho animations -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Hiệu ứng cho các field khi được focus
+    const formInputs = document.querySelectorAll('.form-control');
+    
+    formInputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.style.transform = 'translateY(-3px)';
+        this.style.boxShadow = '0 5px 15px rgba(0, 123, 255, 0.1)';
+        
+        // Highlight the associated icon
+        const icon = this.nextElementSibling;
+        if (icon && icon.tagName === 'I') {
+          icon.style.color = '#0d6efd';
+        }
+      });
+      
+      input.addEventListener('blur', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+        
+        // Reset icon color
+        const icon = this.nextElementSibling;
+        if (icon && icon.tagName === 'I') {
+          icon.style.color = '#95a5a6';
+        }
+      });
+    });
+    
+    // Hiệu ứng cho button login
+    const loginBtn = document.querySelector('.btn-login');
+    if (loginBtn) {
+      loginBtn.addEventListener('mouseover', function() {
+        this.style.animation = 'pulse 0.8s ease-in-out infinite';
+      });
+      
+      loginBtn.addEventListener('mouseout', function() {
+        this.style.animation = 'none';
+      });
+    }
+    
+    // Kiểm tra FontAwesome và thay thế nếu cần
+    function checkFontAwesome() {
+      const testIcon = document.createElement('i');
+      testIcon.className = 'fa fa-user';
+      testIcon.style.display = 'none';
+      document.body.appendChild(testIcon);
+      
+      const computed = window.getComputedStyle(testIcon);
+      const isFontAwesomeLoaded = computed.fontFamily.includes('FontAwesome') || 
+                                   computed.fontFamily.includes('Font Awesome');
+      
+      document.body.removeChild(testIcon);
+      
+      if (!isFontAwesomeLoaded) {
+        const emailIcons = document.querySelectorAll('.icon-email');
+        const passwordIcons = document.querySelectorAll('.icon-password');
+        
+        emailIcons.forEach(icon => {
+          icon.className = 'icon-email';
+        });
+        
+        passwordIcons.forEach(icon => {
+          icon.className = 'icon-password';
+        });
+      }
+    }
+    
+    // Chạy kiểm tra FontAwesome
+    checkFontAwesome();
+  });
+</script>
 {% endblock content %}

@@ -1,174 +1,353 @@
 {% extends 'base.html' %}
-{% block content %}
 {% include 'navbar.html' %}
-<!--Navbar End-->
-<div class="container">
-    <div class="row">
-{% if brand %}
-        {% for b in brand %}
-        <div class="col-md-3 mt-3">
-            <div class="card">
-                <img src="{{url_for('static', filename='images/' + b.image_1)}}" alt="{{b.name}}" class="card-img-top" style="height: 300px; width: 100%">
-                <div class="card-body">
-                    {% if b.discount > 0 %}
-                    <p style="text-shadow: 1px 1px 2px #000000; color: red; transform: rotate(-15deg); position:absolute; top:10%;left: 20%">Discount {{b.discount}} %</p>
-                    {% endif %}
-                    <div class="text-center">{{b.name}}</div>
-                    <div class="text-center">Price {{b.price}}$</div>
-                    <div class="card-footer d-flex">
-                        <a href="{{url_for('single_page', id=b.id)}}" class="btn btn-sm btn-primary">Details</a>
-                        <form action="{{url_for('AddCart')}}" method="post" class="ms-auto">
-                            <input type="hidden" name="product_id" value="{{b.id}}">
-                            <input type="hidden" name="quantity" value="1">
-                            {% set colors = b.colors.split(',') %}
-                            <select name="colors" id="colors" style="visibility: hidden;">
-                                {% for color in colors %}
-                                    {% set col = color.split(':') %}
-                                    <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-warning">Add to Cart</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        <div class="row">
-        <div class="col text-center">
-        {% if brand.has_prev %}
-        <a href="{{url_for('get_brand', id=get_b.id, page=brand.prev_num)}}" class="btn btn-outline-info mt-3">Previous</a>
-        {% endif %}
-        {% if brand.total > 4 %}
-        {% for page in brand.iter_pages(left_edge=1, right_edge=2, left_current=1, right_current=2) %}
-            {% if page %}
-            {% if page == brand.page %}
-           <a href="{{url_for('get_brand', id=get_b.id, page=page)}}" class="btn btn-info mt-3">{{page}}</a>
-            {% else %}
-            <a href="{{url_for('get_brand', id=get_b.id, page=page)}}" class="btn btn-outline-info mt-3">{{page}}</a>
-            {% endif %}
-            {% else %}
-            ...
-            {% endif %}
-        {% endfor %}
-        {% endif %}
-            {% if brand.has_next %}
-            <a href="{{url_for('get_brand', id=get_b.id, page=brand.next_num)}}" class="btn btn-outline-info mt-3">Next</a>
-            {% endif %}
-            </div>
-    </div>
-    </div>
-    <div class="row">
-{% elif get_cat_prod %}
-        {% for c in get_cat_prod %}
+{% block content %}
 
-        <div class="col-md-3 mt-3">
-            <div class="card">
-                <img src="{{url_for('static', filename='images/' + c.image_1)}}" alt="{{c.name}}" class="card-img-top" style="height: 300px; width: 100%">
-                <div class="card-body">
-                    {% if c.discount > 0 %}
-                    <p style="text-shadow: 1px 1px 2px #000000; color: red; transform: rotate(-15deg); position:absolute; top:10%;left: 20%">Discount {{c.discount}} %</p>
-                    {% endif %}
-                    <div class="text-center">{{c.name}}</div>
-                    <div class="text-center">Price {{c.price}}$</div>
-                    <div class="card-footer d-flex">
-                        <a href="{{url_for('single_page', id=c.id)}}" class="btn btn-sm btn-primary">Details</a>
-                        <form action="{{url_for('AddCart')}}" method="post" class="ms-auto">
-                            <input type="hidden" name="product_id" value="{{c.id}}">
-                            <input type="hidden" name="quantity" value="1">
-                            {% set colors = c.colors.split(',') %}
-                            <select name="colors" id="" style="visibility: hidden;">
-                                {% for color in colors %}
-                                    {% set col = color.split(':') %}
-                                    <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-warning">Add to Cart</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        <div class="row">
-        <div class="col text-center">
-        {% if get_cat_prod.has_prev %}
-        <a href="{{url_for('get_categories', id=get_cat.id, page=get_cat_prod.prev_num)}}" class="btn btn-outline-info mt-3">Previous</a>
-        {% endif %}
-        {% if get_cat_prod.total > 4 %}
-        {% for page in get_cat_prod.iter_pages(left_edge=1, right_edge=2, left_current=1, right_current=2) %}
-            {% if page %}
-            {% if page == get_cat_prod.page %}
-           <a href="{{url_for('get_categories', id=get_cat.id, page=page)}}" class="btn btn-info mt-3">{{page}}</a>
-            {% else %}
-            <a href="{{url_for('get_categories', id=get_cat.id, page=page)}}" class="btn btn-outline-info mt-3">{{page}}</a>
-            {% endif %}
-            {% else %}
-            ...
-            {% endif %}
-        {% endfor %}
-        {% endif %}
-            {% if get_cat_prod.has_next %}
-            <a href="{{url_for('home', id=get_cat.id, page=get_cat_prod.next_num)}}" class="btn btn-outline-info mt-3">Next</a>
-            {% endif %}
-            </div>
-    </div>
-    </div>
-<div class="row">
-{% else %}
-        {% for product in products.items %}
-         <div class="col-md-3 mt-3">
-            <div class="card">
-                <img src="{{url_for('static', filename='images/' + product.image_1)}}" alt="{{product.name}}" class="card-img-top" style="height: 300px; width: 100%">
-                <div class="card-body">
-                    {% if product.discount > 0 %}
-                    <p style="text-shadow: 1px 1px 2px #000000; color: red; transform: rotate(-15deg); position:absolute; top:10%;left: 20%">Discount {{product.discount}} %</p>
-                    {% endif %}
-                    <div class="text-center">{{product.name}}</div>
-                    <div class="text-center">Price {{product.price}}$</div>
-                    <div class="card-footer d-flex">
-                        <a href="{{url_for('single_page', id=product.id)}}" class="btn btn-sm btn-primary">Details</a>
-                        <form action="{{url_for('AddCart')}}" method="post" class="ms-auto">
-                            <input type="hidden" name="product_id" value="{{product.id}}">
-                            <input type="hidden" name="quantity" value="1" min="1" max="{{product.stock}}">
-                            {% set colors = product.colors.split(',') %}
-                            <select name="colors" id="colors" style="visibility: hidden;">
-                                {% for color in colors %}
-                                    {% set col = color.split(':') %}
-                                    <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-sm btn-warning">Add to Cart</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="row">
-        <div class="col text-center">
-        {% if products.has_prev %}
-        <a href="{{url_for('home', page=products.prev_num)}}" class="btn btn-outline-info mt-3">Previous</a>
-        {% endif %}
-        {% if products.total > 4 %}
-        {% for page in products.iter_pages(left_edge=1, right_edge=2, left_current=1, right_current=2) %}
-            {% if page %}
-            {% if page == products.page %}
-           <a href="{{url_for('home', page=page)}}" class="btn btn-info mt-3">{{page}}</a>
-            {% else %}
-            <a href="{{url_for('home', page=page)}}" class="btn btn-outline-info mt-3">{{page}}</a>
-            {% endif %}
-            {% else %}
-            ...
-            {% endif %}
-        {% endfor %}
-        {% endif %}
-            {% if products.has_next %}
-            <a href="{{url_for('home', page=products.next_num)}}" class="btn btn-outline-info mt-3">Next</a>
-            {% endif %}
-            </div>
-    </div>
-    {% endif %}
+<style>
+    /* Phong cách tổng thể */
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* Hiệu ứng nền */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        background: rgba(13, 110, 253, 0.05);
+        border-radius: 50%;
+        animation: floatAround 20s infinite linear;
+    }
+    
+    @keyframes floatAround {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(100px, 50px) rotate(360deg); }
+    }
+    
+    /* Container chính */
+    .products-container {
+        margin-top: 80px;
+        margin-bottom: 50px;
+        opacity: 0;
+        animation: fadeIn 0.6s 0.3s forwards;
+    }
+    
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+    
+    /* Card sản phẩm */
+    .product-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        border-color: rgba(13, 110, 253, 0.2);
+    }
+    
+    /* Hình ảnh sản phẩm */
+    .product-img-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .product-img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+    
+    .product-card:hover .product-img {
+        transform: scale(1.1);
+    }
+    
+    /* Badge giảm giá */
+    .badge-discount {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        font-size: 0.85rem;
+        background: linear-gradient(135deg, #ff6f61, #ff3b2e);
+        color: white;
+        padding: 0.3em 0.7em;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(255, 59, 46, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Nội dung card */
+    .card-body {
+        padding: 1.25rem;
+        text-align: center;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #2b2d42;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .price {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #28a745;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-left: 5px;
+    }
+    
+    /* Footer card */
+    .card-footer {
+        background: rgba(248, 249, 250, 0.7);
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    /* Các nút */
+    .btn-details {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        border: none;
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-details:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+    }
+    
+    .btn-add-to-cart {
+        background: linear-gradient(135deg, #ffc107, #ffab00);
+        border: none;
+        color: #212529;
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-add-to-cart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+    }
+    
+    /* Phân trang */
+    .pagination-container {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .page-link {
+        margin: 0 5px;
+        border-radius: 8px !important;
+        border: none;
+        min-width: 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .page-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .products-container {
+            margin-top: 60px;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+        }
+        
+        .btn-details, .btn-add-to-cart {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+
+<div class="floating-elements">
+    <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+    <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
 </div>
+
+<div class="container products-container">
+    <div class="row">
+        {% set products_list = brand or get_cat_prod or products.items %}
+        {% for p in products_list %}
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="card h-100 product-card">
+                    <div class="product-img-container">
+                        <img src="{{ url_for('static', filename='images/' + p.image_1) }}" 
+                             class="card-img-top product-img" 
+                             alt="{{ p.name }}">
+
+                        {% if p.discount > 0 %}
+                            <div class="badge-discount">
+                                -{{ p.discount }}%
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ p.name }}</h5>
+                        <p class="price">
+                            {{ p.price }}$
+                            {% if p.discount > 0 %}
+                                <span class="original-price">{{ "%0.2f"|format(p.price|float + (p.price|float * p.discount|float / 100)) }}$</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="{{ url_for('single_page', id=p.id) }}" 
+                           class="btn btn-details">
+                            <i class="bi bi-eye-fill me-1"></i> Chi tiết
+                        </a>
+                        <form action="{{ url_for('AddCart') }}" method="post" class="m-0 p-0">
+                            <input type="hidden" name="product_id" value="{{ p.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            {% set colors = p.colors.split(',') %}
+                            <select name="colors" style="display: none;">
+                                {% for color in colors %}
+                                    {% set col = color.split(':') %}
+                                    <option value="{{ col[0] }}">{{ col[0]|capitalize }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-add-to-cart">
+                                <i class="bi bi-cart-plus-fill me-1"></i> Thêm 
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Phân trang -->
+    <div class="pagination-container">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% set pagination = brand or get_cat_prod or products %}
+                {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.prev_num) }}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for page in pagination.iter_pages(left_edge=1, right_edge=2, left_current=1, right_current=2) %}
+                    {% if page %}
+                        <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                            <a class="page-link" 
+                               href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=page) }}">
+                                {{ page }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.next_num) }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    // Thêm hiệu ứng nổi
+    const floatingContainer = document.querySelector('.floating-elements');
+    for (let i = 0; i < 5; i++) {
+        const element = document.createElement('div');
+        element.classList.add('floating-element');
+        const size = Math.random() * 80 + 20;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        element.style.top = `${Math.random() * 100}%`;
+        element.style.left = `${Math.random() * 100}%`;
+        element.style.animationDelay = `-${Math.random() * 15}s`;
+        element.style.animationDuration = `${Math.random() * 10 + 10}s`;
+        floatingContainer.appendChild(element);
+    }
+
+    // Hiệu ứng khi hover vào card
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const img = card.querySelector('.product-img');
+            img.style.transform = 'scale(1.1)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            const img = card.querySelector('.product-img');
+            img.style.transform = 'scale(1)';
+        });
+    });
+</script>
+
 {% endblock content %}
