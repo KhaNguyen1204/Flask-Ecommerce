@@ -5,6 +5,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 import os
 from flask_msearch import Search
 from flask_login import LoginManager, login_manager
+from flask_migrate import Migrate
 
 # Thư mục hiện tại
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -23,6 +24,7 @@ photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db) # Khởi tạo Flask-Migrate
 bcrypt = Bcrypt(app) # Bâm app
 search = Search(db=db)
 search.init_app(app)
