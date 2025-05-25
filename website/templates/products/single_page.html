@@ -433,7 +433,7 @@
 <div class="container product-container">
     <div class="row">
         <div class="col-md-6" id="b_image">
-            <img src="{{ url_for('static', filename='images/' + product.image_1) }}" alt="{{ product.name }}" class="img-fluid" />
+            <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" alt="{{ product.name }}" class="img-fluid" />
         </div>
 
         <div class="col-md-6 product-info">
@@ -479,12 +479,12 @@
     <div class="row" id="s_image">
         <div class="col-12">
             <div class="thumbnail-container">
-                <img src="{{ url_for('static', filename='images/' + product.image_1) }}" alt="{{ product.name }}" class="active" />
+                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" alt="{{ product.name }}" class="active" />
                 {% if product.image_2 %}
-                    <img src="{{ url_for('static', filename='images/' + product.image_2) }}" alt="{{ product.name }}"class="active" />
+                    <img src="{{ url_for('static', filename='images/products/' + product.image_2) }}" alt="{{ product.name }}"class="active" />
                 {% endif %}
                 {% if product.image_3 %}
-                    <img src="{{ url_for('static', filename='images/' + product.image_3) }}" alt="{{ product.name }}"class="active" />
+                    <img src="{{ url_for('static', filename='images/products/' + product.image_3) }}" alt="{{ product.name }}"class="active" />
                 {% endif %}
             </div>
         </div>

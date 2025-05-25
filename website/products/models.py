@@ -2,6 +2,7 @@ from website import db, app
 
 class AddProduct(db.Model):
     __tablename__ = 'product'
+    __searchable__ = ['name', 'description'] # Fields to be indexed for search
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Float, nullable=False)

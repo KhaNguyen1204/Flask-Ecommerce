@@ -5,127 +5,152 @@
 {% block content %}
 {% include '_messages.html' %}
 <div class="container">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/admin">Admin</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/admin">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/brands">Brand</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/categories">Category</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-            </li>
-          </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if current_user.is_authenticated and current_user.role.name == 'sale' %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/sales">Product</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/admin">Product</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/brands">Brand</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/categories">Category</a>
+                    </li>
+                    {% if current_user.is_authenticated and current_user.role.name == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_roles">Role</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_staffs">Staff</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_customers">Customer</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_orders">Order</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/change_password">Change Password</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
         </div>
-      </div>
     </nav>
 </div>
-
-<div class="container mt-5" >
+<div class="container mt-4">
+    {% if brands %}
+        <a href="{{ url_for('addbrand') }}" class="btn btn-success mb-3">Add Brand</a>
+    {% else %}
+        <a href="{{ url_for('addcategory') }}" class="btn btn-success mb-3">Add Category</a>
+    {% endif %}
+</div>
+<div class="container mt-5">
     <table class="table table-sm table-condensed table-striped table-hover">
         <thead>
-            <tr>
-                <th>Sr</th>
-                <th>Name</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
+        <tr>
+            <th>Sr</th>
+            <th>Name</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
         </thead>
         <tbody>
-            {% if brands %}
-            {% for brand in brands %}
-            <tr>
-                <td>{{loop.index}}</td>
-                <td>{{brand.name}}</td>
-                 <td><a href="{{url_for('updatebrand', id=brand.id)}}" class="btn btn-sm btn-info">Edit</a></td>
-<!--                <td><a href="" class="btn btn-sm btn-outline-danger">Delete</a></td>-->
-                <td>
+        {% if brands %}
+        {% for brand in brands %}
+        <tr>
+            <td>{{loop.index}}</td>
+            <td>{{brand.name}}</td>
+            <td><a href="{{url_for('updatebrand', id=brand.id)}}" class="btn btn-sm btn-info">Edit</a></td>
+            <!--                <td><a href="" class="btn btn-sm btn-outline-danger">Delete</a></td>-->
+            <td>
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal-{{brand.id}}">
-                  Delete
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal-{{brand.id}}">
+                    Delete
                 </button>
-                </td>
-            </tr>
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModal-{{brand.id}}" tabindex="-1" aria-labelledby="exampleModalLabel-{{brand.name}}" aria-hidden="true">
-              <div class="modal-dialog">
+            </td>
+        </tr>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal-{{brand.id}}" tabindex="-1"
+             aria-labelledby="exampleModalLabel-{{brand.name}}" aria-hidden="true">
+            <div class="modal-dialog">
                 <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel-{{brand.name}}">{{brand.name}}</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                      <span class="text-danger">Are you sure that want to deletethisis brand {{brand.name}}</span>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
-                      <form action="{{url_for('deletebrand', id=brand.id)}}" method="POST">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                      </form>
-                  </div>
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel-{{brand.name}}">{{brand.name}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="text-danger">Are you sure that want to deletethisis brand {{brand.name}}</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{url_for('deletebrand', id=brand.id)}}" method="POST">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
                 </div>
-              </div>
             </div>
-            {% endfor %}
-            {% else %}
-            {% for category in categories %}
-            <tr>
-                <td>{{loop.index}}</td>
-                <td>{{category.name}}</td>
-                 <td><a href="{{url_for('updatecat', id=category.id)}}" class="btn btn-sm btn-outline-info">Edit</a></td>
-<!--                <td><a href="" class="btn btn-sm btn-outline-danger">Delete</a></td>-->
-                <td>
+        </div>
+        {% endfor %}
+        {% else %}
+        {% for category in categories %}
+        <tr>
+            <td>{{loop.index}}</td>
+            <td>{{category.name}}</td>
+            <td><a href="{{url_for('updatecat', id=category.id)}}" class="btn btn-sm btn-outline-info">Edit</a></td>
+            <!--                <td><a href="" class="btn btn-sm btn-outline-danger">Delete</a></td>-->
+            <td>
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal-{{category.id}}">
-                  Delete
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal-{{category.id}}">
+                    Delete
                 </button>
-            </tr>
-            <div class="modal fade" id="exampleModal-{{category.id}}" tabindex="-1" aria-labelledby="exampleModalLabel-{{category.name}}" aria-hidden="true">
-              <div class="modal-dialog">
+        </tr>
+        <div class="modal fade" id="exampleModal-{{category.id}}" tabindex="-1"
+             aria-labelledby="exampleModalLabel-{{category.name}}" aria-hidden="true">
+            <div class="modal-dialog">
                 <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel-{{category.name}}">{{category.name}}</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                      <span class="text-danger">Are you sure that want to deletethisis category {{category.name}}</span>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
-                      <form action="{{url_for('deletecat', id=category.id)}}" method="POST">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                      </form>
-                  </div>
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel-{{category.name}}">{{category.name}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="text-danger">Are you sure that want to deletethisis category {{category.name}}</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{url_for('deletecat', id=category.id)}}" method="POST">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
                 </div>
-              </div>
             </div>
-            {% endfor %}
-            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
         </tbody>
     </table>
 </div>
