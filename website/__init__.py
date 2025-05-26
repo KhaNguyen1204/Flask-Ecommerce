@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 basedir = os.path.abspath(os.path.dirname(__file__))
 # Khởi tạo Flask app
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Pak123!!!@localhost/shopdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@localhost/shopdb'
 app.config['SECRET_KEY'] = 'fkshfkhwoe8ww0590fmw050'
 app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/images/products')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16MB Limit
