@@ -1,58 +1,53 @@
 {% extends "base.html" %}
-{% block title %}My Cart{% endblock title %}
+{% block title %}My Order{% endblock title %}
 {% include 'navbar.html' %}
 {% include '_messages.html' %}
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            Invoice: {{orders.invoice}}
+            Invoice: {{order.invoice}}
             <br>
-            Status: {{orders.status}}
+            Status: {{order.status}}
             <br>
-            Customer name: {{customer.name}}
+            Customer name: {{customer.username}}
             <br>
             Customer email: {{customer.email}}
             <br>
-            Customer contact: {{customer.contact}}
+            Customer contact: {{customer.phone}}
             <br>
         <table class="table table-sm">
             <thead>
                 <th>Sr</th>
-                <th>Image</th>
                 <th>Name</th>
-                <th>Color</th>
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Discount</th>
                 <th>Subtotal</th>
             </thead>
             <tbody>
-                {% for key, product in orders.orders.items() %}
-                {% set discount = "%0.2f"|format((product.discount/100) * product.price|float) %}
+                {% for item in order_details %}
+                {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
                 <tr>
                     <td>{{loop.index}}</td>
-                    <td><img src="{{url_for('static', filename='images/' + product.image)}}" alt="{{product.name}}" width="50px" height="45px"></td>
-                    <td>{{product.name}}</td>
-                    <form action="{{url_for('updateCart', code=key)}}" method="post">
-                    <td>{{product.colors|capitalize}}</td>
-                    <td>{{"%.2f"|format(product.price)}}$</td>
-                    <td>{{product.quantity}}</td>
-                    {% if product.discount > 0 %}
-                    <td>{{product.discount}}% is {{discount}}</td>
+                    <td>{{item.product_name}}</td>
+                    <td>{{"%.2f"|format(item.price)}}$</td>
+                    <td>{{item.quantity}}</td>
+                    {% if item.discount > 0 %}
+                    <td>{{item.discount}}% is {{discount}}$</td>
+                    {% else %}
+                    <td>0%</td>
                     {% endif %}
-                    {% set sub_total = product.quantity|int * product.price|float %}
-                    <td>{{"%0.2f"|format((sub_total|float) - discount|float)}}$</td>
-                    </form>
+                    <td>{{"%0.2f"|format(item.subtotal)}}$</td>
                 </tr>
                 {% endfor %}
                 <tr>
                     <td><a href="#" class="btn btn-success">Check out!</a> </td>
                     <td></td>
-                    <td colspan="3"><h4>Tax : {{tax}}$</h4></td>
-                    <td colspan="4"><h4>Total : {{"%0.2f"|format(grand_total)}}$</h4></td>
+                    <td colspan="2"><h4>Tax: {{"%.2f"|format(tax)}}$</h4></td>
+                    <td colspan="2"><h4>Total: {{"%.2f"|format(grand_total)}}$</h4></td>
                     <td>
-                        <form action="{{url_for('get_pdf', invoice=orders.invoice)}}" method="post">
+                        <form action="{{url_for('get_pdf', invoice=invoice)}}" method="post">
                         <button type="submit" class="btn btn-info">Get PDF</button>
                         </form>
                     </td>
@@ -63,3 +58,4 @@
 </div>
 </div>
 {% endblock content %}
+
