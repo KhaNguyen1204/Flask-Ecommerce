@@ -1,134 +1,333 @@
-{% extends 'base.html' %}
+{% extends 'managers_base.html' %}
+
+{% block title %}Staff Management{% endblock %}
+
+{% block nav_staff %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    .staff-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-right: 12px;
+        box-shadow: var(--shadow);
+    }
+
+    .staff-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .staff-details h6 {
+        margin: 0;
+        color: var(--dark-color);
+        font-weight: 600;
+    }
+
+    .staff-details small {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+    }
+
+    .status-inactive {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        color: white;
+    }
+
+    .position-tag {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        color: var(--primary-color);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .delete-warning {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border-left: 4px solid var(--danger-color);
+    }
+
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .staff-info {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .staff-avatar {
+            margin-bottom: 8px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/admin">Product</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/brands">Brand</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/categories">Category</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_roles">Role</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_staffs">Staff</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_customers">Customer</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_orders">Order</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Account
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/change_password">Change Password</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Staff Management</h1>
+    <p class="page-subtitle">Manage your team members and staff information</p>
+</div>
+
+<!-- Stats Row -->
+<div class="row stats-row">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stats-number">{{ staffs|length if staffs else 0 }}</div>
+            <div class="stats-label">Total Staff</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stats-number">
+                {{ staffs|selectattr('status', 'equalto', 'Active')|list|length if staffs else 0 }}
+            </div>
+            <div class="stats-label">Active Staff</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="stats-number">
+                {{ staffs|map(attribute='position')|unique|list|length if staffs else 0 }}
+            </div>
+            <div class="stats-label">Positions</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <div class="stats-number">
+                {{ staffs|selectattr('hire_date')|list|length if staffs else 0 }}
+            </div>
+            <div class="stats-label">This Month</div>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Actions -->
+<div class="search-section">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="form-control search-input" placeholder="Search staff members..." id="staffSearch">
             </div>
         </div>
-    </nav>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a href="{{ url_for('add_staff') }}" class="btn btn-success-gradient">
+                <i class="fas fa-user-plus me-2"></i>Add New Staff
+            </a>
+        </div>
+    </div>
+</div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center mt-4 mb-4">Staff Management</h1>
-            <div class="mb-3">
-                <a href="{{url_for('add_staff')}}" class="btn btn-primary">Add New Staff</a>
-            </div>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
+<!-- Staff Table -->
+<div class="table-container">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Position</th>
-                    <th>Status</th>
-                    <th>Hire Date</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                    <th><i class="fas fa-user me-2"></i>Staff</th>
+                    <th><i class="fas fa-envelope me-2"></i>Contact</th>
+                    <th><i class="fas fa-briefcase me-2"></i>Position</th>
+                    <th><i class="fas fa-toggle-on me-2"></i>Status</th>
+                    <th><i class="fas fa-calendar me-2"></i>Hire Date</th>
+                    <th><i class="fas fa-cogs me-2"></i>Actions</th>
                 </tr>
-                </thead>
-                <tbody>
+            </thead>
+            <tbody>
                 {% if staffs %}
-                {% for staff in staffs %}
-                <tr>
-                    <td>{{loop.index}}</td>
-                    <td>{{staff.username}}</td>
-                    <td>{{staff.email}}</td>
-                    <td>{{staff.phone}}</td>
-                    <td>{{staff.position}}</td>
-                    <td>{{staff.status}}</td>
-                    <td>{{staff.hire_date.strftime('%Y-%m-%d')}}</td>
-                    <td><a href="{{url_for('update_staff', id=staff.id)}}" class="btn btn-sm btn-info">Edit</a></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#staffModal-{{staff.id}}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
+                    {% for staff in staffs %}
+                    <tr>
+                        <td><strong>{{ loop.index }}</strong></td>
+                        <td>
+                            <div class="staff-info">
+                                <div class="staff-avatar">
+                                    {{ staff.username[0].upper() }}
+                                </div>
+                                <div class="staff-details">
+                                    <h6>{{ staff.username }}</h6>
+                                    <small>ID: {{ staff.id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div class="fw-bold">{{ staff.email }}</div>
+                                <small class="text-muted">
+                                    <i class="fas fa-phone me-1"></i>{{ staff.phone or 'Not provided' }}
+                                </small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="position-tag">{{ staff.position or 'Not specified' }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge {{ 'status-active' if staff.status == 'Active' else 'status-inactive' }}">
+                                {{ staff.status or 'Active' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="fw-bold">{{ staff.hire_date.strftime('%Y-%m-%d') if staff.hire_date else 'Not set' }}</div>
+                            <small class="text-muted">
+                                {{ staff.hire_date.strftime('%B %d, %Y') if staff.hire_date else '' }}
+                            </small>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('update_staff', id=staff.id) }}" 
+                                   class="btn btn-info-gradient btn-sm" title="Edit Staff">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-danger-gradient btn-sm" 
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal-{{ staff.id }}"
+                                        title="Delete Staff">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-users fa-3x mb-3"></i>
+                                <h5>No staff members found</h5>
+                                <p>Start by adding your first staff member to the system.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="staffModal-{{staff.id}}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Delete Staff Member</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <span class="text-danger">Are you sure you want to delete staff member "{{staff.username}}"?</span>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <form action="{{url_for('delete_staff', id=staff.id)}}" method="POST">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
+<!-- Delete Modals -->
+{% if staffs %}
+    {% for staff in staffs %}
+    <div class="modal fade" id="deleteModal-{{ staff.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="delete-warning">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle text-danger fs-2 me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Delete Staff: <strong>{{ staff.username }}</strong></h6>
+                                <p class="mb-0 text-muted">This action cannot be undone. Are you sure you want to proceed?</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="8" class="text-center">No staff members found.</td>
-                </tr>
-                {% endif %}
-                </tbody>
-            </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning-gradient" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <form action="{{ url_for('delete_staff', id=staff.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-danger-gradient">
+                            <i class="fas fa-trash me-2"></i>Delete Staff
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+    {% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('staffSearch');
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                tableRows.forEach(row => {
+                    if (row.querySelector('td[colspan]')) return; // Skip "no data" row
+                    
+                    const staffName = row.querySelector('.staff-details h6').textContent.toLowerCase();
+                    const email = row.querySelector('td:nth-child(3) .fw-bold').textContent.toLowerCase();
+                    const position = row.querySelector('.position-tag').textContent.toLowerCase();
+                    
+                    if (staffName.includes(searchTerm) || 
+                        email.includes(searchTerm) || 
+                        position.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Add smooth transitions
+        const cards = document.querySelectorAll('.stats-card, .table-container, .search-section');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.card.classList.add('fade-in');
+            }, index * 100);
+        });
+    });
+</script>
 {% endblock %}

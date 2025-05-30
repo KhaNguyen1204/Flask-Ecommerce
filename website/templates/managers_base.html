@@ -1,13 +1,13 @@
-{% extends 'base.html' %}
-{% block content %}
-{% include '_messages.html' %}
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Role Management</title>
+    <title>{% block title %}Manager Dashboard{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Base Styles -->
     <style>
         :root {
             --primary-color: #667eea;
@@ -273,23 +273,51 @@
             color: var(--dark-color);
         }
 
-        .role-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        .stats-row {
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            text-align: center;
+            height: 100%;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
-            margin-right: 1rem;
+            font-size: 1.8rem;
+            margin: 0 auto 1rem;
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .modal-content {
@@ -322,74 +350,6 @@
             background: #f8fafc;
         }
 
-        .delete-warning {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin: 1rem 0;
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .stats-row {
-            margin-bottom: 2rem;
-        }
-
-        .stats-card {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
-            text-align: center;
-            height: 100%;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stats-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.8rem;
-            margin: 0 auto 1rem;
-        }
-
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--dark-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .stats-label {
-            color: #6b7280;
-            font-weight: 600;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .role-name {
-            font-weight: 700;
-            color: var(--dark-color);
-            font-size: 1.1rem;
-        }
-
-        .role-description {
-            color: #6b7280;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
         @media (max-width: 768px) {
             .main-container {
                 margin: 0.5rem;
@@ -403,11 +363,6 @@
             
             .page-title {
                 font-size: 2rem;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                gap: 4px;
             }
 
             .search-section {
@@ -455,9 +410,14 @@
             100% { transform: rotate(360deg); }
         }
     </style>
+    
+    <!-- Page specific styles -->
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+    {% include '_messages.html' %}
+    
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg main-navbar fade-in">
         <div class="container-fluid">
@@ -472,37 +432,37 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin">
+                        <a class="nav-link {% block nav_products %}{% endblock %}" href="/admin">
                             <i class="fas fa-box me-1"></i>Products
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/brands">
+                        <a class="nav-link {% block nav_brands %}{% endblock %}" href="/brands">
                             <i class="fas fa-tags me-1"></i>Brands
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/categories">
+                        <a class="nav-link {% block nav_categories %}{% endblock %}" href="/categories">
                             <i class="fas fa-list me-1"></i>Categories
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/manager_roles">
+                        <a class="nav-link {% block nav_roles %}{% endblock %}" href="/manager_roles">
                             <i class="fas fa-user-shield me-1"></i>Roles
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/manager_staffs">
+                        <a class="nav-link {% block nav_staff %}{% endblock %}" href="/manager_staffs">
                             <i class="fas fa-users me-1"></i>Staff
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/manager_customers">
+                        <a class="nav-link {% block nav_customers %}{% endblock %}" href="/manager_customers">
                             <i class="fas fa-user-friends me-1"></i>Customers
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/manager_orders">
+                        <a class="nav-link {% block nav_orders %}{% endblock %}" href="/manager_orders">
                             <i class="fas fa-shopping-cart me-1"></i>Orders
                         </a>
                     </li>
@@ -530,205 +490,14 @@
 
     <!-- Main Container -->
     <div class="main-container fade-in">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Role Management</h1>
-            <p class="page-subtitle">Manage system roles and permissions for your team</p>
-        </div>
-
-        <!-- Stats Row -->
-        <div class="row stats-row">
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <div class="stats-number">{{ roles|length if roles else 0 }}</div>
-                    <div class="stats-label">Total Roles</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-users-cog"></i>
-                    </div>
-                    <div class="stats-number">5</div>
-                    <div class="stats-label">Active Roles</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-key"></i>
-                    </div>
-                    <div class="stats-number">12</div>
-                    <div class="stats-label">Permissions</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stats-number">25</div>
-                    <div class="stats-label">Assigned Users</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Search and Actions -->
-        <div class="search-section">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="search-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="form-control search-input" placeholder="Search roles...">
-                    </div>
-                </div>
-                <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                    <a href="{{ url_for('add_role') }}" class="btn btn-success-gradient">
-                        <i class="fas fa-plus me-2"></i>Add New Role
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Roles Table -->
-        <div class="table-container">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-hashtag me-2"></i>ID</th>
-                            <th><i class="fas fa-user-shield me-2"></i>Role</th>
-                            <th><i class="fas fa-file-text me-2"></i>Description</th>
-                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if roles %}
-                        {% for role in roles %}
-                        <tr>
-                            <td><strong>{{ loop.index }}</strong></td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="role-icon">
-                                        <i class="fas fa-user-shield"></i>
-                                    </div>
-                                    <div>
-                                        <div class="role-name">{{ role.name }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="role-description">
-                                    {{ role.description or 'No description available' }}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="{{ url_for('update_role', id=role.id) }}" 
-                                       class="btn btn-info-gradient btn-sm" title="Edit Role">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-danger-gradient btn-sm" 
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal-{{ role.id }}"
-                                            title="Delete Role">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fas fa-user-shield fa-3x mb-3"></i>
-                                    <h5>No roles found</h5>
-                                    <p>Start by creating your first role</p>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        {% block content %}
+        {% endblock %}
     </div>
 
-    <!-- Delete Modals -->
-    {% if roles %}
-    {% for role in roles %}
-    <div class="modal fade" id="deleteModal-{{ role.id }}" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="delete-warning">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-exclamation-triangle text-danger fs-2 me-3"></i>
-                            <div>
-                                <h6 class="mb-1">Delete Role: <strong>{{ role.name }}</strong></h6>
-                                <p class="mb-0 text-muted">This action cannot be undone. Are you sure you want to proceed?</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-warning-gradient" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Cancel
-                    </button>
-                    <form action="{{ url_for('delete_role', id=role.id) }}" method="POST" class="d-inline">
-                        <button type="submit" class="btn btn-danger-gradient">
-                            <i class="fas fa-trash me-2"></i>Delete Role
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-    {% endif %}
-
+    <!-- Base Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Add loading animation
-        document.addEventListener('DOMContentLoaded', function() {
-            // Search functionality
-            const searchInput = document.querySelector('.search-input');
-            const tableRows = document.querySelectorAll('tbody tr');
-            
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    
-                    tableRows.forEach(row => {
-                        const roleName = row.querySelector('.role-name')?.textContent.toLowerCase() || '';
-                        const roleDescription = row.querySelector('.role-description')?.textContent.toLowerCase() || '';
-                        
-                        if (roleName.includes(searchTerm) || roleDescription.includes(searchTerm)) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-                });
-            }
-
-            // Add smooth transitions
-            const cards = document.querySelectorAll('.stats-card, .table-container, .search-section');
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.classList.add('fade-in');
-                }, index * 100);
-            });
-        });
-    </script>
+    
+    <!-- Page specific scripts -->
+    {% block extra_js %}{% endblock %}
 </body>
-{% endblock content %}
+</html>

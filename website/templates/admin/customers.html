@@ -1,133 +1,665 @@
-{% extends 'base.html' %}
+{% extends 'managers_base.html' %}
+
+{% block title %}Customer Analytics Dashboard{% endblock %}
+
+{% block nav_customers %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .tab-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #e5e7eb;
+        border-radius: 25px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        color: var(--dark-color);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-color: transparent;
+        box-shadow: var(--shadow);
+    }
+
+    .tab-btn:hover:not(.active) {
+        background: #f1f5f9;
+        transform: translateY(-1px);
+    }
+
+    .stats-icon.customers {
+        background: linear-gradient(135deg, var(--info-color), #2563eb);
+    }
+
+    .stats-icon.orders {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+    }
+
+    .stats-icon.revenue {
+        background: linear-gradient(135deg, var(--warning-color), #d97706);
+    }
+
+    .stats-icon.growth {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .filter-section {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .filter-select {
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .customer-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-right: 12px;
+    }
+
+    .customer-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .customer-details {
+        flex: 1;
+    }
+
+    .customer-name {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 2px;
+    }
+
+    .customer-email {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+        color: var(--success-color);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-inactive {
+        background: linear-gradient(135deg, rgba(107, 114, 128, 0.2), rgba(75, 85, 99, 0.2));
+        color: #6b7280;
+        border: 1px solid rgba(107, 114, 128, 0.3);
+    }
+
+    .status-vip {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2));
+        color: var(--warning-color);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .customer-metrics {
+        text-align: center;
+    }
+
+    .metric-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 2px;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+
+    .chart-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .chart-placeholder {
+        height: 300px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    .segment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .segment-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .segment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .segment-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .segment-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-right: 12px;
+    }
+
+    .segment-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 2px;
+    }
+
+    .segment-count {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .segment-description {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+        .analytics-tabs {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tab-btn {
+            margin: 4px 0;
+        }
+
+        .filter-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .segment-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin">Product</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/brands">Brand</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/categories">Category</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_roles">Role</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_staffs">Staff</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/manager_customers">Customer</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_orders">Order</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Account
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/change_password">Change Password</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Customer Analytics</h1>
+    <p class="page-subtitle">Comprehensive analysis of registered customers and their behavior</p>
+</div>
+
+<!-- Analytics Tabs -->
+<div class="analytics-tabs">
+    <button class="tab-btn active" data-tab="overview">
+        <i class="fas fa-chart-pie me-2"></i>Overview
+    </button>
+    <button class="tab-btn" data-tab="customers">
+        <i class="fas fa-users me-2"></i>Customer List
+    </button>
+    <button class="tab-btn" data-tab="segments">
+        <i class="fas fa-layer-group me-2"></i>Segments
+    </button>
+    <button class="tab-btn" data-tab="analytics">
+        <i class="fas fa-chart-line me-2"></i>Analytics
+    </button>
+</div>
+
+<!-- Overview Tab -->
+<div id="overview-tab" class="tab-content active">
+    <!-- Stats Row -->
+    <div class="row stats-row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon customers">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-number">1,247</div>
+                <div class="stats-label">Total Customers</div>
             </div>
         </div>
-    </nav>
-
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center mt-4 mb-4">Customer Management</h1>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-
-            <div class="mb-3">
-                <a href="/add_customer" class="btn btn-primary">Add Customer</a>
-            </div>
-
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Registration Date</th>
-                    <th>Status</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if customers %}
-                {% for customer in customers %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ customer.username }}</td>
-                    <td>{{ customer.email }}</td>
-                    <td>{{ customer.phone }}</td>
-                    <td>{{ customer.date_created.strftime('%Y-%m-%d') if customer.date_created else '' }}</td>
-                    <td>{{ customer.status }}</td>
-                    <td><a href="{{url_for('update_customer', id=customer.id)}}" class="btn btn-sm btn-info">Edit</a></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#customerModal-{{customer.id}}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="customerModal-{{customer.id}}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Delete Customer Member</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <span class="text-danger">Are you sure you want to delete customer member "{{customer.username}}"?</span>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <form action="{{url_for('delete_customer', id=customer.id)}}" method="POST">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon orders">
+                    <i class="fas fa-shopping-cart"></i>
                 </div>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">No customers found.</td>
-                </tr>
-                {% endif %}
+                <div class="stats-number">3,856</div>
+                <div class="stats-label">Total Orders</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon revenue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stats-number">$284K</div>
+                <div class="stats-label">Total Revenue</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon growth">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stats-number">+23%</div>
+                <div class="stats-label">Growth Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="chart-container">
+                <h3 class="chart-title">Customer Registration Trend</h3>
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Customer registration chart will be displayed here
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="chart-container">
+                <h3 class="chart-title">Customer Status</h3>
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Status distribution chart
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer List Tab -->
+<div id="customers-tab" class="tab-content">
+    <!-- Search and Filters -->
+    <div class="search-section">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control search-input" placeholder="Search customers..." id="customerSearch">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="filter-section justify-content-md-end">
+                    <select class="form-select filter-select" style="max-width: 150px;">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                    <select class="form-select filter-select" style="max-width: 120px;">
+                        <option value="25">Show 25</option>
+                        <option value="50">Show 50</option>
+                        <option value="100">Show 100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                        <th><i class="fas fa-user me-2"></i>Customer</th>
+                        <th><i class="fas fa-calendar me-2"></i>Joined</th>
+                        <th><i class="fas fa-shopping-cart me-2"></i>Orders</th>
+                        <th><i class="fas fa-dollar-sign me-2"></i>Total Spent</th>
+                        <th><i class="fas fa-chart-line me-2"></i>Avg Order</th>
+                        <th><i class="fas fa-flag me-2"></i>Status</th>
+                        <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                    <!-- Sample Customer Rows -->
+                    <tr>
+                        <td>001</td>
+                        <td>
+                            <div class="customer-info">
+                                <div class="customer-avatar">JD</div>
+                                <div class="customer-details">
+                                    <div class="customer-name">John Doe</div>
+                                    <div class="customer-email">john.doe@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Jan 15, 2024</td>
+                        <td>
+                            <div class="customer-metrics">
+                                <div class="metric-value">12</div>
+                                <div class="metric-label">Orders</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="customer-metrics">
+                                <div class="metric-value">$1,245</div>
+                                <div class="metric-label">Total</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="customer-metrics">
+                                <div class="metric-value">$104</div>
+                                <div class="metric-label">Average</div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-vip">VIP</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary-gradient btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-info-gradient btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>002</td>
+                        <td>
+                            <div class="customer-info">
+                                <div class="customer-avatar">JS</div>
+                                <div class="customer-details">
+                                    <div class="customer-name">Jane Smith</div>
+                                    <div class="customer-email">jane.smith@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Feb 20, 2024</td>
+                        <td>
+                            <div class="customer-metrics">
+                                <div class="metric-value">8</div>
+                                <div class="metric-label">Orders</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="customer-metrics">
+                                <div class="metric-value">$680</div>
+                                <div class="metric-label">Total</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="customer-metrics">
+                                <div class="metric-value">$85</div>
+                                <div class="metric-label">Average</div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary-gradient btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-info-gradient btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<!-- Segments Tab -->
+<div id="segments-tab" class="tab-content">
+    <div class="segment-grid">
+        <div class="segment-card">
+            <div class="segment-header">
+                <div class="segment-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div>
+                    <div class="segment-title">VIP Customers</div>
+                    <div class="segment-count">48 customers</div>
+                </div>
+            </div>
+            <p class="segment-description">High-value customers with total purchases over $1,000 and frequent buying behavior.</p>
+        </div>
+
+        <div class="segment-card">
+            <div class="segment-header">
+                <div class="segment-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div>
+                    <div class="segment-title">Active Buyers</div>
+                    <div class="segment-count">892 customers</div>
+                </div>
+            </div>
+            <p class="segment-description">Customers who have made at least one purchase in the last 30 days.</p>
+        </div>
+
+        <div class="segment-card">
+            <div class="segment-header">
+                <div class="segment-icon" style="background: linear-gradient(135deg, var(--info-color), #2563eb);">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div>
+                    <div class="segment-title">New Customers</div>
+                    <div class="segment-count">156 customers</div>
+                </div>
+            </div>
+            <p class="segment-description">Customers who registered in the last 30 days.</p>
+        </div>
+
+        <div class="segment-card">
+            <div class="segment-header">
+                <div class="segment-icon" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <div>
+                    <div class="segment-title">At-Risk Customers</div>
+                    <div class="segment-count">89 customers</div>
+                </div>
+            </div>
+            <p class="segment-description">Previously active customers who haven't purchased in the last 90 days.</p>
+        </div>
+
+        <div class="segment-card">
+            <div class="segment-header">
+                <div class="segment-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                    <i class="fas fa-repeat"></i>
+                </div>
+                <div>
+                    <div class="segment-title">Repeat Customers</div>
+                    <div class="segment-count">634 customers</div>
+                </div>
+            </div>
+            <p class="segment-description">Customers who have made 3 or more purchases.</p>
+        </div>
+
+        <div class="segment-card">
+            <div class="segment-header">
+                <div class="segment-icon" style="background: linear-gradient(135deg, #6b7280, #4b5563);">
+                    <i class="fas fa-user-minus"></i>
+                </div>
+                <div>
+                    <div class="segment-title">Inactive Customers</div>
+                    <div class="segment-count">62 customers</div>
+                </div>
+            </div>
+            <p class="segment-description">Customers who haven't made any purchases in the last 6 months.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Tab -->
+<div id="analytics-tab" class="tab-content">
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="chart-container">
+                <h3 class="chart-title">Customer Lifetime Value</h3>
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    CLV distribution chart
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="chart-container">
+                <h3 class="chart-title">Purchase Frequency</h3>
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-area me-2"></i>
+                    Purchase frequency analysis
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h3 class="chart-title">Customer Behavior Timeline</h3>
+                <div class="chart-placeholder">
+                    <i class="fas fa-timeline me-2"></i>
+                    Customer behavior timeline will be displayed here
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                this.classList.add('active');
+                document.getElementById(targetTab + '-tab').classList.add('active');
+            });
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('customerSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('#customersTableBody tr');
+                
+                tableRows.forEach(row => {
+                    const customerName = row.querySelector('.customer-name');
+                    const customerEmail = row.querySelector('.customer-email');
+                    
+                    if (customerName && customerEmail) {
+                        const nameText = customerName.textContent.toLowerCase();
+                        const emailText = customerEmail.textContent.toLowerCase();
+                        
+                        if (nameText.includes(searchTerm) || emailText.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}
