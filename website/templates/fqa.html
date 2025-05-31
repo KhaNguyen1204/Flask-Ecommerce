@@ -65,6 +65,109 @@
             opacity: 0.9;
             position: relative;
             z-index: 1;
+            margin-bottom: 20px;
+        }
+
+        /* Shopping button styles */
+        .shop-now-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            overflow: hidden;
+        }
+
+        .shop-now-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .shop-now-btn:hover::before {
+            left: 100%;
+        }
+
+        .shop-now-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+        }
+
+        .shop-now-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .shop-icon {
+            font-size: 1.2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* Floating shopping button */
+        .floating-shop-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 35px rgba(255, 107, 107, 0.6);
+                transform: scale(1.05);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            }
+        }
+
+        .floating-shop-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.5);
         }
 
         .search-box {
@@ -207,6 +310,54 @@
             margin-bottom: 5px;
         }
 
+        /* Shop promotion banner */
+        .shop-banner {
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shop-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 15s infinite linear;
+        }
+
+        .shop-banner h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .shop-banner p {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+        }
+
+        .shop-banner .shop-now-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .shop-banner .shop-now-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -232,6 +383,19 @@
             .faq-answer.active {
                 padding: 15px;
             }
+
+            .floating-shop-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .shop-now-btn {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
         }
 
         .no-results {
@@ -251,6 +415,10 @@
         <div class="header">
             <h1>🔧 Câu hỏi thường gặp</h1>
             <p>Tìm câu trả lời nhanh chóng cho các thắc mắc của bạn</p>
+            <a href="/" class="shop-now-btn">
+                <span class="shop-icon">🛒</span>
+                Mua sắm ngay
+            </a>
         </div>
 
         <div class="search-box">
@@ -258,6 +426,15 @@
         </div>
 
         <div class="faq-content">
+            <div class="shop-banner">
+                <h3>🎉 Ưu đại đặc biệt!</h3>
+                <p>Giảm giá lên đến 50% cho tất cả sản phẩm công nghệ. Laptop, điện thoại, đồng hồ thông minh và nhiều hơn nữa!</p>
+                <a href="/" class="shop-now-btn">
+                    <span class="shop-icon">🛍️</span>
+                    Khám phá ngay
+                </a>
+            </div>
+
             <div class="faq-section">
                 <h2 class="section-title">
                     <span class="section-icon">🛒</span>
@@ -414,6 +591,11 @@
         </div>
     </div>
 
+    <!-- Floating Shopping Button -->
+    <button class="floating-shop-btn" onclick="window.location.href='#shop'">
+        🛒
+    </button>
+
     <script>
         // FAQ Accordion functionality
         document.querySelectorAll('.faq-question').forEach(question => {
@@ -467,7 +649,7 @@
                         questionElement.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
                     } else {
                         questionElement.textContent = originalText;
-                    }
+                    </div>
                 } else {
                     item.style.display = 'none';
                 }
@@ -499,6 +681,14 @@
                     item.style.opacity = '1';
                     item.style.transform = 'translateY(0)';
                 }, index * 100);
+            });
+        });
+
+        // Shopping button click handlers
+        document.querySelectorAll('a[href="#shop"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('Chuyển hướng đến trang mua sắm! 🛒\n\nBạn có thể thay đổi href="#shop" thành URL thực tế của cửa hàng.');
             });
         });
     </script>

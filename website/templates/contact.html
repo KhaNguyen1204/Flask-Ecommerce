@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liên Hệ - Kết Nối Cùng Chúng Tôi</title>
+    <title>Liên Hệ - Kết Nối Cùng AZPhone</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -43,6 +43,56 @@
             font-size: 1.3rem;
             opacity: 0.9;
             animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        /* Shopping Button Styles */
+        .shopping-section {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .shopping-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            text-decoration: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shopping-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+            color: white;
+        }
+
+        .shopping-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .shopping-btn:hover::before {
+            left: 100%;
+        }
+
+        .shopping-btn i {
+            margin-right: 12px;
+            font-size: 1.1em;
         }
 
         .contact-grid {
@@ -289,6 +339,11 @@
                 width: 100%;
                 max-width: 300px;
             }
+
+            .shopping-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
         }
 
         .floating-elements {
@@ -375,6 +430,14 @@
         <div class="header">
             <h1><i class="fas fa-paper-plane"></i> Liên Hệ</h1>
             <p>Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn 24/7</p>
+        </div>
+
+        <!-- Shopping Button Section -->
+        <div class="shopping-section">
+            <a href="/" class="shopping-btn">
+                <i class="fas fa-shopping-cart"></i>
+                Mua Sắm Ngay
+            </a>
         </div>
 
         <div class="contact-grid">
