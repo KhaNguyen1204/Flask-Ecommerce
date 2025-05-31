@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giới thiệu - AZphone</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --accent-color: #28a745;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="600" cy="700" r="120" fill="url(%23a)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-custom {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .feature-box {
+            padding: 40px 30px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-box:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .icon-box::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .feature-box:hover .icon-box::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .team-member {
+            text-align: center;
+            padding: 40px 25px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            transform: scale(0);
+        }
+
+        .team-member:hover::before {
+            opacity: 0.1;
+            transform: scale(1);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .team-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-img::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .team-member:hover .team-img::after {
+            transform: translateX(100%);
+        }
+
+        .stats-section {
+            background: var(--gradient-success);
+            color: white;
+            position: relative;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 50px 20px;
+            position: relative;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            counter-reset: num var(--num);
+        }
+
+        .stat-number.animate {
+            animation: countUp 2s ease-out;
+        }
+
+        @keyframes countUp {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .phone-icon {
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+        }
+
+        .story-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section {
+            background: var(--gradient-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 40%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(15deg);
+            animation: slideInOut 8s ease-in-out infinite;
+        }
+
+        @keyframes slideInOut {
+            0%, 100% { transform: translateX(100%) rotate(15deg); }
+            50% { transform: translateX(-50%) rotate(15deg); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .section-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                    <div class="phone-icon mb-4">
+                        <i class="fas fa-mobile-alt" style="font-size: 4rem;"></i>
+                    </div>
+                    <h1 class="hero-title">Chào mừng đến với AZphone</h1>
+                    <p class="hero-subtitle">
+                        Điểm đến tin cậy cho mọi nhu cầu công nghệ di động của bạn. 
+                        Chúng tôi cam kết mang đến những sản phẩm chất lượng cao và dịch vụ tuyệt vời nhất.
+                    </p>
+                    <a href="#story" class="btn btn-light btn-custom pulse">Tìm hiểu thêm</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section id="story" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <h2 class="section-title text-center" data-aos="fade-up">Câu chuyện của chúng tôi</h2>
+                    <div data-aos="fade-up" data-aos-delay="200">
+                        <p class="story-text">
+                            Được thành lập vào tháng 2 năm 2025, AZphone ra đời từ niềm đam mê công nghệ và mong muốn 
+                            mang đến cho khách hàng những sản phẩm điện thoại di động chất lượng cao với giá cả hợp lý. 
+                            Chúng tôi bắt đầu như một đội ngũ nhỏ gồm ba thành viên trẻ trung, năng động với tầm nhìn 
+                            tạo ra một cửa hàng trực tuyến đáng tin cậy và thân thiện.
+                        </p>
+                        <p class="story-text">
+                            Từ những ngày đầu khiêm tốn, chúng tôi đã không ngừng học hỏi và phát triển để hiểu rõ 
+                            nhu cầu của khách hàng. Với phương châm "Khách hàng là trung tâm", AZphone cam kết cung cấp 
+                            không chỉ sản phẩm chất lượng mà còn dịch vụ chăm sóc khách hàng tận tâm và chuyên nghiệp.
+                        </p>
+                        <p class="story-text">
+                            Ngày hôm nay, chúng tôi tự hào là đối tác tin cậy của hàng nghìn khách hàng, luôn nỗ lực 
+                            cập nhật những xu hướng công nghệ mới nhất và mang đến trải nghiệm mua sắm tuyệt vời nhất 
+                            cho mọi người.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title text-center" data-aos="fade-up">Tại sao chọn AZphone?</h2>
+            <div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-box text-center">
+                        <div class="icon-box bg-primary text-white">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <h4 class="mb-3">Giao hàng nhanh chóng</h4>
+                        <p class="text-muted">
+                            Cam kết giao hàng trong 24h tại nội thành và 2-3 ngày toàn quốc. 
+                            Đóng gói cẩn thận, bảo đảm sản phẩm nguyên vẹn khi đến tay bạn.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-box text-center">
+                        <div class="icon-box bg-success text-white">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="mb-3">Thanh toán bảo mật</h4>
+                        <p class="text-muted">
+                            Hệ thống thanh toán được mã hóa SSL 256-bit, hỗ trợ đa dạng phương thức 
+                            từ thẻ tín dụng, ví điện tử đến thanh toán khi nhận hàng.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-box text-center">
+                        <div class="icon-box bg-info text-white">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h4 class="mb-3">Hỗ trợ 24/7</h4>
+                        <p class="text-muted">
+                            Đội ngũ tư vấn chuyên nghiệp sẵn sàng hỗ trợ bạn mọi lúc qua hotline, 
+                            chat trực tuyến và email với thái độ nhiệt tình, tận tâm.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-box text-center">
+                        <div class="icon-box bg-warning text-white">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h4 class="mb-3">Chính hãng 100%</h4>
+                        <p class="text-muted">
+                            Tất cả sản phẩm đều được nhập khẩu chính hãng, có đầy đủ giấy tờ, 
+                            bảo hành theo tiêu chuẩn quốc tế và chính sách đổi trả linh hoạt.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-box text-center">
+                        <div class="icon-box bg-danger text-white">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <h4 class="mb-3">Giá cả cạnh tranh</h4>
+                        <p class="text-muted">
+                            Cam kết giá tốt nhất thị trường với nhiều chương trình khuyến mãi hấp dẫn, 
+                            ưu đãi đặc biệt dành cho khách hàng thân thiết và sinh viên.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-box text-center">
+                        <div class="icon-box bg-secondary text-white">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h4 class="mb-3">Dịch vụ kỹ thuật</h4>
+                        <p class="text-muted">
+                            Cung cấp dịch vụ sửa chữa, bảo trì chuyên nghiệp với đội ngũ kỹ thuật 
+                            có nhiều năm kinh nghiệm và trang thiết bị hiện đại.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-5 stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-item">
+                        <div class="stat-number">20000K+</div>
+                        <h5>Khách hàng hài lòng</h5>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-item">
+                        <div class="stat-number">150+</div>
+                        <h5>Sản phẩm đa dạng</h5>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <h5>Tỷ lệ hài lòng</h5>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-item">
+                        <div class="stat-number">1000</div>
+                        <h5>Hỗ trợ liên tục</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center" data-aos="fade-up">Đội ngũ của chúng tôi</h2>
+            <div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="team-member">
+                        <div class="team-img">
+                            <img src="/static/images/admin_pictures/duy.jpg" alt="Lương Văn Duy" style="width:150px;">
+                        </div>
+                        <h4>Lương Văn Duy</h4>
+                        <p class="text-primary mb-2">CEO & Nhà sáng lập</p>
+                        <p class="text-muted small mb-2">ID: 22520318</p>
+                        <p class="text-muted">
+                            Người dẫn dắt tầm nhìn phát triển AZphone thành thương hiệu uy tín. 
+                            Với kinh nghiệm trong lĩnh vực công nghệ và kinh doanh, anh luôn 
+                            đặt khách hàng làm trung tâm của mọi quyết định.
+                        </p>
+                        <div class="social-links mt-3">
+                            <a href="https://www.linkedin.com/"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.facebook.com/duy.luongvan.204"><i class="fab fa-facebook"></i></a>
+                            <a href="https://www.facebook.com/duy.luongvan.204"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="team-member">
+                        <div class="team-img">
+                            <img src="/static/images/admin_pictures/duy.jpg" alt="Lương Văn Duy" style="width:150px;">
+                        </div>
+                        <h4>Phạm Anh Kiệt</h4>
+                        <p class="text-primary mb-2">Trưởng phòng Marketing</p>
+                        <p class="text-muted small mb-2">ID: 123</p>
+                        <p class="text-muted">
+                            Chuyên gia marketing sáng tạo với khả năng xây dựng chiến lược 
+                            truyền thông hiệu quả. Anh chịu trách nhiệm phát triển thương hiệu 
+                            và tạo kết nối mạnh mẽ với cộng đồng khách hàng.
+                        </p>
+                        <div class="social-links mt-3">
+                            <a href="https://www.linkedin.com/"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="team-member">
+                        <div class="team-img">
+                            <img src="/static/images/admin_pictures/duy.jpg" alt="Lương Văn Duy" style="width:150px;">
+
+                        </div>
+                        <h4>Nguyễn Hà Vũ Kha</h4>
+                        <p class="text-primary mb-2">Trưởng phòng Kỹ thuật</p>
+                        <p class="text-muted small mb-2">ID: 5724</p>
+                        <p class="text-muted">
+                            Kỹ sư phần mềm tài năng đảm bảo website hoạt động mượt mà và bảo mật. 
+                            Anh không ngừng cải tiến trải nghiệm người dùng và áp dụng 
+                            công nghệ mới nhất vào hệ thống.
+                        </p>
+                        <div class="social-links mt-3">
+                            <a href="https://www.linkedin.com/"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA Section -->
+    <section class="py-5 cta-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center text-white" data-aos="fade-up">
+                    <h2 class="mb-4">Sẵn sàng trải nghiệm?</h2>
+                    <p class="lead mb-4">
+                        Hãy tham gia cùng hàng nghìn khách hàng đã tin tưởng và lựa chọn AZphone 
+                        cho nhu cầu công nghệ di động của họ.
+                    </p>
+                    <a href="#" class="btn btn-light btn-custom me-3">Mua sắm ngay</a>
+                    <a href="#" class="btn btn-outline-light btn-custom">Liên hệ tư vấn</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Initialize AOS animation
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent);
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = counter.textContent; // Keep original text (with +, %, etc.)
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 40);
+            });
+        }
+
+        // Trigger counter animation when stats section comes into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+
+        // Add parallax effect to hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.hero-section');
+            if (parallax) {
+                const speed = scrolled * 0.5;
+                parallax.style.transform = `translateY(${speed}px)`;
+            }
+        });
+    </script>
+</body>
+</html>

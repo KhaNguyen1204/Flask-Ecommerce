@@ -11,6 +11,11 @@ from website.decorators import role_required
 import logging
 
 
+@app.route('/aboutus')
+def about_us():
+    return render_template('about_us.html')
+
+
 @app.route('/customer/register', methods=['GET', 'POST'])
 def customer_register():
     form = CustomerRegisterForm()
