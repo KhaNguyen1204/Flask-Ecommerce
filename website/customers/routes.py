@@ -15,6 +15,10 @@ import logging
 def about_us():
     return render_template('about_us.html')
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
 
 @app.route('/customer/register', methods=['GET', 'POST'])
 def customer_register():
