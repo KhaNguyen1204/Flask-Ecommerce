@@ -19,6 +19,9 @@ def about_us():
 def contact():
     return render_template('contact.html')
 
+@app.route('/fqa')
+def fqa():
+    return render_template('fqa.html')
 
 @app.route('/customer/register', methods=['GET', 'POST'])
 def customer_register():

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Câu hỏi thường gặp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-box {
+            padding: 30px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .faq-content {
+            padding: 20px 30px 40px;
+        }
+
+        .faq-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #1e293b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #1e293b;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        }
+
+        .faq-question.active {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+
+        .faq-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-question.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #fefefe;
+        }
+
+        .faq-answer.active {
+            max-height: 300px;
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .faq-answer p {
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .contact-info h3 {
+            color: #0c4a6e;
+            margin-bottom: 10px;
+        }
+
+        .contact-info p {
+            color: #075985;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .faq-content {
+                padding: 15px 20px 30px;
+            }
+
+            .faq-question {
+                padding: 15px;
+            }
+
+            .faq-answer.active {
+                padding: 15px;
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Câu hỏi thường gặp</h1>
+            <p>Tìm câu trả lời nhanh chóng cho các thắc mắc của bạn</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="🔍 Tìm kiếm câu hỏi..." id="searchInput">
+        </div>
+
+        <div class="faq-content">
+            <div class="faq-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🛒</span>
+                    Đặt hàng & Thanh toán
+                </h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Làm sao để đặt hàng trên website?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Để đặt hàng trên website của chúng tôi, bạn có thể làm theo các bước sau:</p>
+                        <p>1. Chọn sản phẩm bạn muốn mua (laptop, điện thoại, đồng hồ thông minh...)</p>
+                        <p>2. Nhấn "Thêm vào giỏ hàng" và kiểm tra thông tin</p>
+                        <p>3. Điền thông tin giao hàng và chọn phương thức thanh toán</p>
+                        <p>4. Xác nhận đơn hàng và hoàn tất thanh toán</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Website hỗ trợ những phương thức thanh toán nào?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Chúng tôi hỗ trợ nhiều phương thức thanh toán tiện lợi:</p>
+                        <p>• Thanh toán khi nhận hàng (COD)</p>
+                        <p>• Chuyển khoản ngân hàng</p>
+                        <p>• Thanh toán qua ví điện tử (MoMo, ZaloPay, VNPay)</p>
+                        <p>• Thanh toán bằng thẻ tín dụng/ghi nợ</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🚚</span>
+                    Giao hàng & Nhận hàng
+                </h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Thời gian giao hàng là bao lâu?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Thời gian giao hàng phụ thuộc vào khu vực của bạn:</p>
+                        <p>• Nội thành Hà Nội, TP.HCM: 1-2 ngày làm việc</p>
+                        <p>• Các tỉnh thành khác: 2-4 ngày làm việc</p>
+                        <p>• Vùng sâu, vùng xa: 4-7 ngày làm việc</p>
+                        <p>Chúng tôi sẽ gửi mã vận đơn để bạn theo dõi tiến trình giao hàng.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Phí giao hàng được tính như thế nào?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Phí giao hàng được tính dựa trên:</p>
+                        <p>• Miễn phí giao hàng cho đơn hàng từ 500.000đ trở lên</p>
+                        <p>• Đơn hàng dưới 500.000đ: phí giao hàng 30.000đ</p>
+                        <p>• Giao hàng nhanh trong ngày: phí bổ sung 50.000đ</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🔄</span>
+                    Đổi trả & Bảo hành
+                </h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Tôi có thể đổi/trả sản phẩm không?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Chúng tôi hỗ trợ đổi/trả sản phẩm trong các trường hợp sau:</p>
+                        <p>• Sản phẩm lỗi do nhà sản xuất: đổi/trả trong 30 ngày</p>
+                        <p>• Không đúng mô tả: đổi/trả trong 7 ngày</p>
+                        <p>• Không vừa ý: đổi trong 7 ngày (sản phẩm còn nguyên seal)</p>
+                        <p>Điều kiện: Sản phẩm còn nguyên vẹn, đầy đủ phụ kiện và hóa đơn mua hàng.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Chính sách bảo hành thế nào?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Tất cả sản phẩm đều được bảo hành chính hãng:</p>
+                        <p>• Laptop: 12-24 tháng tùy hãng</p>
+                        <p>• Điện thoại: 12 tháng</p>
+                        <p>• Đồng hồ thông minh: 12 tháng</p>
+                        <p>• Phụ kiện: 6-12 tháng</p>
+                        <p>Bảo hành tại các trung tâm bảo hành ủy quyền trên toàn quốc.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-section">
+                <h2 class="section-title">
+                    <span class="section-icon">👤</span>
+                    Tài khoản & Bảo mật
+                </h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Tôi quên mật khẩu thì làm sao?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Để khôi phục mật khẩu, bạn có thể:</p>
+                        <p>1. Nhấn "Quên mật khẩu?" ở trang đăng nhập</p>
+                        <p>2. Nhập email/số điện thoại đã đăng ký</p>
+                        <p>3. Kiểm tra email/SMS để nhận mã xác nhận</p>
+                        <p>4. Tạo mật khẩu mới và đăng nhập</p>
+                        <p>Nếu gặp khó khăn, vui lòng liên hệ hotline để được hỗ trợ.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Làm thế nào để cập nhật thông tin tài khoản?</span>
+                        <span class="faq-icon">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Để cập nhật thông tin tài khoản:</p>
+                        <p>1. Đăng nhập vào tài khoản của bạn</p>
+                        <p>2. Vào mục "Thông tin cá nhân"</p>
+                        <p>3. Chỉnh sửa các thông tin cần thiết</p>
+                        <p>4. Nhấn "Lưu thay đổi"</p>
+                        <p>Một số thông tin quan trọng có thể cần xác thực qua email/SMS.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-info">
+                <h3>💬 Vẫn cần hỗ trợ?</h3>
+                <p>📞 Hotline: 1900-123-456 (7:30 - 22:00 hàng ngày)</p>
+                <p>📧 Email: support@.com</p>
+                <p>📍 Địa chỉ: 123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</p>
+            </div>
+
+            <div class="no-results">
+                <h3>🔍 Không tìm thấy kết quả</h3>
+                <p>Thử tìm kiếm với từ khóa khác hoặc liên hệ với chúng tôi để được hỗ trợ.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FAQ Accordion functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const answer = question.nextElementSibling;
+                const isActive = question.classList.contains('active');
+
+                // Close all other items
+                document.querySelectorAll('.faq-question.active').forEach(activeQuestion => {
+                    if (activeQuestion !== question) {
+                        activeQuestion.classList.remove('active');
+                        activeQuestion.nextElementSibling.classList.remove('active');
+                    }
+                });
+
+                // Toggle current item
+                if (isActive) {
+                    question.classList.remove('active');
+                    answer.classList.remove('active');
+                } else {
+                    question.classList.add('active');
+                    answer.classList.add('active');
+                }
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const faqItems = document.querySelectorAll('.faq-item');
+        const faqSections = document.querySelectorAll('.faq-section');
+        const noResults = document.querySelector('.no-results');
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            let hasResults = false;
+
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                
+                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    hasResults = true;
+                    
+                    // Highlight search terms
+                    const questionElement = item.querySelector('.faq-question span');
+                    const originalText = questionElement.textContent;
+                    if (searchTerm && question.includes(searchTerm)) {
+                        const regex = new RegExp(`(${searchTerm})`, 'gi');
+                        questionElement.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    } else {
+                        questionElement.textContent = originalText;
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide sections based on results
+            faqSections.forEach(section => {
+                const visibleItems = section.querySelectorAll('.faq-item[style="display: block;"], .faq-item:not([style*="display: none"])');
+                section.style.display = visibleItems.length > 0 ? 'block' : 'none';
+            });
+
+            // Show/hide no results message
+            if (hasResults || searchTerm === '') {
+                noResults.classList.remove('show');
+            } else {
+                noResults.classList.add('show');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add some smooth animations on load
+            const items = document.querySelectorAll('.faq-item');
+            items.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    item.style.transition = 'all 0.5s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
