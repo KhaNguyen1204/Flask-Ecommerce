@@ -27,28 +27,28 @@
             </thead>
             <tbody>
                 {% for item in order_details %}
-                {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
+                {% set discount = "%0.0f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
                 <tr>
                     <td>{{loop.index}}</td>
                     <td>{{item.product_name}}</td>
-                    <td>{{"%.2f"|format(item.price)}}$</td>
+                    <td>{{"%.0f"|format(item.price)}}đ</td>
                     <td>{{item.quantity}}</td>
                     {% if item.discount > 0 %}
-                    <td>{{item.discount}}% is {{discount}}$</td>
+                    <td>{{item.discount}}% is {{discount}}đ</td>
                     {% else %}
                     <td>0%</td>
                     {% endif %}
-                    <td>{{"%0.2f"|format(item.subtotal)}}$</td>
+                    <td>{{"%0.0f"|format(item.subtotal)}}đ</td>
                 </tr>
                 {% endfor %}
                 <tr>
-                    <td><a href="#" class="btn btn-success">Check out!</a> </td>
+                    <td><a href="/" class="btn btn-success">Check out!</a> </td>
                     <td></td>
-                    <td colspan="2"><h4>Tax: {{"%.2f"|format(tax)}}$</h4></td>
-                    <td colspan="2"><h4>Total: {{"%.2f"|format(grand_total)}}$</h4></td>
+                    <td colspan="2"><h4>Tax: {{"%.0f"|format(tax)}}đ</h4></td>
+                    <td colspan="2"><h4>Total: {{"%.0f"|format(grand_total)}}đ</h4></td>
                     <td>
                         <form action="{{url_for('get_pdf', invoice=invoice)}}" method="post">
-                        <button type="submit" class="btn btn-info">Get PDF</button>
+                        <button type="submit" class="btn btn-info">Xuất hóa đơn</button>
                         </form>
                     </td>
                 </tr>
