@@ -43,11 +43,6 @@
         color: #6b7280;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-    }
-
     .section-toggle {
         display: flex;
         justify-content: center;
@@ -94,6 +89,27 @@
         background: linear-gradient(135deg, #06b6d4, #0891b2);
     }
 
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    .empty-state p {
+        margin-bottom: 2rem;
+    }
+
     @media (max-width: 768px) {
         .section-toggle {
             flex-direction: column;
@@ -102,11 +118,6 @@
 
         .toggle-btn {
             margin: 4px 0;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-            gap: 4px;
         }
     }
 </style>
@@ -122,6 +133,28 @@
     <p class="page-subtitle">Manage your product brands and categories efficiently</p>
 </div>
 
+<!-- Stats Cards -->
+<div class="row stats-row">
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="stats-icon brands">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stats-number">{{ brands|length if brands else 0 }}</div>
+            <div class="stats-label">Total Brands</div>
+        </div>
+    </div>
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="stats-card">
+            <div class="stats-icon categories">
+                <i class="fas fa-list"></i>
+            </div>
+            <div class="stats-number">{{ categories|length if categories else 0 }}</div>
+            <div class="stats-label">Total Categories</div>
+        </div>
+    </div>
+</div>
+
 <!-- Section Toggle -->
 <div class="section-toggle">
     <button class="toggle-btn active" data-section="brands">
@@ -132,317 +165,200 @@
     </button>
 </div>
 
-<!-- Stats Cards -->
-<div class="row stats-row">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="stats-icon brands">
-                <i class="fas fa-tags"></i>
-            </div>
-            <div class="stats-number">24</div>
-            <div class="stats-label">Total Brands</div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="stats-icon categories">
-                <i class="fas fa-list"></i>
-            </div>
-            <div class="stats-number">18</div>
-            <div class="stats-label">Total Categories</div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="stats-icon brands">
-                <i class="fas fa-plus"></i>
-            </div>
-            <div class="stats-number">5</div>
-            <div class="stats-label">New This Month</div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stats-card">
-            <div class="stats-icon categories">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="stats-number">8.3%</div>
-            <div class="stats-label">Growth Rate</div>
-        </div>
-    </div>
-</div>
-
 <!-- Flash Messages -->
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    <i class="fas fa-check-circle me-2"></i>
-    Brand updated successfully!
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 <!-- Brands Section -->
 <div id="brands-section" class="section-content active">
-    <!-- Search Section -->
-    <div class="search-section">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Search brands..." id="brandSearch">
-                </div>
-            </div>
-            <div class="col-md-6 text-end">
-                <a href="/addbrand" class="btn btn-primary-gradient me-2">
-                    <i class="fas fa-plus me-2"></i>Add New Brand
-                </a>
-                <button class="btn btn-success-gradient">
-                    <i class="fas fa-download me-2"></i>Export
-                </button>
-            </div>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fas fa-tags me-2"></i>Brands</h3>
+        <a href="{{ url_for('addbrand') }}" class="btn btn-primary-gradient">
+            <i class="fas fa-plus me-2"></i>Add Brand
+        </a>
     </div>
 
-    <!-- Brands Table -->
     <div class="table-container">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-hashtag me-2"></i>#</th>
-                        <th><i class="fas fa-tags me-2"></i>Brand Name</th>
-                        <th><i class="fas fa-box me-2"></i>Products</th>
-                        <th><i class="fas fa-calendar me-2"></i>Created</th>
-                        <th><i class="fas fa-cog me-2"></i>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>
-                            <div class="item-info">
-                                <div class="brand-icon">N</div>
-                                <div>
-                                    <div class="item-name">Nike</div>
-                                    <div class="item-meta">Sports & Fashion</div>
+        {% if brands and brands|length > 0 %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-2"></i>#</th>
+                            <th><i class="fas fa-tags me-2"></i>Brand Name</th>
+                            <th><i class="fas fa-box me-2"></i>Products</th>
+                            <th><i class="fas fa-calendar me-2"></i>Created</th>
+                            <th><i class="fas fa-cog me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for brand in brands %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <div class="item-info">
+                                    <div class="brand-icon">{{ brand.name[0]|upper if brand.name else 'B' }}</div>
+                                    <div>
+                                        <div class="item-name">{{ brand.name }}</div>
+                                        <div class="item-meta">{{ brand.description if brand.description else 'No description' }}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-primary rounded-pill">23</span></td>
-                        <td>2024-01-15</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-info-gradient" title="Edit">
+                            </td>
+                            <td><span class="badge bg-primary rounded-pill">{{ brand.products_count if brand.products_count else 0 }}</span></td>
+                            <td>{{ brand.created_at.strftime('%Y-%m-%d') if brand.created_at else 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('updatebrand', id=brand.id) }}" class="btn btn-sm btn-info-gradient me-2" title="Edit">
                                     <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteBrandModal1" title="Delete">
+                                </a>
+                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteBrandModal{{ brand.id }}" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>
-                            <div class="item-info">
-                                <div class="brand-icon">A</div>
-                                <div>
-                                    <div class="item-name">Adidas</div>
-                                    <div class="item-meta">Sports & Lifestyle</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-primary rounded-pill">18</span></td>
-                        <td>2024-02-10</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-info-gradient" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteBrandModal2" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>
-                            <div class="item-info">
-                                <div class="brand-icon">A</div>
-                                <div>
-                                    <div class="item-name">Apple</div>
-                                    <div class="item-meta">Technology</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-primary rounded-pill">42</span></td>
-                        <td>2024-03-05</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-info-gradient" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteBrandModal3" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-tags"></i>
+                <h3>No Brands Found</h3>
+                <p>You haven't added any brands yet. Start by creating your first brand!</p>
+                <a href="{{ url_for('addbrand') }}" class="btn btn-primary-gradient">
+                    <i class="fas fa-plus me-2"></i>Add Your First Brand
+                </a>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <!-- Categories Section -->
 <div id="categories-section" class="section-content">
-    <!-- Search Section -->
-    <div class="search-section">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Search categories..." id="categorySearch">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fas fa-list me-2"></i>Categories</h3>
+        <a href="{{ url_for('addcategory') }}" class="btn btn-primary-gradient">
+            <i class="fas fa-plus me-2"></i>Add Category
+        </a>
+    </div>
+
+    <div class="table-container">
+        {% if categories and categories|length > 0 %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-2"></i>#</th>
+                            <th><i class="fas fa-list me-2"></i>Category Name</th>
+                            <th><i class="fas fa-box me-2"></i>Products</th>
+                            <th><i class="fas fa-calendar me-2"></i>Created</th>
+                            <th><i class="fas fa-cog me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <div class="item-info">
+                                    <div class="category-icon">{{ category.name[0]|upper if category.name else 'C' }}</div>
+                                    <div>
+                                        <div class="item-name">{{ category.name }}</div>
+                                        <div class="item-meta">{{ category.description if category.description else 'No description' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-info rounded-pill">{{ category.products_count if category.products_count else 0 }}</span></td>
+                            <td>{{ category.created_at.strftime('%Y-%m-%d') if category.created_at else 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_category', id=category.id) }}" class="btn btn-sm btn-info-gradient me-2" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal{{ category.id }}" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-list"></i>
+                <h3>No Categories Found</h3>
+                <p>You haven't added any categories yet. Start by creating your first category!</p>
+                <a href="{{ url_for('addcategory') }}" class="btn btn-primary-gradient">
+                    <i class="fas fa-plus me-2"></i>Add Your First Category
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Modals for Brands -->
+{% if brands %}
+    {% for brand in brands %}
+    <div class="modal fade" id="deleteBrandModal{{ brand.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the brand "<strong>{{ brand.name }}</strong>"?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ url_for('deletebrand', id=brand.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger-gradient">Delete Brand</button>
+                    </form>
                 </div>
             </div>
-            <div class="col-md-6 text-end">
-                <a href="/addcategory" class="btn btn-primary-gradient me-2">
-                    <i class="fas fa-plus me-2"></i>Add New Category
-                </a>
-                <button class="btn btn-success-gradient">
-                    <i class="fas fa-download me-2"></i>Export
-                </button>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Delete Modals for Categories -->
+{% if categories %}
+    {% for category in categories %}
+    <div class="modal fade" id="deleteCategoryModal{{ category.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the category "<strong>{{ category.name }}</strong>"?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ url_for('delete_category', id=category.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger-gradient">Delete Category</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Categories Table -->
-    <div class="table-container">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-hashtag me-2"></i>#</th>
-                        <th><i class="fas fa-list me-2"></i>Category Name</th>
-                        <th><i class="fas fa-box me-2"></i>Products</th>
-                        <th><i class="fas fa-calendar me-2"></i>Created</th>
-                        <th><i class="fas fa-cog me-2"></i>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>
-                            <div class="item-info">
-                                <div class="category-icon">E</div>
-                                <div>
-                                    <div class="item-name">Electronics</div>
-                                    <div class="item-meta">Gadgets & Devices</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-info rounded-pill">156</span></td>
-                        <td>2024-01-10</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-info-gradient" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal1" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>
-                            <div class="item-info">
-                                <div class="category-icon">C</div>
-                                <div>
-                                    <div class="item-name">Clothing</div>
-                                    <div class="item-meta">Fashion & Apparel</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-info rounded-pill">89</span></td>
-                        <td>2024-01-20</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-info-gradient" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal2" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>
-                            <div class="item-info">
-                                <div class="category-icon">H</div>
-                                <div>
-                                    <div class="item-name">Home & Garden</div>
-                                    <div class="item-meta">Furniture & Decor</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-info rounded-pill">67</span></td>
-                        <td>2024-02-15</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-info-gradient" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger-gradient" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal3" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Pagination -->
-<nav class="d-flex justify-content-center mt-4">
-    <ul class="pagination">
-        <li class="page-item disabled">
-            <a class="page-link" href="#"><i class="fas fa-chevron-left"></i></a>
-        </li>
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-            <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
-        </li>
-    </ul>
-</nav>
-
-<!-- Delete Modals -->
-<div class="modal fade" id="deleteBrandModal1" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete the brand "<strong>Nike</strong>"?</p>
-                <p class="text-danger">This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger-gradient">Delete Brand</button>
-            </div>
-        </div>
-    </div>
-</div>
+    {% endfor %}
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -465,24 +381,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(targetSection + '-section').classList.add('active');
         });
     });
-    
-    // Search functionality
-    const brandSearch = document.getElementById('brandSearch');
-    const categorySearch = document.getElementById('categorySearch');
-    
-    if (brandSearch) {
-        brandSearch.addEventListener('input', function() {
-            // Implement search logic here
-            console.log('Searching brands:', this.value);
-        });
-    }
-    
-    if (categorySearch) {
-        categorySearch.addEventListener('input', function() {
-            // Implement search logic here
-            console.log('Searching categories:', this.value);
-        });
-    }
 });
 </script>
 {% endblock %}

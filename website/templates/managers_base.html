@@ -416,7 +416,6 @@
 </head>
 
 <body>
-    {% include '_messages.html' %}
     
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg main-navbar fade-in">
@@ -437,13 +436,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% block nav_brands %}{% endblock %}" href="/brands">
-                            <i class="fas fa-tags me-1"></i>Brands
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% block nav_categories %}{% endblock %}" href="/categories">
-                            <i class="fas fa-list me-1"></i>Categories
+                        <a class="nav-link {% block nav_brands_categories %}{% endblock %}" href="/brands">
+                            <i class="fas fa-tags me-1"></i>Brand&Cat
                         </a>
                     </li>
                     <li class="nav-item">

@@ -8,8 +8,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-<!-- Favicon cho đa nền tảng -->
-    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+
+    <!-- Favicon đa nền tảng -->
+        <!-- Basic favicon (cho trình duyệt cũ) -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Standard favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+
+    <!-- Apple Touch Icon (cho iOS/Safari) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <!-- Android Chrome Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
         <style>
       :root {
         --primary-color: #3b82f6;
@@ -518,24 +531,24 @@
 
           <!-- Quick Links Column -->
           <div class="col-lg-2 col-md-6">
-            <h5 class="text-white fs-5 mb-3">Quick Links</h5>
+            <h5 class="text-white fs-5 mb-3">Truy cập nhanh </h5>
             <ul class="list-unstyled">
-              <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Home</a></li>
-              <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Products</a></li>
-              <li class="mb-2"><a href="/aboutus" class="text-white-80 footer-link text-decoration-none">About Us</a></li>
-              <li class="mb-2"><a href="/contact" class="text-white-80 footer-link text-decoration-none">Contact</a></li>
+              <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Trang chủ </a></li>
+              <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Sản phẩm </a></li>
+              <li class="mb-2"><a href="/aboutus" class="text-white-80 footer-link text-decoration-none">Về chúng tôi </a></li>
+              <li class="mb-2"><a href="/contact" class="text-white-80 footer-link text-decoration-none">Liên hệ </a></li>
               <li class="mb-2"><a href="/fqa" class="text-white-80 footer-link text-decoration-none">FAQ</a></li>
             </ul>
           </div>
 
           <!-- Contact Column -->
           <div class="col-lg-3 col-md-6">
-            <h5 class="text-white fs-5 mb-3">Contact Info</h5>
+            <h5 class="text-white fs-5 mb-3">Thông tin liên hệ</h5>
             <div class="contact-info">
               <div class="d-flex mb-3">
                 <i class="bi bi-geo-alt-fill"></i>
                 <div>
-                  <h6 class="text-white mb-0">Our Location</h6>
+                  <h6 class="text-white mb-0">Showroom</h6>
                   <p class="text-white-80 small mb-0">123 Đường Nguyễn Huệ, Quận 1
                                                       TP. Hồ Chí Minh, Việt Nam</p>
                 </div>
@@ -543,14 +556,14 @@
               <div class="d-flex mb-3">
                 <i class="bi bi-envelope-fill"></i>
                 <div>
-                  <h6 class="text-white mb-0">Email Us</h6>
+                  <h6 class="text-white mb-0">Email</h6>
                   <p class="text-white-80 small mb-0">contact@tgdd.com</p>
                 </div>
               </div>
               <div class="d-flex">
                 <i class="bi bi-telephone-fill"></i>
                 <div>
-                  <h6 class="text-white mb-0">Call Us</h6>
+                  <h6 class="text-white mb-0">SDT</h6>
                   <p class="text-white-80 small mb-0">+84 123 456 789</p>
                 </div>
               </div>
@@ -559,7 +572,7 @@
 
           <!-- Newsletter Column -->
           <div class="col-lg-3 col-md-6">
-            <h5 class="text-white fs-5 mb-3">Newsletter</h5>
+            <h5 class="text-white fs-5 mb-3">Tin tức mới nhất</h5>
             <p class="text-white-80 mb-3">Hãy để lại email để nhận thông báo sớm nhất về khuyến mãi, sản phẩm mới và ưu đãi dành riêng cho bạn.</p>
             <form class="mb-4">
               <div class="input-group mb-3">
@@ -569,7 +582,7 @@
                 </button>
               </div>
             </form>
-            <h5 class="text-white fs-5 mb-3">Follow Us</h5>
+            <h5 class="text-white fs-5 mb-3">Theo dõi chúng tôi</h5>
             <div class="social-links">
               <a href="https://www.facebook.com/duy.luongvan.204" class="social-icon me-2 text-white">
                 <i class="bi bi-facebook"></i>

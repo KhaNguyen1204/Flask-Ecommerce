@@ -11,6 +11,8 @@ from website.customers.model import Customer, Order, OrderDetail
 from website.customers.forms import CustomerRegisterForm
 from flask_login import current_user, logout_user, login_user
 
+
+
 @app.route('/admin')
 @role_required(['admin'])
 def admin():

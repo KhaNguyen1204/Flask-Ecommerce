@@ -388,12 +388,12 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="/">
-                            <i class="bi bi-grid"></i>All Products
+                            <i class="bi bi-grid"></i>Tất cả sản phẩm 
                         </a>
                     </li>
                         <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-folder"></i>Brand
+                            <i class="bi bi-folder"></i>Thương hiệu 
                         </a>
                         <div class="dropdown-menu">
                             {% for brand in brands %}
@@ -406,7 +406,7 @@
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-folder"></i>Categories
+                            <i class="bi bi-folder"></i>Danh mục 
                         </a>
                         <div class="dropdown-menu">
                             {% for category in categories %}
@@ -420,7 +420,7 @@
                 
                 <div class="d-flex align-items-center ms-auto">
                     <form class="search-form d-flex me-3" role="search" action="{{url_for('result')}}">
-                        <input class="form-control search-input" type="search" placeholder="Search products..." aria-label="Search" name="q">
+                        <input class="form-control search-input" type="search" placeholder="Sản phẩm cần tìm..." aria-label="Search" name="q">
                         <button class="btn search-btn" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
@@ -441,18 +441,18 @@
                     </div>
                     <div class="nav-item">
                         <a class="nav-link auth-link logout" href="{{url_for('customer_logout')}}">
-                            <i class="bi bi-box-arrow-right"></i>Logout
+                            <i class="bi bi-box-arrow-right"></i>Đăng xuất 
                         </a>
                     </div>
                     {% else %}
                     <div class="nav-item me-2">
                         <a class="nav-link auth-link signin" href="{{url_for('customer_register')}}">
-                            <i class="bi bi-person-plus"></i>Sign Up
+                            <i class="bi bi-person-plus"></i>Đăng ký
                         </a>
                     </div>
                     <div class="nav-item">
                         <a class="nav-link auth-link login" href="{{url_for('login')}}">
-                            <i class="bi bi-box-arrow-in-right"></i>Login
+                            <i class="bi bi-box-arrow-in-right"></i>Đăng nhập
                         </a>
                     </div>
                     {% endif %}

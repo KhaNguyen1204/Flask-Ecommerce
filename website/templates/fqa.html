@@ -427,7 +427,7 @@
 
         <div class="faq-content">
             <div class="shop-banner">
-                <h3>🎉 Ưu đại đặc biệt!</h3>
+                <h3>🎉 Ưu đái đặc biệt!</h3>
                 <p>Giảm giá lên đến 50% cho tất cả sản phẩm công nghệ. Laptop, điện thoại, đồng hồ thông minh và nhiều hơn nữa!</p>
                 <a href="/" class="shop-now-btn">
                     <span class="shop-icon">🛍️</span>
@@ -580,7 +580,7 @@
             <div class="contact-info">
                 <h3>💬 Vẫn cần hỗ trợ?</h3>
                 <p>📞 Hotline: 1900-123-456 (7:30 - 22:00 hàng ngày)</p>
-                <p>📧 Email: support@.com</p>
+                <p>📧 Email: support@example.com</p>
                 <p>📍 Địa chỉ: 123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</p>
             </div>
 
@@ -592,9 +592,9 @@
     </div>
 
     <!-- Floating Shopping Button -->
-    <button class="floating-shop-btn" onclick="window.location.href='#shop'">
+    <a href="/" class="floating-shop-btn">
         🛒
-    </button>
+    </a>
 
     <script>
         // FAQ Accordion functionality
@@ -649,7 +649,7 @@
                         questionElement.innerHTML = originalText.replace(regex, '<span class="highlight">$1</span>');
                     } else {
                         questionElement.textContent = originalText;
-                    </div>
+                    }
                 } else {
                     item.style.display = 'none';
                 }
@@ -681,14 +681,6 @@
                     item.style.opacity = '1';
                     item.style.transform = 'translateY(0)';
                 }, index * 100);
-            });
-        });
-
-        // Shopping button click handlers
-        document.querySelectorAll('a[href="#shop"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                alert('Chuyển hướng đến trang mua sắm! 🛒\n\nBạn có thể thay đổi href="#shop" thành URL thực tế của cửa hàng.');
             });
         });
     </script>

@@ -1,3 +1,5 @@
+<!--Giao diện chi tiết san phẩm-->
+
 {% extends 'base.html' %}
 {% block content %}
 {% include 'navbar.html' %}
@@ -262,7 +264,7 @@
         <div class="col-md-6 product-info">
             <h1>{{ product.name }}</h1>
             <div class="price-container">
-                <span class="price-tag">{{ product.price }}$</span>
+                <span class="price-tag">{{ product.price }} - VND</span>
                 {% if product.discount > 0 %}
                     <span class="discount-badge">{{ product.discount }}% OFF</span>
                 {% endif %}

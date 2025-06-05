@@ -1,3 +1,5 @@
+<!-- Giao diện hiển thị danh sách sản phẩm tối ưu -->
+
 {% extends 'base.html' %}
 {% include 'navbar.html' %}
 {% block content %}
@@ -64,22 +66,66 @@
         border-color: rgba(13, 110, 253, 0.2);
     }
     
-    /* Hình ảnh sản phẩm */
+    /* Hình ảnh sản phẩm - Tối ưu cho 750x500 */
     .product-img-container {
         position: relative;
         overflow: hidden;
         border-radius: 16px 16px 0 0;
+        /* Tỷ lệ khung hình phù hợp với ảnh 750x500 (3:2) */
+        aspect-ratio: 3 / 2;
+        background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                    linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                    linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     }
     
     .product-img {
         width: 100%;
-        aspect-ratio: 1 / 1;
+        height: 100%;
         object-fit: cover;
-        transition: transform 0.6s ease;
+        object-position: center;
+        transition: transform 0.6s ease, opacity 0.3s ease;
+        /* Đảm bảo ảnh luôn sắc nét */
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        opacity: 0;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .product-img.loaded {
+        opacity: 1;
     }
     
     .product-card:hover .product-img {
         transform: scale(1.1);
+    }
+    
+    /* Loading skeleton */
+    .product-img-container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #0d6efd;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 1;
+    }
+    
+    .product-img.loaded + .product-img-container::before {
+        display: none;
+    }
+    
+    @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
     
     /* Badge giảm giá */
@@ -118,12 +164,14 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        line-height: 1.4;
     }
     
     .price {
         font-size: 1.1rem;
         font-weight: 600;
         color: #28a745;
+        margin: 0;
     }
     
     .original-price {
@@ -140,6 +188,7 @@
         padding: 0.75rem;
         display: flex;
         justify-content: space-between;
+        gap: 0.5rem;
     }
     
     /* Các nút */
@@ -152,11 +201,17 @@
         font-size: 0.85rem;
         font-weight: 500;
         transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
     }
     
     .btn-details:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+        color: white;
     }
     
     .btn-add-to-cart {
@@ -168,11 +223,16 @@
         font-size: 0.85rem;
         font-weight: 500;
         transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
     }
     
     .btn-add-to-cart:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        color: #212529;
     }
     
     /* Phân trang */
@@ -189,22 +249,69 @@
         min-width: 40px;
         text-align: center;
         transition: all 0.3s ease;
+        color: #0d6efd;
     }
     
     .page-item.active .page-link {
         background: linear-gradient(135deg, #0d6efd, #0b5ed7);
         box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        color: white;
     }
     
     .page-link:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        color: #0d6efd;
+    }
+    
+    .page-item.disabled .page-link {
+        color: #6c757d;
+    }
+    
+    /* Error state cho ảnh */
+    .product-img.error {
+        opacity: 1;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .product-img.error::before {
+        content: "📷";
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-img.error::after {
+        content: "Không có ảnh";
+        font-size: 0.8rem;
     }
     
     /* Responsive */
+    @media (max-width: 1200px) {
+        .product-img-container {
+            /* Trên tablet lớn, giữ tỷ lệ 3:2 */
+            aspect-ratio: 3 / 2;
+        }
+    }
+
     @media (max-width: 768px) {
         .products-container {
             margin-top: 60px;
+        }
+        
+        .product-img-container {
+            /* Trên mobile, điều chỉnh tỷ lệ để tiết kiệm không gian */
+            aspect-ratio: 4 / 3;
+        }
+        
+        .product-img {
+            /* Tối ưu hiệu suất trên mobile */
+            will-change: transform;
         }
         
         .card-title {
@@ -214,6 +321,45 @@
         .btn-details, .btn-add-to-cart {
             padding: 0.25rem 0.5rem;
             font-size: 0.8rem;
+            min-width: 70px;
+        }
+        
+        .card-footer {
+            padding: 0.5rem;
+            gap: 0.25rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .product-img-container {
+            /* Trên mobile nhỏ, tỷ lệ vuông để tối ưu không gian */
+            aspect-ratio: 1 / 1;
+        }
+        
+        .card-title {
+            font-size: 0.9rem;
+        }
+        
+        .btn-details, .btn-add-to-cart {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.4rem;
+            min-width: 60px;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+    }
+    
+    /* Tối ưu cho màn hình rất nhỏ */
+    @media (max-width: 375px) {
+        .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        
+        .btn-details span, .btn-add-to-cart span {
+            display: none;
         }
     }
 </style>
@@ -233,7 +379,12 @@
                     <div class="product-img-container">
                         <img src="{{ url_for('static', filename='images/products/' + p.image_1) }}"
                              class="card-img-top product-img" 
-                             alt="{{ p.name }}">
+                             alt="{{ p.name }}"
+                             loading="lazy"
+                             width="750"
+                             height="500"
+                             onload="this.classList.add('loaded')"
+                             onerror="this.classList.add('error'); this.alt='Không có ảnh';">
 
                         {% if p.discount > 0 %}
                             <div class="badge-discount">
@@ -243,11 +394,11 @@
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title">{{ p.name }}</h5>
+                        <h5 class="card-title" title="{{ p.name }}">{{ p.name }}</h5>
                         <p class="price">
-                            {{ p.price }}$
+                            {{ "{:,.0f}".format(p.price|float) }}đ
                             {% if p.discount > 0 %}
-                                <span class="original-price">{{ "%0.2f"|format(p.price|float + (p.price|float * p.discount|float / 100)) }}$</span>
+                                <span class="original-price">{{ "{:,.0f}".format(p.price|float + (p.price|float * p.discount|float / 100)) }}đ</span>
                             {% endif %}
                         </p>
                     </div>
@@ -255,7 +406,7 @@
                     <div class="card-footer">
                         <a href="{{ url_for('single_page', id=p.id) }}" 
                            class="btn btn-details">
-                            <i class="bi bi-eye-fill me-1"></i> Chi tiết
+                            <i class="bi bi-eye-fill me-1"></i> <span>Chi tiết</span>
                         </a>
                         <form action="{{ url_for('AddCart') }}" method="post" class="m-0 p-0">
                             <input type="hidden" name="product_id" value="{{ p.id }}">
@@ -268,7 +419,7 @@
                                 {% endfor %}
                             </select>
                             <button type="submit" class="btn btn-add-to-cart">
-                                <i class="bi bi-cart-plus-fill me-1"></i> Thêm 
+                                <i class="bi bi-cart-plus-fill me-1"></i> <span>Thêm</span>
                             </button>
                         </form>
                     </div>
@@ -278,6 +429,7 @@
     </div>
 
     <!-- Phân trang -->
+    {% if products_list %}
     <div class="pagination-container">
         <nav aria-label="Page navigation">
             <ul class="pagination">
@@ -285,7 +437,8 @@
                 {% if pagination.has_prev %}
                     <li class="page-item">
                         <a class="page-link" 
-                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.prev_num) }}">
+                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.prev_num) }}"
+                           aria-label="Trang trước">
                             <i class="bi bi-chevron-left"></i>
                         </a>
                     </li>
@@ -295,7 +448,8 @@
                     {% if page %}
                         <li class="page-item {% if page == pagination.page %}active{% endif %}">
                             <a class="page-link" 
-                               href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=page) }}">
+                               href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=page) }}"
+                               aria-label="Trang {{ page }}">
                                 {{ page }}
                             </a>
                         </li>
@@ -309,7 +463,8 @@
                 {% if pagination.has_next %}
                     <li class="page-item">
                         <a class="page-link" 
-                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.next_num) }}">
+                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.next_num) }}"
+                           aria-label="Trang sau">
                             <i class="bi bi-chevron-right"></i>
                         </a>
                     </li>
@@ -317,11 +472,14 @@
             </ul>
         </nav>
     </div>
+    {% endif %}
 </div>
 
 <script>
-    // Thêm hiệu ứng nổi
+    // Thêm hiệu ứng nổi động
     const floatingContainer = document.querySelector('.floating-elements');
+    
+    // Tạo thêm các phần tử nổi ngẫu nhiên
     for (let i = 0; i < 5; i++) {
         const element = document.createElement('div');
         element.classList.add('floating-element');
@@ -335,18 +493,116 @@
         floatingContainer.appendChild(element);
     }
 
-    // Hiệu ứng khi hover vào card
+    // Tối ưu hiệu ứng hover cho card
     const productCards = document.querySelectorAll('.product-card');
     productCards.forEach(card => {
+        let hoverTimeout;
+        
         card.addEventListener('mouseenter', () => {
+            clearTimeout(hoverTimeout);
             const img = card.querySelector('.product-img');
-            img.style.transform = 'scale(1.1)';
+            if (img && img.classList.contains('loaded')) {
+                img.style.transform = 'scale(1.1)';
+            }
         });
         
         card.addEventListener('mouseleave', () => {
             const img = card.querySelector('.product-img');
-            img.style.transform = 'scale(1)';
+            if (img) {
+                hoverTimeout = setTimeout(() => {
+                    img.style.transform = 'scale(1)';
+                }, 50);
+            }
         });
+    });
+
+    // Xử lý lazy loading và error cho ảnh
+    const images = document.querySelectorAll('.product-img');
+    
+    // Intersection Observer cho lazy loading hiệu quả hơn
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.src && !img.classList.contains('loaded') && !img.classList.contains('error')) {
+                    // Đã có src, chỉ cần đợi load
+                    if (img.complete) {
+                        img.classList.add('loaded');
+                    }
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, {
+        rootMargin: '50px'
+    });
+
+    images.forEach(img => {
+        imageObserver.observe(img);
+        
+        // Xử lý khi ảnh load thành công
+        img.addEventListener('load', function() {
+            this.classList.add('loaded');
+        });
+        
+        // Xử lý khi ảnh lỗi
+        img.addEventListener('error', function() {
+            this.classList.add('error');
+            this.alt = 'Không có ảnh';
+        });
+    });
+
+    // Tối ưu hiệu suất scroll
+    let ticking = false;
+    
+    function updateScrollEffects() {
+        // Có thể thêm các hiệu ứng scroll tại đây
+        ticking = false;
+    }
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(updateScrollEffects);
+            ticking = true;
+        }
+    });
+
+    // Preload ảnh quan trọng
+    function preloadCriticalImages() {
+        const firstRowImages = document.querySelectorAll('.product-card:nth-child(-n+4) .product-img');
+        firstRowImages.forEach(img => {
+            if (img.src && !img.classList.contains('loaded')) {
+                const preloadImg = new Image();
+                preloadImg.onload = () => img.classList.add('loaded');
+                preloadImg.onerror = () => img.classList.add('error');
+                preloadImg.src = img.src;
+            }
+        });
+    }
+
+    // Chạy preload sau khi DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', preloadCriticalImages);
+    } else {
+        preloadCriticalImages();
+    }
+
+    // Format giá tiền cho các phần tử được load động
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN').format(price);
+    }
+
+    // Accessibility improvements
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            const focusedElement = document.activeElement;
+            if (focusedElement.classList.contains('product-card')) {
+                const detailsLink = focusedElement.querySelector('.btn-details');
+                if (detailsLink) {
+                    detailsLink.click();
+                }
+            }
+        }
     });
 </script>
 

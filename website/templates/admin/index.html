@@ -1,770 +1,261 @@
 {% extends 'managers_base.html' %}
 
-{% block title %}Product Management - Manager Dashboard{% endblock %}
+{% block title %}Products - Manager Dashboard{% endblock %}
 
 {% block nav_products %}active{% endblock %}
 
-{% block extra_css %}
-<style>
-    .product-image {
-        width: 50px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        border: 2px solid #f1f5f9;
-        transition: all 0.3s ease;
-    }
-
-    .product-image:hover {
-        transform: scale(1.1);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-
-    .delete-warning {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-        border-radius: var(--border-radius);
-        padding: 1.5rem;
-        margin: 1rem 0;
-        border-left: 4px solid var(--danger-color);
-    }
-
-    .price-display {
-        font-weight: 700;
-        color: var(--success-color);
-        font-size: 1.1rem;
-    }
-
-    .discount-badge {
-        background: linear-gradient(135deg, var(--warning-color), #d97706);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .brand-tag {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-        color: var(--primary-color);
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-    }
-
-    /* Chart Styles */
-    .chart-container {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
-        border-radius: var(--border-radius);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: var(--shadow-lg);
-        border: 1px solid rgba(226, 232, 240, 0.5);
-        backdrop-filter: blur(10px);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .chart-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--success-color));
-        border-radius: var(--border-radius) var(--border-radius) 0 0;
-    }
-
-    .chart-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .chart-title i {
-        color: var(--primary-color);
-    }
-
-    .chart-canvas {
-        max-height: 400px;
-        position: relative;
-    }
-
-    .chart-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(226, 232, 240, 0.5);
-    }
-
-    .chart-stat-item {
-        text-align: center;
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 8px;
-        border: 1px solid rgba(226, 232, 240, 0.3);
-    }
-
-    .chart-stat-number {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-
-    .chart-stat-label {
-        font-size: 0.875rem;
-        color: var(--text-muted);
-        margin-top: 0.25rem;
-    }
-
-    .charts-section {
-        margin-bottom: 3rem;
-    }
-
-    .charts-row {
-        margin-bottom: 2rem;
-    }
-
-    @media (max-width: 768px) {
-        .action-buttons {
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .chart-container {
-            padding: 1rem;
-        }
-        
-        .chart-canvas {
-            max-height: 300px;
-        }
-    }
-</style>
-{% endblock %}
-
 {% block content %}
+
+
 <!-- Page Header -->
 <div class="page-header">
-    <h1 class="page-title">Product Management</h1>
-    <p class="page-subtitle">Manage your products, inventory, and product information</p>
+    <h1 class="page-title">
+        <i class="fas fa-box me-3"></i>Product Management
+    </h1>
+    <p class="page-subtitle">Manage your product inventory and details</p>
 </div>
 
-<!-- Stats Row -->
-<div class="row stats-row">
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-icon">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stats-number">{{ products|length if products else 0 }}</div>
-            <div class="stats-label">Total Products</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-icon">
-                <i class="fas fa-tags"></i>
-            </div>
-            <div class="stats-number">{{ brands|length if brands else 0 }}</div>
-            <div class="stats-label">Active Brands</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-icon">
-                <i class="fas fa-list"></i>
-            </div>
-            <div class="stats-number">{{ categories|length if categories else 0 }}</div>
-            <div class="stats-label">Categories</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-icon">
-                <i class="fas fa-percentage"></i>
-            </div>
-            <div class="stats-number">{{ products|selectattr('discount', '>', 0)|list|length if products else 0 }}</div>
-            <div class="stats-label">On Sale</div>
-        </div>
-    </div>
-</div>
-
-<!-- Charts Section -->
-<div class="charts-section">
-    <div class="row charts-row">
-        <!-- Brand Distribution Chart -->
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-chart-pie"></i>
-                    Brand Distribution
-                </div>
-                <div class="chart-canvas">
-                    <canvas id="brandChart"></canvas>
-                </div>
-                <div class="chart-stats" id="brandStats">
-                    <!-- Dynamic brand stats will be inserted here -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Price Range Distribution -->
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-chart-bar"></i>
-                    Price Range Distribution
-                </div>
-                <div class="chart-canvas">
-                    <canvas id="priceChart"></canvas>
-                </div>
-                <div class="chart-stats" id="priceStats">
-                    <!-- Dynamic price stats will be inserted here -->
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row charts-row">
-        <!-- Discount Analysis -->
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-chart-line"></i>
-                    Discount Analysis
-                </div>
-                <div class="chart-canvas">
-                    <canvas id="discountChart"></canvas>
-                </div>
-                <div class="chart-stats" id="discountStats">
-                    <!-- Dynamic discount stats will be inserted here -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Product Overview -->
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-chart-area"></i>
-                    Product Overview
-                </div>
-                <div class="chart-canvas">
-                    <canvas id="overviewChart"></canvas>
-                </div>
-                <div class="chart-stats">
-                    <div class="chart-stat-item">
-                        <div class="chart-stat-number" id="avgPrice">$0</div>
-                        <div class="chart-stat-label">Average Price</div>
-                    </div>
-                    <div class="chart-stat-item">
-                        <div class="chart-stat-number" id="maxPrice">$0</div>
-                        <div class="chart-stat-label">Highest Price</div>
-                    </div>
-                    <div class="chart-stat-item">
-                        <div class="chart-stat-number" id="minPrice">$0</div>
-                        <div class="chart-stat-label">Lowest Price</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Search and Actions -->
+<!-- Search and Add Section -->
 <div class="search-section">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="form-control search-input" placeholder="Search products..." id="productSearch">
-            </div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search products..." id="searchInput">
         </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <a href="{{ url_for('addproduct') }}" class="btn btn-success-gradient">
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('addproduct') }}" class="btn btn-primary-gradient">
                 <i class="fas fa-plus me-2"></i>Add New Product
             </a>
         </div>
     </div>
 </div>
 
-<!-- Products Table -->
-<div class="table-container">
-    <div class="table-responsive">
-        <table class="table" id="productsTable">
-            <thead>
-                <tr>
-                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
-                    <th><i class="fas fa-box me-2"></i>Product</th>
-                    <th><i class="fas fa-dollar-sign me-2"></i>Price</th>
-                    <th><i class="fas fa-percentage me-2"></i>Discount</th>
-                    <th><i class="fas fa-tag me-2"></i>Brand</th>
-                    <th><i class="fas fa-image me-2"></i>Image</th>
-                    <th><i class="fas fa-cogs me-2"></i>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td><strong>{{ loop.index }}</strong></td>
-                    <td>
-                        <div class="fw-bold">{{ product.name }}</div>
-                    </td>
-                    <td>
-                        <span class="price-display">${{ "%.2f"|format(product.price) }}</span>
-                    </td>
-                    <td>
-                        {% if product.discount > 0 %}
-                            <span class="discount-badge">{{ product.discount }}% OFF</span>
-                        {% else %}
-                            <span class="text-muted">No discount</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="brand-tag">{{ product.brand.name }}</span>
-                    </td>
-                    <td>
-                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
-                             alt="{{ product.name }}" class="product-image">
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="{{ url_for('updateproduct', id=product.id) }}" 
-                               class="btn btn-info-gradient btn-sm" title="Edit Product">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button type="button" class="btn btn-danger-gradient btn-sm" 
-                                    data-bs-toggle="modal" data-bs-target="#deleteModal-{{ product.id }}"
-                                    title="Delete Product">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- Stats Cards -->
+<div class="stats-row row mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stats-number">{{ products|length }}</div>
+            <div class="stats-label">Total Products</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stats-number">{{ products|selectattr('stock', 'gt', 0)|list|length }}</div>
+            <div class="stats-label">In Stock</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stats-number">{{ products|selectattr('stock', 'lt', 10)|list|length }}</div>
+            <div class="stats-label">Low Stock</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, var(--info-color), #2563eb);">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stats-number">{{ products|map(attribute='brand')|unique|list|length }}</div>
+            <div class="stats-label">Brands</div>
+        </div>
     </div>
 </div>
 
-<!-- Delete Modals -->
+<!-- Products Table -->
+<div class="table-container">
+    <table class="table table-hover" id="productsTable">
+        <thead>
+            <tr>
+                <th>
+                    <i class="fas fa-hashtag me-2"></i>No.
+                </th>
+                <th>
+                    <i class="fas fa-box me-2"></i>Product
+                </th>
+                <th>
+                    <i class="fas fa-dollar-sign me-2"></i>Price
+                </th>
+                <th>
+                    <i class="fas fa-percentage me-2"></i>Discount
+                </th>
+                <th>
+                    <i class="fas fa-tag me-2"></i>Brand
+                </th>
+                <th>
+                    <i class="fas fa-image me-2"></i>Image
+                </th>
+                <th>
+                    <i class="fas fa-cogs me-2"></i>Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr class="product-row">
+                <td>
+                    <span class="badge bg-primary">{{ loop.index }}</span>
+                </td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <strong class="text-dark">{{ product.name }}</strong>
+                        <small class="text-muted">ID: {{ product.id }}</small>
+                    </div>
+                </td>
+                <td>
+                    <span class="fw-bold text-success">${{ "%.2f"|format(product.price) }}</span>
+                </td>
+                <td>
+                    {% if product.discount > 0 %}
+                        <span class="badge bg-warning">{{ product.discount }}%</span>
+                    {% else %}
+                        <span class="text-muted">No discount</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge bg-info">{{ product.brand.name }}</span>
+                </td>
+                <td>
+                    <div class="product-image-container">
+                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
+                             alt="{{ product.name }}" 
+                             class="product-thumbnail"
+                             style="width: 50px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow);">
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('updateproduct', id=product.id) }}" 
+                           class="btn btn-info-gradient btn-sm" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="top" 
+                           title="Edit Product">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" 
+                                class="btn btn-danger-gradient btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteModal-{{ product.id }}"
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top" 
+                                title="Delete Product">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Delete Modals (moved outside the loop) -->
 {% for product in products %}
-<div class="modal fade" id="deleteModal-{{ product.id }}" tabindex="-1">
+<div class="modal fade" id="deleteModal-{{ product.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ product.id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                <h5 class="modal-title" id="deleteModalLabel-{{ product.id }}">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ product.name }}
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="delete-warning">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-exclamation-triangle text-danger fs-2 me-3"></i>
-                        <div>
-                            <h6 class="mb-1">Delete Product: <strong>{{ product.name }}</strong></h6>
-                            <p class="mb-0 text-muted">This action cannot be undone. Are you sure you want to proceed?</p>
-                        </div>
+                <div class="text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
                     </div>
+                    <span class="text-danger">Are you sure that want to delete this product {{ product.name }}?</span>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning-gradient" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </button>
+                <button type="button" class="btn btn-warning-gradient" data-bs-dismiss="modal">Cancel</button>
                 <form action="{{ url_for('deleteproduct', id=product.id) }}" method="POST" class="d-inline">
-                    <button type="submit" class="btn btn-danger-gradient">
-                        <i class="fas fa-trash me-2"></i>Delete Product
-                    </button>
+                    <button type="submit" class="btn btn-danger-gradient btn-sm">Delete</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 {% endfor %}
+           
+        </tbody>
+    </table>
+</div>
 
-<!-- Hidden data for charts -->
-<script type="application/json" id="productsData">
-[
-    {% for product in products %}
-    {
-        "name": "{{ product.name|e }}",
-        "price": {{ product.price }},
-        "discount": {{ product.discount }},
-        "brand": "{{ product.brand.name|e }}"
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-]
-</script>
+<!-- Empty State (if no products) -->
+{% if not products %}
+<div class="text-center py-5">
+    <div class="empty-state">
+        <i class="fas fa-box-open text-muted" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+        <h4 class="text-muted">No Products Found</h4>
+        <p class="text-muted mb-4">Start by adding your first product to the inventory.</p>
+        <a href="{{ url_for('addproduct') }}" class="btn btn-primary-gradient">
+            <i class="fas fa-plus me-2"></i>Add First Product
+        </a>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Get products data
-    const productsData = JSON.parse(document.getElementById('productsData').textContent);
-    
-    // Color schemes
-    const colors = {
-        primary: ['#3B82F6', '#1E40AF', '#1D4ED8', '#2563EB', '#3730A3'],
-        success: ['#10B981', '#059669', '#047857', '#065F46', '#064E3B'],
-        warning: ['#F59E0B', '#D97706', '#B45309', '#92400E', '#78350F'],
-        danger: ['#EF4444', '#DC2626', '#B91C1C', '#991B1B', '#7F1D1D'],
-        info: ['#06B6D4', '#0891B2', '#0E7490', '#155E75', '#164E63'],
-        gradient: [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(245, 158, 11, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
-            'rgba(6, 182, 212, 0.8)',
-            'rgba(139, 92, 246, 0.8)',
-            'rgba(236, 72, 153, 0.8)'
-        ]
-    };
-
-    // Chart configurations
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 20,
-                    usePointStyle: true,
-                    font: {
-                        size: 12,
-                        weight: '600'
-                    }
-                }
-            }
-        },
-        animation: {
-            duration: 1500,
-            easing: 'easeInOutCubic'
-        }
-    };
-
-    // 1. Brand Distribution Chart
-    function createBrandChart() {
-        const brandCounts = {};
-        productsData.forEach(product => {
-            brandCounts[product.brand] = (brandCounts[product.brand] || 0) + 1;
-        });
-
-        const brands = Object.keys(brandCounts);
-        const counts = Object.values(brandCounts);
-
-        const ctx = document.getElementById('brandChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: brands,
-                datasets: [{
-                    data: counts,
-                    backgroundColor: colors.gradient.slice(0, brands.length),
-                    borderColor: '#ffffff',
-                    borderWidth: 3,
-                    hoverBorderWidth: 5
-                }]
-            },
-            options: {
-                ...chartOptions,
-                cutout: '60%',
-                plugins: {
-                    ...chartOptions.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = counts.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                return `${context.label}: ${context.parsed} products (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Update brand stats
-        const brandStats = document.getElementById('brandStats');
-        brandStats.innerHTML = brands.map(brand => `
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">${brandCounts[brand]}</div>
-                <div class="chart-stat-label">${brand}</div>
-            </div>
-        `).join('');
-    }
-
-    // 2. Price Range Distribution Chart
-    function createPriceChart() {
-        const priceRanges = {
-            'Under $50': 0,
-            '$50-$100': 0,
-            '$100-$200': 0,
-            '$200-$500': 0,
-            'Over $500': 0
-        };
-
-        productsData.forEach(product => {
-            const price = product.price;
-            if (price < 50) priceRanges['Under $50']++;
-            else if (price < 100) priceRanges['$50-$100']++;
-            else if (price < 200) priceRanges['$100-$200']++;
-            else if (price < 500) priceRanges['$200-$500']++;
-            else priceRanges['Over $500']++;
-        });
-
-        const ctx = document.getElementById('priceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(priceRanges),
-                datasets: [{
-                    label: 'Products',
-                    data: Object.values(priceRanges),
-                    backgroundColor: colors.primary[0],
-                    borderColor: colors.primary[1],
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                ...chartOptions,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-
-        // Update price stats
-        const prices = productsData.map(p => p.price);
-        const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
-        const maxPrice = Math.max(...prices);
-        const minPrice = Math.min(...prices);
-
-        document.getElementById('priceStats').innerHTML = `
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">$${avgPrice.toFixed(2)}</div>
-                <div class="chart-stat-label">Average</div>
-            </div>
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">$${maxPrice.toFixed(2)}</div>
-                <div class="chart-stat-label">Highest</div>
-            </div>
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">$${minPrice.toFixed(2)}</div>
-                <div class="chart-stat-label">Lowest</div>
-            </div>
-        `;
-    }
-
-    // 3. Discount Analysis Chart
-    function createDiscountChart() {
-        const discountRanges = {
-            'No Discount': 0,
-            '1-10%': 0,
-            '11-25%': 0,
-            '26-50%': 0,
-            'Over 50%': 0
-        };
-
-        productsData.forEach(product => {
-            const discount = product.discount;
-            if (discount === 0) discountRanges['No Discount']++;
-            else if (discount <= 10) discountRanges['1-10%']++;
-            else if (discount <= 25) discountRanges['11-25%']++;
-            else if (discount <= 50) discountRanges['26-50%']++;
-            else discountRanges['Over 50%']++;
-        });
-
-        const ctx = document.getElementById('discountChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'polarArea',
-            data: {
-                labels: Object.keys(discountRanges),
-                datasets: [{
-                    data: Object.values(discountRanges),
-                    backgroundColor: colors.warning.concat(colors.success),
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                ...chartOptions,
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-
-        // Update discount stats
-        const discounts = productsData.map(p => p.discount);
-        const avgDiscount = discounts.reduce((a, b) => a + b, 0) / discounts.length;
-        const maxDiscount = Math.max(...discounts);
-        const discountedProducts = discounts.filter(d => d > 0).length;
-
-        document.getElementById('discountStats').innerHTML = `
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">${avgDiscount.toFixed(1)}%</div>
-                <div class="chart-stat-label">Average Discount</div>
-            </div>
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">${maxDiscount}%</div>
-                <div class="chart-stat-label">Max Discount</div>
-            </div>
-            <div class="chart-stat-item">
-                <div class="chart-stat-number">${discountedProducts}</div>
-                <div class="chart-stat-label">On Sale</div>
-            </div>
-        `;
-    }
-
-    // 4. Product Overview Chart
-    function createOverviewChart() {
-        const brandData = {};
-        productsData.forEach(product => {
-            if (!brandData[product.brand]) {
-                brandData[product.brand] = {
-                    count: 0,
-                    totalValue: 0,
-                    avgDiscount: 0,
-                    discounts: []
-                };
-            }
-            brandData[product.brand].count++;
-            brandData[product.brand].totalValue += product.price;
-            brandData[product.brand].discounts.push(product.discount);
-        });
-
-        // Calculate averages
-        Object.keys(brandData).forEach(brand => {
-            const data = brandData[brand];
-            data.avgPrice = data.totalValue / data.count;
-            data.avgDiscount = data.discounts.reduce((a, b) => a + b, 0) / data.discounts.length;
-        });
-
-        const brands = Object.keys(brandData);
-        const ctx = document.getElementById('overviewChart').getContext('2d');
-        
-        new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: ['Product Count', 'Average Price', 'Average Discount', 'Total Value', 'Brand Strength'],
-                datasets: brands.slice(0, 3).map((brand, index) => ({
-                    label: brand,
-                    data: [
-                        brandData[brand].count * 10, // Scale for visibility
-                        brandData[brand].avgPrice / 10, // Scale down
-                        brandData[brand].avgDiscount * 2, // Scale up
-                        brandData[brand].totalValue / 100, // Scale down
-                        (brandData[brand].count * brandData[brand].avgPrice) / 100 // Composite score
-                    ],
-                    backgroundColor: colors.gradient[index] + '40',
-                    borderColor: colors.gradient[index],
-                    borderWidth: 2,
-                    pointBackgroundColor: colors.gradient[index],
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2
-                }))
-            },
-            options: {
-                ...chartOptions,
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100
-                    }
-                }
-            }
-        });
-
-        // Update overview stats
-        const prices = productsData.map(p => p.price);
-        const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
-        const maxPrice = Math.max(...prices);
-        const minPrice = Math.min(...prices);
-
-        document.getElementById('avgPrice').textContent = `$${avgPrice.toFixed(2)}`;
-        document.getElementById('maxPrice').textContent = `$${maxPrice.toFixed(2)}`;
-        document.getElementById('minPrice').textContent = `$${minPrice.toFixed(2)}`;
-    }
-
-    // Initialize all charts
-    if (productsData.length > 0) {
-        createBrandChart();
-        createPriceChart();
-        createDiscountChart();
-        createOverviewChart();
-    }
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
     // Search functionality
-    const searchInput = document.getElementById('productSearch');
-    const tableRows = document.querySelectorAll('#productsTable tbody tr');
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            tableRows.forEach(row => {
-                const productName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const brandName = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
-                
-                if (productName.includes(searchTerm) || brandName.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    }
-
-    // Add smooth transitions
-    const cards = document.querySelectorAll('.stats-card, .table-container, .search-section, .chart-container');
-    cards.forEach((card, index) => {
-        setTimeout(() => {
-            card.classList.add('fade-in');
-        }, index * 100);
-    });
-
-    // Enhanced table interactions
-    tableRows.forEach(row => {
-        row.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.002)';
-        });
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#productsTable tbody tr.product-row');
         
-        row.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
+        rows.forEach(row => {
+            const productName = row.querySelector('td:nth-child(2) strong').textContent.toLowerCase();
+            const brandName = row.querySelector('td:nth-child(5) .badge').textContent.toLowerCase();
+            
+            if (productName.includes(searchTerm) || brandName.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
     });
-});
+
+    // Add loading states for buttons
+    document.querySelectorAll('form button[type="submit"]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Don't prevent default, just show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            this.disabled = true;
+            
+            // Re-enable after 3 seconds in case of error
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-trash me-2"></i>Delete';
+                this.disabled = false;
+            }, 3000);
+        });
+    });
+
+    // Add fade-in animation to table rows
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('#productsTable tbody tr');
+        rows.forEach((row, index) => {
+            setTimeout(() => {
+                row.classList.add('fade-in');
+            }, index * 100);
+        });
+    });
 </script>
 {% endblock %}
