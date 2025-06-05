@@ -1,4 +1,4 @@
-from website import app, db
+from shop import app, db
 
 # Tạo db
 with app.app_context():

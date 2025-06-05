@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/warehouse">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_warehouse">Kho</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/inbound_receipt">Phiếu nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/outbound_receipt">Phiếu xuất</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Tài khoản
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/change_password">Đổi mật khẩu</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search" id="search-input">
+                    <button class="btn btn-outline-success" type="submit">Tìm</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Quản lý phiếu nhập kho</h4>
+                    <a href="{{ url_for('inbound_receipt_add') }}" class="btn btn-success">
+                        <i class="fa fa-plus"></i> Tạo phiếu nhập mới
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Số phiếu</th>
+                                    <th scope="col">Ngày nhập</th>
+                                    <th scope="col">Nhà cung cấp</th>
+                                    <th scope="col">Kho</th>
+                                    <th scope="col">Tổng tiền</th>
+                                    <th scope="col">Người tạo</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if receipts %}
+                                {% for receipt in receipts %}
+                                <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>{{ receipt.receipt_number }}</td>
+                                    <td>{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ receipt.supplier }}</td>
+                                    <td>{{ receipt.warehouse.name }}</td>
+                                    <td>{{ "{:,.0f}".format(receipt.total_amount) }} đ</td>
+                                    <td>{{ receipt.creator.username }}</td>
+                                    <td>
+                                        {% if receipt.status == 'pending' %}
+                                            <span class="badge bg-warning">Chờ xử lý</span>
+                                        {% elif receipt.status == 'completed' %}
+                                            <span class="badge bg-success">Hoàn thành</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Đã hủy</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('inbound_receipt_detail', id=receipt.id) }}" class="btn btn-sm btn-info">
+                                                <i class="fa fa-eye"></i> Chi tiết
+                                            </a>
+                                            {% if receipt.status == 'pending' %}
+                                            <a href="{{ url_for('inbound_receipt_edit', id=receipt.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-edit"></i> Sửa
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal-{{ receipt.id }}">
+                                                <i class="fa fa-trash"></i> Xóa
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center">Không tìm thấy phiếu nhập nào.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modals -->
+{% if receipts %}
+{% for receipt in receipts %}
+<div class="modal fade" id="deleteModal-{{ receipt.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger">Bạn có chắc chắn muốn xóa phiếu nhập "{{ receipt.receipt_number }}"?</p>
+                <p>Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form action="{{ url_for('inbound_receipt_add', id=receipt.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

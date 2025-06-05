@@ -1,0 +1,156 @@
+<!-- shop/templates/accounting/revenue_report.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Báo cáo doanh thu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; }
+        .card { border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .table thead { background: #e9ecef; }
+        .table tbody tr:hover { background: #f1f3f6; }
+        .btn-primary, .btn-success { border-radius: 8px; }
+        .summary-box { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="bi bi-file-earmark-bar-graph"></i> Báo cáo doanh thu</h2>
+        <a href="{{ url_for('finance_management') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại quản lý tài chính
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST" class="row g-3 align-items-end">
+                {{ form.csrf_token }}
+                <div class="col-md-3">
+                    {{ form.start_date.label(class="form-label") }}
+                    {{ form.start_date(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.end_date.label(class="form-label") }}
+                    {{ form.end_date(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.report_type.label(class="form-label") }}
+                    {{ form.report_type(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.submit(class="btn btn-primary w-100") }}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if stats and report_type == 'sumary' %}
+    <div class="summary-box mb-4">
+        <div class="row text-center">
+            <div class="col-md-4 mb-2 mb-md-0">
+                <div class="fw-semibold text-secondary">Tổng số đơn hàng</div>
+                <div class="fs-4 text-primary">{{ stats.total_orders if stats.total_orders is defined else stats['total_orders'] }}</div>
+            </div>
+            <div class="col-md-4 mb-2 mb-md-0">
+                <div class="fw-semibold text-secondary">Tổng doanh thu</div>
+                <div class="fs-4 text-success">{{ '{:,.0f}'.format(stats.total_revenue if stats.total_revenue is defined else stats['total_revenue']) }} đ</div>
+            </div>
+            <div class="col-md-4">
+                <div class="fw-semibold text-secondary">Giá trị đơn TB</div>
+                <div class="fs-4 text-info">{{ '{:,.0f}'.format(stats.average_order_value if stats.average_order_value is defined else stats['average_order_value']) }} đ</div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <a href="{{ url_for('export_revenue', start_date=start_time.strftime('%Y-%m-%d'), end_date=end_time.strftime('%Y-%m-%d'), report_type=report_type) }}" class="btn btn-success">
+            <i class="bi bi-download"></i> Xuất báo cáo CSV
+        </a>
+    </div>
+    {% endif %}
+
+    {% if stats and report_type in ['daily', 'monthly', 'yearly'] %}
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 text-secondary">
+                <i class="bi bi-bar-chart"></i>
+                {% if report_type == 'daily' %}Báo cáo theo ngày{% elif report_type == 'monthly' %}Báo cáo theo tháng{% else %}Báo cáo theo năm{% endif %}
+            </h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>{% if report_type == 'daily' %}Ngày{% elif report_type == 'monthly' %}Tháng{% else %}Năm{% endif %}</th>
+                        <th>Số đơn</th>
+                        <th>Doanh thu</th>
+                        <th>Giá trị TB</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, data in stats.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ data.count }}</td>
+                        <td>{{ '{:,.0f}'.format(data.revenue) }} đ</td>
+                        <td>{{ '{:,.0f}'.format(data.average) }} đ</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mb-3 mt-3">
+            <a href="{{ url_for('export_revenue', start_date=start_time.strftime('%Y-%m-%d'), end_date=end_time.strftime('%Y-%m-%d'), report_type=report_type) }}" class="btn btn-success">
+                <i class="bi bi-download"></i> Xuất báo cáo CSV
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if orders %}
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 text-secondary"><i class="bi bi-list-ul"></i> Chi tiết sản phẩm đã bán</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                        <th>Mã đơn hàng</th>
+                        <th>Ngày bán</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set idx = 1 %}
+                    {% for order in orders %}
+                        {% for item in order.order_details %}
+                        <tr>
+                            <td>{{ idx }}</td>
+                            <td>{{ item.product_name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ '{:,.0f}'.format(item.price) }} đ</td>
+                            <td>{{ '{:,.0f}'.format(item.subtotal) }} đ</td>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.date_created.strftime('%d/%m/%Y') }}</td>
+                        </tr>
+                        {% set idx = idx + 1 %}
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-4">Không có sản phẩm nào được bán trong khoảng thời gian này.</div>
+    {% endif %}
+</div>
+</body>
+</html>

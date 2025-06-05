@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Chi tiết phiếu nhập kho</h4>
+                    <div>
+                        <a href="{{ url_for('inbound_receipt') }}" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Quay lại
+                        </a>
+                        {% if receipt.status == 'pending' %}
+                        <a href="{{ url_for('inbound_receipt_edit', id=receipt.id) }}" class="btn btn-warning btn-sm">
+                            <i class="fa fa-edit"></i> Chỉnh sửa
+                        </a>
+                        {% endif %}
+                        <button onclick="printReceipt()" class="btn btn-info btn-sm">
+                            <i class="fa fa-print"></i> In phiếu
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <h5 class="text-uppercase">Thông tin phiếu nhập</h5>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <p><strong>Số phiếu:</strong> {{ receipt.receipt_number }}</p>
+                                            <p><strong>Ngày nhập:</strong> {{ receipt.receipt_date.strftime('%d/%m/%Y') }}</p>
+                                            <p><strong>Nhà cung cấp:</strong> {{ receipt.supplier }}</p>
+                                            <p><strong>Kho nhập:</strong> {{ receipt.warehouse.name }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Người tạo:</strong> {{ receipt.creator.username }}</p>
+                                            <p><strong>Ghi chú:</strong> {{ receipt.notes or 'Không có' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="p-3 border rounded">
+                                        <h4 class="text-uppercase mb-3">Trạng thái</h4>
+                                        <span class="badge
+                                            {% if receipt.status == 'pending' %}bg-warning
+                                            {% elif receipt.status == 'completed' %}bg-success
+                                            {% else %}bg-danger{% endif %} p-2 fs-6">
+                                            {% if receipt.status == 'pending' %}Chờ xử lý
+                                            {% elif receipt.status == 'completed' %}Đã hoàn thành
+                                            {% else %}Đã hủy{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h5 class="mt-4 mb-3">Chi tiết sản phẩm</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th width="5%">STT</th>
+                                            <th width="35%">Sản phẩm</th>
+                                            <th width="15%">Số lượng</th>
+                                            <th width="20%">Đơn giá</th>
+                                            <th width="25%">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for detail in receipt.receipt_details %}
+                                        <tr>
+                                            <td class="text-center">{{ loop.index }}</td>
+                                            <td>{{ detail.product.name }}</td>
+                                            <td class="text-center">{{ detail.quantity }}</td>
+                                            <td class="text-end">{{ '{:,.2f}'.format(detail.price) }} đ</td>
+                                            <td class="text-end">{{ '{:,.2f}'.format(detail.subtotal) }} đ</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
+                                            <td class="text-end fw-bold">{{ '{:,.2f}'.format(receipt.total_amount) }} đ</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            {% if receipt.status == 'pending' %}
+                            <div class="row mt-4">
+                                <div class="col-md-12 d-flex justify-content-end">
+                                    <form action="{{ url_for('inbound_receipt_complete', id=receipt.id) }}" method="post" class="me-2">
+                                        <button type="submit" class="btn btn-success">Hoàn thành phiếu</button>
+                                    </form>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                        Hủy phiếu
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Modal xác nhận hủy phiếu -->
+                            <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-danger text-white">
+                                            <h5 class="modal-title" id="cancelModalLabel">Xác nhận hủy phiếu</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="text-center mb-3">
+                                                <i class="fa fa-exclamation-triangle text-warning" style="font-size: 48px;"></i>
+                                            </div>
+                                            <p class="text-center fs-5">Bạn có chắc chắn muốn hủy phiếu nhập này?</p>
+                                            <p class="text-center text-muted">Hành động này không thể hoàn tác.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                            <form action="{{ url_for('inbound_receipt_cancel', id=receipt.id) }}" method="post">
+                                                <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function printReceipt() {
+        window.print();
+    }
+</script>
+{% endblock %}

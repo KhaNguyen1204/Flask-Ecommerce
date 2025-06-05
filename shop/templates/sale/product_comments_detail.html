@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include '_messages.html' %}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #f8f9fa 100%);
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+    }
+    .product-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+    .gallery-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .main-image {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .main-image img {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .main-image img:hover { transform: scale(1.05);}
+    .thumbnail-container {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 10px 0;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: thin;
+    }
+    .thumbnail-container img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .thumbnail-container img:hover, .thumbnail-container img.active {
+        border-color: #ff6f61;
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(255,111,97,0.3);
+    }
+    .product-info {
+        padding: 20px;
+    }
+    .product-info h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2b2d42;
+        margin-bottom: 15px;
+        background: linear-gradient(45deg, #ff6f61, #ff3b2e);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .price-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .price-tag {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ff6f61;
+    }
+    .discount-badge {
+        background: #28a745;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #4a4a4a;
+        margin-bottom: 25px;
+    }
+    .review-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 40px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .review-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #2b2d42;
+        margin-bottom: 20px;
+    }
+    .review-list {
+        margin-bottom: 30px;
+    }
+    .review-item {
+        border-bottom: 1px solid #e9ecef;
+        padding: 15px 0;
+    }
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    .review-user {
+        font-weight: 600;
+        color: #ff6f61;
+    }
+    .review-rating i {
+        font-size: 1rem;
+    }
+    .review-date {
+        color: #888;
+        font-size: 0.9rem;
+    }
+    .review-comment {
+        font-size: 1rem;
+        color: #333;
+        margin-left: 5px;
+    }
+    .review-replies {
+        margin-left: 30px;
+        margin-top: 10px;
+    }
+    .reply-form {
+        display: none;
+        margin-left: 30px;
+        margin-top: 10px;
+    }
+    .reply-toggle-btn {
+        margin-left: 30px;
+        margin-top: 5px;
+    }
+    @media (max-width: 768px) {
+        .product-container { padding: 20px;}
+        .main-image img { height: 350px;}
+        .product-info h1 { font-size: 1.5rem;}
+        .price-tag { font-size: 1.5rem;}
+    }
+    @media (max-width: 576px) {
+        .gallery-container { margin-bottom: 20px;}
+        .thumbnail-container img { width: 60px; height: 60px;}
+    }
+</style>
+
+<div class="container product-container">
+    <div class="row">
+        <!-- Image Gallery -->
+        <div class="col-md-6 gallery-container">
+            <div class="main-image">
+                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                     alt="{{ product.name }}" class="img-fluid" id="main-image">
+            </div>
+            <div class="thumbnail-container">
+                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                     alt="{{ product.name }}" class="active">
+                {% if product.image_2 %}
+                <img src="{{ url_for('static', filename='images/products/' + product.image_2) }}"
+                     alt="{{ product.name }}">
+                {% endif %}
+                {% if product.image_3 %}
+                <img src="{{ url_for('static', filename='images/products/' + product.image_3) }}"
+                     alt="{{ product.name }}">
+                {% endif %}
+            </div>
+        </div>
+        <!-- Product Info -->
+        <div class="col-md-6 product-info">
+            <h1>{{ product.name }}</h1>
+            <div class="price-container">
+                <span class="price-tag">{{ product.price }}₫</span>
+                {% if product.discount > 0 %}
+                <span class="discount-badge">{{ product.discount }}% OFF</span>
+                {% endif %}
+            </div>
+            <p class="description">{{ product.description|truncate(1024) }}</p>
+            <div class="mb-2">
+                <span class="badge bg-secondary">Kho: {{ product.stock }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- Product Review Section -->
+    <div class="review-section mt-5">
+        <h3 class="review-title">Đánh giá & Bình luận của khách hàng</h3>
+        <div class="review-list">
+            {% if reviews %}
+            {% for review in reviews %}
+            <div class="review-item" id="review-{{ review.id }}">
+                <div class="review-header">
+                    <span class="review-user">{{ review.customer.username }}</span>
+                    <span class="review-rating">
+                        {% for i in range(1, 6) %}
+                            {% if i <= review.rating %}
+                                <i class="fa fa-star text-warning"></i>
+                            {% else %}
+                                <i class="fa fa-star text-secondary"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span class="review-date">
+                        {{ review.created_at.strftime('%d/%m/%Y %H:%M:%S') if review.created_at else '' }}
+                    </span>
+                </div>
+                <div class="review-comment">{{ review.comment }}</div>
+                <!-- Staff Replies -->
+                <div class="review-replies">
+                    {% for reply in review.reviews %}
+                    <div class="alert alert-secondary p-2 mb-1">
+                        <strong>Nhân viên:</strong> {{ reply.reply }}
+                        <span class="text-muted" style="font-size:0.85em;">
+                            ({{ reply.created_at.strftime('%d/%m/%Y %H:%M:%S') }})
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Reply button and form for staff -->
+                {% if current_user.is_authenticated and current_user.role.name == 'sale' %}
+                <button class="btn btn-sm btn-outline-primary reply-toggle-btn" data-review="{{ review.id }}">
+                    Trả lời
+                </button>
+                <form action="{{ url_for('reply_review', review_id=review.id) }}" method="post" class="reply-form">
+                    <div class="input-group mt-2">
+                        <input type="text" name="reply" class="form-control" placeholder="Nhập phản hồi..." required>
+                        <button type="submit" class="btn btn-primary">Gửi</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- FontAwesome for star icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script>
+    // Thumbnail image click handler
+    const mainImage = document.getElementById('main-image');
+    const thumbnails = document.querySelectorAll('.thumbnail-container img');
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            mainImage.style.opacity = '0';
+            setTimeout(() => {
+                mainImage.src = thumbnail.src;
+                mainImage.style.opacity = '1';
+            }, 200);
+            thumbnails.forEach(img => img.classList.remove('active'));
+            thumbnail.classList.add('active');
+        });
+    });
+    // Toggle reply form
+    document.querySelectorAll('.reply-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const reviewId = this.getAttribute('data-review');
+            const form = document.querySelector(`#review-${reviewId} .reply-form`);
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock content %}

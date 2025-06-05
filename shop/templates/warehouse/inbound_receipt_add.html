@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/warehouse">Product</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_warehouse">Warehouse</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/inbound_receipt">Phiếu nhập</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/change_password">Change Password</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Tạo phiếu nhập kho mới</h4>
+                    <a href="{{ url_for('inbound_receipt') }}" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <form method="post" id="inboundReceiptForm">
+                        {{ form.hidden_tag() }}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.receipt_number.id }}" class="form-label">{{ form.receipt_number.label }}</label>
+                                    {{ form.receipt_number(class="form-control") }}
+                                    {% if form.receipt_number.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.receipt_number.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.receipt_date.id }}" class="form-label">{{ form.receipt_date.label }}</label>
+                                    {{ form.receipt_date(class="form-control", type="date") }}
+                                    {% if form.receipt_date.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.receipt_date.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.supplier.id }}" class="form-label">{{ form.supplier.label }}</label>
+                                    {{ form.supplier(class="form-control") }}
+                                    {% if form.supplier.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.supplier.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.warehouse_id.id }}" class="form-label">{{ form.warehouse_id.label }}</label>
+                                    {{ form.warehouse_id(class="form-select") }}
+                                    {% if form.warehouse_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.warehouse_id.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id }}" class="form-label">{{ form.notes.label }}</label>
+                            {{ form.notes(class="form-control", rows="3") }}
+                            {% if form.notes.errors %}
+                            <div class="text-danger">
+                                {% for error in form.notes.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+                        <h5>Chi tiết phiếu nhập</h5>
+
+                        <div id="receipt-details">
+                            <!-- Ban đầu hiển thị một dòng chi tiết -->
+                            <div class="receipt-detail-row row mb-3">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Sản phẩm</label>
+                                        <select name="product_id[]" class="form-select product-select" required>
+                                            <option value="">-- Chọn sản phẩm --</option>
+                                            {% for product in products %}
+                                            <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label class="form-label">Số lượng</label>
+                                        <input type="number" name="quantity[]" class="form-control quantity-input" value="1" min="1" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="mb-3">
+                                        <label class="form-label">Đơn giá</label>
+                                        <input type="number" name="price[]" class="form-control price-input" value="0" min="0" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Thành tiền</label>
+                                        <input type="text" class="form-control subtotal-display" readonly>
+                                        <input type="hidden" name="subtotal[]" class="subtotal-input" value="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="mb-3">
+                                        <label class="form-label">&nbsp;</label>
+                                        <button type="button" class="btn btn-danger form-control remove-detail">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" id="add-detail" class="btn btn-success">
+                                <i class="fa fa-plus"></i> Thêm sản phẩm
+                            </button>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <h5>Tổng tiền:</h5>
+                                            <h5 id="total-amount-display">0 đ</h5>
+                                            <input type="hidden" name="total_amount" id="total-amount-input" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">Lưu phiếu nhập</button>
+                            <a href="{{ url_for('inbound_receipt') }}" class="btn btn-secondary">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Thêm dòng chi tiết mới
+        document.getElementById('add-detail').addEventListener('click', function() {
+            var detailsContainer = document.getElementById('receipt-details');
+            var newRow = detailsContainer.querySelector('.receipt-detail-row').cloneNode(true);
+
+            // Reset giá trị
+            newRow.querySelectorAll('input').forEach(function(input) {
+                if (input.type !== 'hidden') {
+                    input.value = input.type === 'number' ? (input.min || 0) : '';
+                }
+            });
+            newRow.querySelector('select').selectedIndex = 0;
+
+            detailsContainer.appendChild(newRow);
+            attachEventListeners();
+            calculateTotals();
+        });
+
+        // Xóa dòng chi tiết
+        function attachRemoveListener(removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                var detailsContainer = document.getElementById('receipt-details');
+                if (detailsContainer.querySelectorAll('.receipt-detail-row').length > 1) {
+                    this.closest('.receipt-detail-row').remove();
+                    calculateTotals();
+                } else {
+                    alert('Phiếu nhập phải có ít nhất một sản phẩm!');
+                }
+            });
+        }
+
+        // Tính toán thành tiền và tổng tiền
+        function calculateSubtotal(row) {
+            var quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+            var price = parseFloat(row.querySelector('.price-input').value) || 0;
+            var subtotal = quantity * price;
+
+            row.querySelector('.subtotal-input').value = subtotal;
+            row.querySelector('.subtotal-display').value = formatCurrency(subtotal);
+
+            return subtotal;
+        }
+
+        function calculateTotals() {
+            var total = 0;
+            document.querySelectorAll('.receipt-detail-row').forEach(function(row) {
+                total += calculateSubtotal(row);
+            });
+
+            document.getElementById('total-amount-input').value = total;
+            document.getElementById('total-amount-display').textContent = formatCurrency(total) + ' đ';
+        }
+
+        // Định dạng tiền tệ
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount);
+        }
+
+        // Cập nhật giá khi chọn sản phẩm
+        function attachProductSelectListener(select) {
+            select.addEventListener('change', function() {
+                var row = this.closest('.receipt-detail-row');
+                var option = this.options[this.selectedIndex];
+                var price = option.dataset.price || 0;
+
+                row.querySelector('.price-input').value = price;
+                calculateSubtotal(row);
+                calculateTotals();
+            });
+        }
+
+        // Cập nhật thành tiền khi thay đổi số lượng hoặc đơn giá
+        function attachInputListeners(row) {
+            row.querySelectorAll('.quantity-input, .price-input').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    calculateSubtotal(row);
+                    calculateTotals();
+                });
+            });
+        }
+
+        // Gắn các sự kiện cho tất cả các dòng
+        function attachEventListeners() {
+            document.querySelectorAll('.receipt-detail-row').forEach(function(row) {
+                attachRemoveListener(row.querySelector('.remove-detail'));
+                attachProductSelectListener(row.querySelector('.product-select'));
+                attachInputListeners(row);
+            });
+        }
+
+        // Khởi tạo ban đầu
+        attachEventListeners();
+        calculateTotals();
+    });
+</script>
+{% endblock %}

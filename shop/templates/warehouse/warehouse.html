@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/warehouse">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager_warehouse">Kho</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/inbound_receipt">Phiếu nhập</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/outbound_receipt">Phiếu xuất</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Tài khoản
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/change_password">Đổi mật khẩu</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search" id="search-input">
+                    <button class="btn btn-outline-success" type="submit">Tìm</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Quản lý sản phẩm trong kho</h4>
+                    <div>
+                        <a href="{{ url_for('inbound_receipt_add') }}" class="btn btn-success me-2">
+                            <i class="fa fa-plus"></i> Nhập kho
+                        </a>
+                        <a href="{{ url_for('outbound_receipt_add') }}" class="btn btn-warning">
+                            <i class="fa fa-minus"></i> Xuất kho
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <!-- Bộ lọc sản phẩm -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <select class="form-select" id="category-filter">
+                                <option value="">Tất cả danh mục</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="brand-filter">
+                                <option value="">Tất cả thương hiệu</option>
+                                {% for brand in brands %}
+                                <option value="{{ brand.id }}">{{ brand.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="stock-filter">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="low">Sắp hết hàng</option>
+                                <option value="out">Hết hàng</option>
+                                <option value="in">Còn hàng</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="reset-filter" class="btn btn-secondary w-100">Xóa bộ lọc</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Hình ảnh</th>
+                                    <th scope="col">Tên sản phẩm</th>
+                                    <th scope="col">Mã SP</th>
+                                    <th scope="col">Danh mục</th>
+                                    <th scope="col">Thương hiệu</th>
+                                    <th scope="col">Số lượng</th>
+                                    <th scope="col">Giá bán</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if products %}
+                                {% for product in products %}
+                                <tr class="product-row"
+                                    data-category="{{ product.category_id }}"
+                                    data-brand="{{ product.brand_id }}"
+                                    data-stock="{% if product.stock <= 0 %}out{% elif product.stock <= 3 %}low{% else %}in{% endif %}">
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>
+                                        {% if product.image_1 %}
+                                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" width="50" height="50" alt="{{ product.name }}">
+                                        {% else %}
+                                        <div class="bg-light text-center" style="width:50px;height:50px;line-height:50px;">N/A</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ product.name }}</td>
+                                    <td>{{ product.id or 'N/A' }}</td>
+                                    <td>{{ product.category.name }}</td>
+                                    <td>{{ product.brand.name }}</td>
+                                    <td>{{ product.stock }}</td>
+                                    <td>{{ "{:,.0f}".format(product.price) }} đ</td>
+                                    <td>
+                                        {% if product.stock <= 0 %}
+                                        <span class="badge bg-danger">Hết hàng</span>
+                                        {% elif product.stock <= 3 %}
+                                        <span class="badge bg-warning">Sắp hết</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Còn hàng</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-info"
+                                                    data-bs-toggle="modal" data-bs-target="#productModal-{{ product.id }}">
+                                                <i class="fa fa-eye"></i> Chi tiết
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-primary"
+                                                    data-bs-toggle="modal" data-bs-target="#stockAdjustModal-{{ product.id }}">
+                                                <i class="fa fa-edit"></i> Điều chỉnh
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="10" class="text-center">Không có sản phẩm nào</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals cho chi tiết sản phẩm -->
+{% if products %}
+{% for product in products %}
+<div class="modal fade" id="productModal-{{ product.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết sản phẩm: {{ product.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if product.image_1 %}
+                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" class="img-fluid rounded" alt="{{ product.name }}">
+                        {% else %}
+                        <div class="bg-light text-center p-5">Không có hình ảnh</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h4>{{ product.name }}</h4>
+                        <p><strong>Mã sản phẩm:</strong> {{ product.code or 'N/A' }}</p>
+                        <p><strong>Danh mục:</strong> {{ product.category.name }}</p>
+                        <p><strong>Thương hiệu:</strong> {{ product.brand.name }}</p>
+                        <p><strong>Giá bán:</strong> {{ "{:,.0f}".format(product.price) }} đ</p>
+                        <p><strong>Số lượng tồn kho:</strong> {{ product.stock }}</p>
+                        <p><strong>Trạng thái:</strong>
+                            {% if product.stock <= 0 %}
+                            <span class="badge bg-danger">Hết hàng</span>
+                            {% elif product.stock <= 3 %}
+                            <span class="badge bg-warning">Sắp hết</span>
+                            {% else %}
+                            <span class="badge bg-success">Còn hàng</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Mô tả:</strong> {{ product.description|truncate(50) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal điều chỉnh số lượng -->
+<div class="modal fade" id="stockAdjustModal-{{ product.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Điều chỉnh số lượng: {{ product.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('adjust_stock', id=product.id) }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng hiện tại</label>
+                        <input type="text" class="form-control" value="{{ product.stock }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adjustment_type" class="form-label">Loại điều chỉnh</label>
+                        <select name="adjustment_type" id="adjustment_type" class="form-select" required>
+                            <option value="add">Thêm vào</option>
+                            <option value="subtract">Trừ đi</option>
+                            <option value="set">Đặt giá trị mới</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adjustment_quantity" class="form-label">Số lượng</label>
+                        <input type="number" name="adjustment_quantity" id="adjustment_quantity" class="form-control" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adjustment_reason" class="form-label">Lý do</label>
+                        <textarea name="adjustment_reason" id="adjustment_reason" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lọc sản phẩm theo danh mục
+        document.getElementById('category-filter').addEventListener('change', filterProducts);
+
+        // Lọc sản phẩm theo thương hiệu
+        document.getElementById('brand-filter').addEventListener('change', filterProducts);
+
+        // Lọc sản phẩm theo trạng thái tồn kho
+        document.getElementById('stock-filter').addEventListener('change', filterProducts);
+
+        // Reset bộ lọc
+        document.getElementById('reset-filter').addEventListener('click', function() {
+            document.getElementById('category-filter').value = '';
+            document.getElementById('brand-filter').value = '';
+            document.getElementById('stock-filter').value = '';
+            document.getElementById('search-input').value = '';
+            filterProducts();
+        });
+
+        // Tìm kiếm sản phẩm
+        document.getElementById('search-input').addEventListener('keyup', filterProducts);
+
+        function filterProducts() {
+            const categoryFilter = document.getElementById('category-filter').value;
+            const brandFilter = document.getElementById('brand-filter').value;
+            const stockFilter = document.getElementById('stock-filter').value;
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            document.querySelectorAll('.product-row').forEach(function(row) {
+                let showRow = true;
+
+                if (categoryFilter && row.dataset.category !== categoryFilter) {
+                    showRow = false;
+                }
+
+                if (brandFilter && row.dataset.brand !== brandFilter) {
+                    showRow = false;
+                }
+
+                if (stockFilter && row.dataset.stock !== stockFilter) {
+                    showRow = false;
+                }
+
+                if (searchTerm) {
+                    const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                    const productCode = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                    if (!productName.includes(searchTerm) && !productCode.includes(searchTerm)) {
+                        showRow = false;
+                    }
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+    });
+</script>
+{% endblock %}

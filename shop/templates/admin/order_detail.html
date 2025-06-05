@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mt-4 mb-4">Order Detail</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Invoice: {{ order.invoice }}</h5>
+            <p class="card-text"><strong>Customer:</strong> {{ order.customer.username if order.customer else '' }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ order.status }}</p>
+            <p class="card-text"><strong>Date Created:</strong> {{ order.date_created.strftime('%Y-%m-%d %H:%M') if order.date_created else '' }}</p>
+        </div>
+    </div>
+    <h4>Order Items</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set total = 0 %}
+        {% for key, item in order.orders.items() %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ item['name'] }}</td>
+                <td>{{ item['quantity'] }}</td>
+                <td>{{ item['price'] }}</td>
+                <td>
+                    {{ item['quantity'] * item['price'] }}
+                    {% set total = total + (item['quantity'] * item['price']) %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="text-end">Total</th>
+                <th>{{ total }}</th>
+            </tr>
+        </tfoot>
+    </table>
+    <a href="{{ url_for('manager_order') }}" class="btn btn-secondary mt-3">Back to Orders</a>
+</div>
+{% endblock %}

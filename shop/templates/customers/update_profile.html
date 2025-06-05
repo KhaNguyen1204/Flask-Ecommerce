@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow border-0">
+          <div class="card-header bg-white py-3">
+            <h4 class="mb-0 fw-bold">Cập nhật thông tin tài khoản</h4>
+          </div>
+          <div class="card-body">
+            <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+              {{ form.hidden_tag() }}
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="username" class="form-label">Tên đăng nhập</label>
+                  {{ form.username(class="form-control") }}
+                  {% if form.username.errors %}
+                    <div class="text-danger">
+                      {% for error in form.username.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                  <label for="email" class="form-label">Email</label>
+                  {{ form.email(class="form-control") }}
+                  {% if form.email.errors %}
+                    <div class="text-danger">
+                      {% for error in form.email.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="phone" class="form-label">Số điện thoại</label>
+                  {{ form.phone(class="form-control") }}
+                  {% if form.phone.errors %}
+                    <div class="text-danger">
+                      {% for error in form.phone.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                  <label for="country" class="form-label">Quốc gia</label>
+                  {{ form.country(class="form-control") }}
+                  {% if form.country.errors %}
+                    <div class="text-danger">
+                      {% for error in form.country.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="city" class="form-label">Thành phố</label>
+                  {{ form.city(class="form-control") }}
+                  {% if form.city.errors %}
+                    <div class="text-danger">
+                      {% for error in form.city.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                  <label for="zipcode" class="form-label">Mã bưu điện</label>
+                  {{ form.zipcode(class="form-control") }}
+                  {% if form.zipcode.errors %}
+                    <div class="text-danger">
+                      {% for error in form.zipcode.errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="address" class="form-label">Địa chỉ</label>
+                {{ form.address(class="form-control") }}
+                {% if form.address.errors %}
+                  <div class="text-danger">
+                    {% for error in form.address.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="profile" class="form-label">Ảnh đại diện</label>
+                <div class="input-group">
+                  {{ form.profile(class="form-control") }}
+                </div>
+                {% if form.profile.errors %}
+                  <div class="text-danger">
+                    {% for error in form.profile.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                {% if customer.profile %}
+                <div class="mt-2">
+                  <img src="{{ url_for('static', filename='images/' + customer.profile) }}"
+                       class="img-thumbnail" style="height: 100px; width: auto;" alt="Current profile">
+                  <small class="text-muted">Ảnh đại diện hiện tại</small>
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu mới (để trống nếu không thay đổi)</label>
+                {{ form.password(class="form-control") }}
+                {% if form.password.errors %}
+                  <div class="text-danger">
+                    {% for error in form.password.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label for="confirm" class="form-label">Xác nhận mật khẩu mới</label>
+                {{ form.confirm(class="form-control") }}
+                {% if form.confirm.errors %}
+                  <div class="text-danger">
+                    {% for error in form.confirm.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="d-grid gap-2 mt-4">
+                {{ form.submit(class="btn btn-primary py-2") }}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

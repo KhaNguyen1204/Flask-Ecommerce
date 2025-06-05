@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <div class="card shadow border-0">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold">Lịch sử đơn hàng</h4>
+            <a href="{{ url_for('customer_profile') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-2"></i>Quay lại hồ sơ
+            </a>
+          </div>
+          <div class="card-body">
+            {% if orders %}
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Mã đơn hàng</th>
+                      <th>Ngày đặt</th>
+                      <th>Tổng số sản phẩm</th>
+                      <th>Tổng tiền</th>
+                      <th>Trạng thái</th>
+                      <th class="text-center">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for order in orders %}
+                    <tr>
+                      <td>{{ order.invoice }}</td>
+                      <td>{{ order.date_created.strftime('%d-%m-%Y') }}</td>
+                      <td>{{ order.order_details|length }}</td>
+                      <td>{{ "{:,.0f}".format(order.grand_total) }} VND</td>
+                      <td>
+                        <span class="badge bg-success">{{ order.status }}</span>
+                      </td>
+                      <td class="text-center">
+                        <a href="{{ url_for('orders', invoice=order.invoice) }}" class="btn btn-sm btn-info me-2">
+                          <i class="bi bi-eye"></i> Chi tiết
+                        </a>
+                        <form action="{{ url_for('get_pdf', invoice=order.invoice) }}" method="POST" class="d-inline">
+                          <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-download"></i> Hóa đơn
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="text-center py-5">
+                <i class="bi bi-bag-x display-1 text-muted"></i>
+                <h5 class="mt-3">Bạn chưa có đơn hàng nào</h5>
+                <p class="text-muted">Hãy mua sắm và quay lại sau</p>
+                <a href="{{ url_for('home') }}" class="btn btn-primary mt-3">
+                  <i class="bi bi-cart-plus me-2"></i>Mua sắm ngay
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

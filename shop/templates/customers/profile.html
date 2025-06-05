@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-body text-center py-5">
+                        {% if customer.profile %}
+                        <img src="{{ url_for('static', filename='images/' + customer.profile) }}"
+                             class="rounded-circle img-fluid mb-3"
+                             style="width: 150px; height: 150px; object-fit: cover;" alt="Profile Image">
+                        {% else %}
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                             style="width: 150px; height: 150px;">
+                            <i class="bi bi-person display-1 text-secondary"></i>
+                        </div>
+                        {% endif %}
+                        <h4 class="fw-bold">{{ customer.username }}</h4>
+                        <p class="text-muted">Customer</p>
+                        <a href="{{ url_for('update_profile') }}" class="btn btn-primary px-4 py-2">
+                            <i class="bi bi-pencil-square me-2"></i>Cập nhật tài khoản
+                        </a>
+                        <a href="{{ url_for('history_orders') }}" class="btn btn-info px-4 py-2">
+                            <i class="bi bi-clock-history me-2"></i>Danh sách đơn hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Thông tin tài khoản</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Tên đăng nhập</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.username }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.email }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Số điện thoại</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.phone }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Quốc gia</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.country }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Thành phố</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.city }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Địa chỉ</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.address }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <h6 class="mb-0">Mã bưu điện</h6>
+                            </div>
+                            <div class="col-sm-8 text-secondary">
+                                {{ customer.zipcode }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
