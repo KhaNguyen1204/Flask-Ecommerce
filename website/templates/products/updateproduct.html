@@ -4,6 +4,11 @@
 {% endblock title %}
 {% block content %}
 {% include '_messages.html' %}
+<div class="mb-4">
+    <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i> Quay lại
+    </a>
+</div>
 <div class="container">
     <div class="row">
   <div class="col-md-2"></div>
