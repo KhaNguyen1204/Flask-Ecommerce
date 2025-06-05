@@ -1,261 +1,70 @@
-{% extends 'managers_base.html' %}
-
-{% block title %}Products - Manager Dashboard{% endblock %}
-
-{% block nav_products %}active{% endblock %}
+{% set show_footer = False %}
+{% extends "base.html" %}
 
 {% block content %}
-
-
-<!-- Page Header -->
-<div class="page-header">
-    <h1 class="page-title">
-        <i class="fas fa-box me-3"></i>Product Management
-    </h1>
-    <p class="page-subtitle">Manage your product inventory and details</p>
+{% include '_messages.html' %}
+<div class="container">
+    {% include '_navbar_admin.html' %}
 </div>
-
-<!-- Search and Add Section -->
-<div class="search-section">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" placeholder="Search products..." id="searchInput">
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('addproduct') }}" class="btn btn-primary-gradient">
-                <i class="fas fa-plus me-2"></i>Add New Product
-            </a>
-        </div>
-    </div>
+<div class="container mt-4">
+    <a href="{{ url_for('addproduct') }}" class="btn btn-success mb-3">Add Product</a>
 </div>
-
-<!-- Stats Cards -->
-<div class="stats-row row mb-4">
-    <div class="col-md-3 col-sm-6">
-        <div class="stats-card">
-            <div class="stats-icon" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stats-number">{{ products|length }}</div>
-            <div class="stats-label">Total Products</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="stats-card">
-            <div class="stats-icon" style="background: linear-gradient(135deg, var(--success-color), #059669);">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stats-number">{{ products|selectattr('stock', 'gt', 0)|list|length }}</div>
-            <div class="stats-label">In Stock</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="stats-card">
-            <div class="stats-icon" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="stats-number">{{ products|selectattr('stock', 'lt', 10)|list|length }}</div>
-            <div class="stats-label">Low Stock</div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="stats-card">
-            <div class="stats-icon" style="background: linear-gradient(135deg, var(--info-color), #2563eb);">
-                <i class="fas fa-tags"></i>
-            </div>
-            <div class="stats-number">{{ products|map(attribute='brand')|unique|list|length }}</div>
-            <div class="stats-label">Brands</div>
-        </div>
-    </div>
-</div>
-
-<!-- Products Table -->
-<div class="table-container">
-    <table class="table table-hover" id="productsTable">
+<div class="container mt-5">
+    <table class="table table-sm table-condensed table-striped">
         <thead>
-            <tr>
-                <th>
-                    <i class="fas fa-hashtag me-2"></i>No.
-                </th>
-                <th>
-                    <i class="fas fa-box me-2"></i>Product
-                </th>
-                <th>
-                    <i class="fas fa-dollar-sign me-2"></i>Price
-                </th>
-                <th>
-                    <i class="fas fa-percentage me-2"></i>Discount
-                </th>
-                <th>
-                    <i class="fas fa-tag me-2"></i>Brand
-                </th>
-                <th>
-                    <i class="fas fa-image me-2"></i>Image
-                </th>
-                <th>
-                    <i class="fas fa-cogs me-2"></i>Actions
-                </th>
-            </tr>
+        <tr>
+            <th>Sr</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Discount</th>
+            <th>Brand</th>
+            <th>Image</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
         </thead>
         <tbody>
-            {% for product in products %}
-            <tr class="product-row">
-                <td>
-                    <span class="badge bg-primary">{{ loop.index }}</span>
-                </td>
-                <td>
-                    <div class="d-flex flex-column">
-                        <strong class="text-dark">{{ product.name }}</strong>
-                        <small class="text-muted">ID: {{ product.id }}</small>
+        {% for product in products %}
+        <tr>
+            <td>{{loop.index}}</td>
+            <td>{{product.name}}</td>
+            <td>{{product.price}}</td>
+            <td>{{product.discount}}</td>
+            <td>{{product.brand.name}}</td>
+            <td><img src="{{url_for('static', filename='images/products/' + product.image_1)}}" alt="" width="30" height="40">
+            </td>
+            <td><a href="{{url_for('updateproduct', id=product.id)}}" class="btn btn-info btn-sm">Edit</a></td>
+            <!-- Button trigger modal -->
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal-{{product.id}}">Delete
+                </button>
+            </td>
+        </tr>
+        </tr>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal-{{product.id}}" tabindex="-1"
+             aria-labelledby="exampleModalLabel-{{product.name}}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel-{{product.name}}">{{product.name}}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </td>
-                <td>
-                    <span class="fw-bold text-success">${{ "%.2f"|format(product.price) }}</span>
-                </td>
-                <td>
-                    {% if product.discount > 0 %}
-                        <span class="badge bg-warning">{{ product.discount }}%</span>
-                    {% else %}
-                        <span class="text-muted">No discount</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <span class="badge bg-info">{{ product.brand.name }}</span>
-                </td>
-                <td>
-                    <div class="product-image-container">
-                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
-                             alt="{{ product.name }}" 
-                             class="product-thumbnail"
-                             style="width: 50px; height: 60px; object-fit: cover; border-radius: 8px; box-shadow: var(--shadow);">
+                    <div class="modal-body">
+                        <span class="text-danger">Are you sure that want to delete this is product {{product.name}}</span>
                     </div>
-                </td>
-                <td>
-                    <div class="d-flex gap-2">
-                        <a href="{{ url_for('updateproduct', id=product.id) }}" 
-                           class="btn btn-info-gradient btn-sm" 
-                           data-bs-toggle="tooltip" 
-                           data-bs-placement="top" 
-                           title="Edit Product">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <button type="button" 
-                                class="btn btn-danger-gradient btn-sm" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#deleteModal-{{ product.id }}"
-                                data-bs-toggle="tooltip" 
-                                data-bs-placement="top" 
-                                title="Delete Product">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{url_for('deleteproduct', id=product.id)}}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
                     </div>
-                </td>
-            </tr>
-
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- Delete Modals (moved outside the loop) -->
-{% for product in products %}
-<div class="modal fade" id="deleteModal-{{ product.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ product.id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel-{{ product.id }}">
-                    <i class="fas fa-exclamation-triangle me-2"></i>{{ product.name }}
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
-                    </div>
-                    <span class="text-danger">Are you sure that want to delete this product {{ product.name }}?</span>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-warning-gradient" data-bs-dismiss="modal">Cancel</button>
-                <form action="{{ url_for('deleteproduct', id=product.id) }}" method="POST" class="d-inline">
-                    <button type="submit" class="btn btn-danger-gradient btn-sm">Delete</button>
-                </form>
-            </div>
         </div>
-    </div>
-</div>
-{% endfor %}
-           
+        {% endfor %}
         </tbody>
     </table>
 </div>
-
-<!-- Empty State (if no products) -->
-{% if not products %}
-<div class="text-center py-5">
-    <div class="empty-state">
-        <i class="fas fa-box-open text-muted" style="font-size: 4rem; margin-bottom: 1rem;"></i>
-        <h4 class="text-muted">No Products Found</h4>
-        <p class="text-muted mb-4">Start by adding your first product to the inventory.</p>
-        <a href="{{ url_for('addproduct') }}" class="btn btn-primary-gradient">
-            <i class="fas fa-plus me-2"></i>Add First Product
-        </a>
-    </div>
-</div>
-{% endif %}
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#productsTable tbody tr.product-row');
-        
-        rows.forEach(row => {
-            const productName = row.querySelector('td:nth-child(2) strong').textContent.toLowerCase();
-            const brandName = row.querySelector('td:nth-child(5) .badge').textContent.toLowerCase();
-            
-            if (productName.includes(searchTerm) || brandName.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
-
-    // Add loading states for buttons
-    document.querySelectorAll('form button[type="submit"]').forEach(button => {
-        button.addEventListener('click', function(e) {
-            // Don't prevent default, just show loading state
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-            this.disabled = true;
-            
-            // Re-enable after 3 seconds in case of error
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-trash me-2"></i>Delete';
-                this.disabled = false;
-            }, 3000);
-        });
-    });
-
-    // Add fade-in animation to table rows
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('#productsTable tbody tr');
-        rows.forEach((row, index) => {
-            setTimeout(() => {
-                row.classList.add('fade-in');
-            }, index * 100);
-        });
-    });
-</script>
-{% endblock %}
+{% endblock content %}
