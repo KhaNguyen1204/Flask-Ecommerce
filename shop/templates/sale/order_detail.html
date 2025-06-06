@@ -1,57 +1,142 @@
-{% extends 'base.html' %}
+{% set show_footer = False %}
+{% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h2>Order Detail</h2>
-        <a href="{{ url_for('get_pdf', invoice=invoice) }}" class="btn btn-primary">
-            Export Invoice
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">Chi tiết đơn hàng</h2>
+
+        <a href="{{ url_for('get_pdf', invoice=invoice) }}" class="btn btn-success btn-lg">
+            <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn
         </a>
     </div>
-    <div class="card mb-4">
+
+    <!-- Thông tin đơn hàng -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Thông tin đơn hàng</h5>
+        </div>
         <div class="card-body">
-            <h5 class="card-title">Invoice: {{ order.invoice }}</h5>
-            <p class="card-text"><strong>Customer:</strong> {{ order.customer.username if order.customer else '' }}</p>
-            <p class="card-text"><strong>Status:</strong> {{ order.status }}</p>
-            <p class="card-text"><strong>Date Created:</strong> {{ order.date_created.strftime('%Y-%m-%d %H:%M') if order.date_created else '' }}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>Mã hóa đơn:</strong> 
+                        <span class="badge bg-info fs-6">{{ order.invoice }}</span>
+                    </p>
+                    <p class="mb-2"><strong>Khách hàng:</strong> 
+                        <span class="text-success">{{ order.customer.username if order.customer else 'Chưa xác định' }}</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-2"><strong>Trạng thái:</strong> 
+                        <span class="badge bg-warning">{{ order.status }}</span>
+                    </p>
+                    <p class="mb-2"><strong>Ngày đặt hàng:</strong> 
+                        <span class="text-muted">{{ order.date_created.strftime('%d/%m/%Y - %H:%M') if order.date_created else 'Chưa xác định' }}</span>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-    <h4>Order Items</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% set total = 0 %}
-        {% for item in order_details %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.price }}</td>
-                <td>
-                    {{ item.quantity * item.price }}
-                    {% set total = total + (item.quantity * item.price) %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="4" class="text-end">Tax</th>
-                <th>{{ tax }}</th>
-            </tr>
-            <tr>
-                <th colspan="4" class="text-end">Total</th>
-                <th>{{ grand_total }}</th>
-            </tr>
-        </tfoot>
-    </table>
-    <a href="{{ url_for('manager_order') }}" class="btn btn-secondary mt-3">Back to Orders</a>
+
+    <!-- Danh sách sản phẩm -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Danh sách sản phẩm</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" width="5%">STT</th>
+                            <th width="50%">Tên sản phẩm</th>
+                            <th class="text-center" width="10%">Số lượng</th>
+                            <th class="text-end" width="20%">Đơn giá</th>
+                            <th class="text-end" width="20%">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% set total = 0 %}
+                    {% for item in order_details %}
+                        <tr>
+                            <td class="text-center">{{ loop.index }}</td>
+                            <td>
+                                <strong>{{ item.product.name }}</strong>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ item.quantity }}</span>
+                            </td>
+                            <td class="text-end">{{ "{:,.0f}".format(item.price) }} VND</td>
+                            <td class="text-end fw-bold text-success">
+                                {{ "{:,.0f}".format(item.quantity * item.price) }} VND
+                                {% set total = total + (item.quantity * item.price) %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Tổng kết -->
+        <div class="card-footer bg-light">
+            <div class="row">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td class="text-end"><strong>Thuế:</strong></td>
+                            <td class="text-end text-warning fw-bold">{{ "{:,.0f}".format(tax) }} VND</td>
+                        </tr>
+                        <tr class="table-success">
+                            <td class="text-end"><strong>Tổng cộng:</strong></td>
+                            <td class="text-end fw-bold fs-5">{{ "{:,.0f}".format(grand_total) }} VND</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút quay lại -->
+    <div class="mt-4">
+        <a href="{{ url_for('manager_order') }}" class="btn btn-outline-secondary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách đơn hàng
+        </a>
+    </div>
 </div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    border: none;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.85em;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+</style>
 {% endblock %}

@@ -1,87 +1,54 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  {% if title %}
-    {{ title }}
-  {% else %}
-    Register
-  {% endif %}
-{% endblock title %}
+  {{ title or "Register" }}
+{% endblock %}
 
 {% block content %}
   {% from "_formhelpers.html" import render_field %}
   {% include '_messages.html' %}
-  
-<div class="mb-4">
-    <a href="{{ url_for('customers_manager') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i> Quay lại
+
+  <div class="container py-4">
+    <a href="{{ url_for('customers_manager') }}" class="btn btn-sm btn-outline-secondary mb-3">
+      <i class="bi bi-arrow-left me-1"></i> Quay lại
     </a>
-</div>
-</div>
-  <div class="container py-5">
+
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div class="card border-0 shadow-lg">
-          <div class="card-header bg-primary text-white p-4">
-            <h2 class="text-center mb-0">Create Your Account</h2>
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0">Create Your Account</h4>
           </div>
-          <div class="card-body p-4">
-            <form action="" method="post">
+          <div class="card-body">
+            <form action="" method="post" enctype="multipart/form-data">
               {{ form.csrf_token }}
-              
               <div class="row">
                 <div class="col-md-6">
-                  <div class="mb-3">
-                    {{ render_field(form.username, class_="form-control form-control-lg", placeholder="Username") }}
-                  </div>
-                  <div class="mb-3">
-                    {{ render_field(form.email, class_="form-control form-control-lg", placeholder="Email Address") }}
-                  </div>
-                  <div class="mb-3">
-                    {{ render_field(form.password, class_="form-control form-control-lg", placeholder="Password") }}
-                  </div>
-                  <div class="mb-4">
-                    {{ render_field(form.confirm, class_="form-control form-control-lg", placeholder="Confirm Password") }}
-                  </div>
+                  {{ render_field(form.username, class_="form-control mb-3", placeholder="Username") }}
+                  {{ render_field(form.email, class_="form-control mb-3", placeholder="Email Address") }}
+                  {{ render_field(form.password, class_="form-control mb-3", placeholder="Password") }}
+                  {{ render_field(form.confirm, class_="form-control mb-3", placeholder="Confirm Password") }}
                 </div>
-                
                 <div class="col-md-6">
-                  <div class="mb-3">
-                    {{ render_field(form.country, class_="form-control form-control-lg", placeholder="Country") }}
-                  </div>
-                  <div class="mb-3">
-                    {{ render_field(form.city, class_="form-control form-control-lg", placeholder="City") }}
-                  </div>
-                  <div class="mb-3">
-                    {{ render_field(form.phone, class_="form-control form-control-lg", placeholder="Phone Number") }}
-                  </div>
-                  <div class="mb-3">
-                    {{ render_field(form.address, class_="form-control form-control-lg", placeholder="Address") }}
-                  </div>
-                  <div class="mb-4">
-                    {{ render_field(form.zipcode, class_="form-control form-control-lg", placeholder="Zipcode") }}
-                  </div>
+                  {{ render_field(form.country, class_="form-control mb-3", placeholder="Country") }}
+                  {{ render_field(form.city, class_="form-control mb-3", placeholder="City") }}
+                  {{ render_field(form.phone, class_="form-control mb-3", placeholder="Phone Number") }}
+                  {{ render_field(form.address, class_="form-control mb-3", placeholder="Address") }}
+                  {{ render_field(form.zipcode, class_="form-control mb-3", placeholder="Zipcode") }}
                 </div>
               </div>
-              
-              <div class="row mt-2">
-                <div class="col-md-6">
-                  <div class="mb-4">
-                    <label class="form-label fw-bold">Profile Picture</label>
-                    <div class="input-group">
-                      {{ form.profile(class_="form-control") }}
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6 d-flex align-items-end justify-content-end">
-                  {{ form.submit(class_="btn btn-primary btn-lg px-5") }}
-                </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Profile Picture</label>
+                {{ form.profile(class_="form-control") }}
               </div>
-              
-              <div class="row mt-3">
-                <div class="col-12 text-center">
-                  <p class="text-muted">Already have an account? <a href="#" class="text-primary fw-bold">Sign In</a></p>
-                </div>
+
+              <div class="d-flex justify-content-end">
+                {{ form.submit(class_="btn btn-primary px-4") }}
+              </div>
+
+              <div class="text-center mt-3">
+                <small class="text-muted">Already have an account? <a href="/login" class="text-primary">Sign In</a></small>
               </div>
             </form>
           </div>
@@ -89,4 +56,4 @@
       </div>
     </div>
   </div>
-{% endblock content %}
+{% endblock %}

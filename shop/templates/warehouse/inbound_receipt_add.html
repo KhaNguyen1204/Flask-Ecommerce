@@ -1,54 +1,19 @@
+
+{% set show_footer = False %}
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/warehouse">Product</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_warehouse">Warehouse</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/inbound_receipt">Phiếu nhập</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Account
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/change_password">Change Password</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+
 
     <div class="row mt-4">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-dark text-white">
                     <h4 class="mb-0">Tạo phiếu nhập kho mới</h4>
-                    <a href="{{ url_for('inbound_receipt') }}" class="btn btn-secondary btn-sm">
-                            <i class="fa fa-arrow-left"></i> Quay lại
+                    <a href="{{ request.referrer or url_for('inbound_receipt') }}" class="btn btn-secondary btn-sm">
+                        <i class="fa fa-arrow-left"></i> Quay lại
                     </a>
+
                 </div>
                 <div class="card-body">
                     {% with messages = get_flashed_messages(with_categories=true) %}

@@ -1,75 +1,66 @@
 <!-- templates/_navbar.html -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light bg-gradient-orange border-bottom shadow-sm">
     <div class="container-fluid px-4">
-        <a class="navbar-brand fw-semibold text-dark" href="/admin">
-            <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Admin
+        <a class="navbar-brand fw-bold fs-4 text-dark" href="/admin">
+            <i class="bi bi-grid-3x3-gap me-2 text-warning"></i>Admin
         </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <button class="navbar-toggler border-0 navbar-toggler-orange" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'product' else 'text-dark' }}" href="/admin">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/admin" id="nav-product">
                         <i class="bi bi-box-seam me-2"></i>Products
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'brand' else 'text-dark' }}" href="/brands">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/brands" id="nav-brand">
                         <i class="bi bi-tags me-2"></i>Brands
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'category' else 'text-dark' }}" href="/categories">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/categories" id="nav-category">
                         <i class="bi bi-diagram-3 me-2"></i>Categories
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'customer' else 'text-dark' }}" href="/manager_customers">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/manager_customers" id="nav-customer">
                         <i class="bi bi-people me-2"></i>Customers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'order' else 'text-dark' }}" href="/manager_orders">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/manager_orders" id="nav-order">
                         <i class="bi bi-receipt me-2"></i>Orders
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'order' else 'text-dark' }}" href="/warehouse">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/warehouse" id="nav-warehouse">
                         <i class="bi bi-receipt me-2"></i>Warehouses
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 py-2 rounded-2 {{ 'active-nav' if active_page == 'order' else 'text-dark' }}" href="/finance_management">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/finance_management" id="nav-report">
                         <i class="bi bi-receipt me-2"></i>Reports
                     </a>
                 </li>
             </ul>
 
-            <div class="d-flex align-items-center gap-3">
-                <form class="d-flex" role="search">
-                    <div class="input-group">
-                        <input class="form-control form-control-sm border-1" type="search" placeholder="Tìm kiếm..." aria-label="Search" style="min-width: 200px;">
-                        <button class="btn btn-outline-secondary btn-sm" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form>
-
+            <div class="d-flex align-items-center">
                 <div class="dropdown">
-                    <a class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                    <a class="btn btn-outline-dark btn-sm dropdown-toggle d-flex align-items-center text-dark fw-bold" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle me-2"></i>Account
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end mt-2 border-1 shadow-sm">
                         <li>
-                            <a class="dropdown-item py-2" href="/change_password">
+                            <a class="dropdown-item py-2" href="/change_password" id="nav-change-password">
                                 <i class="bi bi-key me-2 text-muted"></i>Đổi mật khẩu
                             </a>
                         </li>
                         <li><hr class="dropdown-divider my-1"></li>
                         <li>
-                            <a class="dropdown-item py-2 text-danger" href="/logout">
+                            <a class="dropdown-item py-2 text-danger" href="/logout" id="nav-logout">
                                 <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
                             </a>
                         </li>
@@ -79,3 +70,136 @@
         </div>
     </div>
 </nav>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lấy đường dẫn hiện tại
+    const currentPath = window.location.pathname;
+    
+    // Danh sách các nav item và đường dẫn tương ứng
+    const navItems = {
+        '/admin': 'nav-product',
+        '/brands': 'nav-brand',
+        '/categories': 'nav-category',
+        '/manager_customers': 'nav-customer',
+        '/manager_orders': 'nav-order',
+        '/warehouse': 'nav-warehouse',
+        '/finance_management': 'nav-report',
+        '/change_password': 'nav-change-password',
+        '/logout': 'nav-logout'
+    };
+    
+    // Tìm và active nav item tương ứng
+    for (const [path, navId] of Object.entries(navItems)) {
+        if (currentPath.startsWith(path)) {
+            const navElement = document.getElementById(navId);
+            if (navElement) {
+                navElement.classList.add('active-nav');
+                navElement.classList.remove('text-dark');
+                
+                // Nếu là dropdown item thì active cả dropdown toggle
+                if (navId === 'nav-change-password' || navId === 'nav-logout') {
+                    const dropdownToggle = navElement.closest('.dropdown-menu').previousElementSibling;
+                    if (dropdownToggle) {
+                        dropdownToggle.classList.add('active');
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
+<style>
+/* Orange gradient background cho navbar */
+.bg-gradient-orange {
+    background: #fbe87e;
+}
+
+
+/* Style cho nav links với hover effect */
+.nav-link-hover {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.nav-link-hover:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #333 !important;
+    transform: translateY(-1px);
+}
+
+/* Style cho active nav item */
+.nav-link.active-nav {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #333 !important;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Style cho navbar toggler */
+.navbar-toggler-orange {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.navbar-toggler-orange:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}
+
+/* Style cho dropdown button */
+.btn-outline-dark {
+    border-color: rgba(0, 0, 0, 0.5);
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 0, 0, 0.7);
+    color: #333;
+}
+
+/* Style cho dropdown toggle khi active */
+.btn-outline-dark.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #333 !important;
+    border-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Style cho navbar brand */
+.navbar-brand {
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #333 !important;
+    transform: scale(1.05);
+}
+
+/* Custom yellow icon cho brand */
+.text-warning {
+    color: #ffd700 !important;
+}
+
+/* Shadow enhancement */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.5rem rgba(255, 140, 0, 0.3) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .bg-gradient-orange {
+        background: linear-gradient(180deg, #66ff00 0%, #a56000 50%, #ff6600 100%);
+    }
+    
+    .navbar-nav {
+        padding-top: 1rem;
+    }
+    
+    .nav-link-hover {
+        margin-bottom: 0.25rem;
+    }
+}
+</style>

@@ -2,90 +2,433 @@
 {% extends "base.html" %}
 
 {% block title %}
-{% if title %} {{ title }} {% else %} Brand or Category {% endif %}
+{% if title %} {{ title }} {% else %} Customer Management {% endif %}
 {% endblock title %}
+
 {% block content %}
 {% include '_messages.html' %}
+
 <div class="container">
-    {% include '_navbar_admin.html' %}
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center mt-4 mb-4">Customer Management</h1>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
+{% include '_navbar_admin.html' %}
 
-            <div class="mb-3">
-                <a href="/add_customer" class="btn btn-primary">Add Customer</a>
-            </div>
+<!-- Main Header with Search -->
+<div class="container mt-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <!-- Left: Title -->
+        <div>
+            <h2 class="text-primary fw-bold mb-1">Quản Lý Khách Hàng</h2>
+            <p class="text-muted mb-0">Danh sách và quản lý tất cả khách hàng trong hệ thống</p>
+        </div>
 
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Registration Date</th>
-                    <th>Status</th>
-                    <th>Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if customers %}
-                {% for customer in customers %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ customer.username }}</td>
-                    <td>{{ customer.email }}</td>
-                    <td>{{ customer.phone }}</td>
-                    <td>{{ customer.date_created.strftime('%Y-%m-%d') if customer.date_created else '' }}</td>
-                    <td>{{ customer.status }}</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#customerModal-{{customer.id}}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
+        <!-- Right: Search and Add Button -->
+        <div class="d-flex gap-2 align-items-center">
+            <!-- Search Form -->
+            <form method="GET" action="" class="d-flex align-items-center">
+                
+                <input type="text" name="search" id="searchInput" class="form-control" placeholder="Tìm khách hàng..." value="{{ request.args.get('search', '') }}">
+                <button class="btn btn-outline-primary ms-2" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
 
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="customerModal-{{customer.id}}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Delete Customer Member</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <span class="text-danger">Are you sure you want to delete customer member "{{customer.username}}"?</span>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <form action="{{url_for('delete_customer', id=customer.id)}}" method="POST">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">No customers found.</td>
-                </tr>
-                {% endif %}
-                </tbody>
-            </table>
+            <!-- Add Button -->
+            <a href="/add_customer" class="btn btn-success px-3">
+                <i class="fas fa-user-plus me-1"></i>Thêm Khách hàng
+            </a>
         </div>
     </div>
 </div>
-{% endblock %}
+
+<!-- Flash Messages -->
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+<!-- Data Table -->
+<div class="container">
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <!-- Table Header -->
+            <div class="bg-dark text-white p-3">
+                <div class="row align-items-center fw-bold">
+                    <div class="col-1 text-center">STT</div>
+                    <div class="col-2">Tên Khách Hàng</div>
+                    <div class="col-2">Email</div>
+                    <div class="col-2">Số Điện Thoại</div>
+                    <div class="col-2">Ngày Đăng Ký</div>
+                    <div class="col-1 text-center">Trạng Thái</div>
+                    <div class="col-2 text-center">Thao Tác</div>
+                </div>
+            </div>
+            
+            <!-- Table Body -->
+            <div class="table-responsive" id="customerTable">
+                {% if customers %}
+                    {% for customer in customers %}
+                    <div class="row align-items-center border-bottom py-3 {% if loop.index % 2 == 0 %}bg-light{% endif %} hover-row customer-row">
+                        <div class="col-1 text-center">
+                            <span class="badge bg-secondary rounded-circle px-2 py-1">{{loop.index}}</span>
+                        </div>
+                        <div class="col-2">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold customer-name">{{ customer.username }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2 customer-email">
+                            <small class="text-muted">
+                                <i class="fas fa-envelope me-1"></i>
+                                {{ customer.email }}
+                            </small>
+                        </div>
+                        <div class="col-2 customer-phone">
+                            <small class="text-muted">
+                                <i class="fas fa-phone me-1"></i>
+                                {{ customer.phone if customer.phone else 'Chưa cập nhật' }}
+                            </small>
+                        </div>
+                        <div class="col-2">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ customer.date_created.strftime('%d/%m/%Y') if customer.date_created else 'N/A' }}
+                            </small>
+                        </div>
+                        <div class="col-1 text-center">
+                            {% if customer.status == 'active' or customer.status == 'Active' %}
+                                <span class="badge bg-success">Hoạt động</span>
+                            {% elif customer.status == 'inactive' or customer.status == 'Inactive' %}
+                                <span class="badge bg-secondary">Không hoạt động</span>
+                            {% elif customer.status == 'blocked' or customer.status == 'Blocked' %}
+                                <span class="badge bg-danger">Bị khóa</span>
+                            {% else %}
+                                <span class="badge bg-warning">{{ customer.status }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-2 text-center">
+                            <button type="button" class="btn btn-info btn-sm me-2" title="Xem chi tiết" data-bs-toggle="modal"
+                                    data-bs-target="#viewModal-{{customer.id}}">
+                                <i class="fas fa-eye me-1"></i>Chi tiết
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" title="Xóa" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal-{{customer.id}}">
+                                <i class="fas fa-trash me-1"></i>Xóa
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- View Detail Modal -->
+                    <div class="modal fade" id="viewModal-{{customer.id}}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-info text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-user me-2"></i>Thông tin khách hàng
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Tên khách hàng:</label>
+                                                <p class="mb-0">{{ customer.username }}</p>
+                                            </div>
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Email:</label>
+                                                <p class="mb-0">{{ customer.email }}</p>
+                                            </div>
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Số điện thoại:</label>
+                                                <p class="mb-0">{{ customer.phone if customer.phone else 'Chưa cập nhật' }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Ngày đăng ký:</label>
+                                                <p class="mb-0">{{ customer.date_created.strftime('%d/%m/%Y %H:%M') if customer.date_created else 'N/A' }}</p>
+                                            </div>
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">Trạng thái:</label>
+                                                <p class="mb-0">
+                                                    {% if customer.status == 'active' or customer.status == 'Active' %}
+                                                        <span class="badge bg-success">Hoạt động</span>
+                                                    {% elif customer.status == 'inactive' or customer.status == 'Inactive' %}
+                                                        <span class="badge bg-secondary">Không hoạt động</span>
+                                                    {% elif customer.status == 'blocked' or customer.status == 'Blocked' %}
+                                                        <span class="badge bg-danger">Bị khóa</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">{{ customer.status }}</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="info-item mb-3">
+                                                <label class="fw-bold text-muted">ID:</label>
+                                                <p class="mb-0">#{{ customer.id }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal fade" id="deleteModal-{{customer.id}}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <div class="mb-3">
+                                        <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h6 class="mb-2">Bạn có chắc chắn muốn xóa khách hàng này?</h6>
+                                    <p class="text-muted mb-0">
+                                        Khách hàng: <strong class="text-danger">{{customer.username}}</strong>
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        Email: <strong>{{customer.email}}</strong>
+                                    </p>
+                                    <small class="text-muted">Hành động này không thể hoàn tác!</small>
+                                </div>
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-1"></i>Hủy
+                                    </button>
+                                    <form action="{{url_for('delete_customer', id=customer.id)}}" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-trash me-1"></i>Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted">Chưa có khách hàng nào</h5>
+                        <p class="text-muted">Hãy thêm khách hàng đầu tiên để bắt đầu quản lý</p>
+                        <a href="/add_customer" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Thêm Khách Hàng
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Count Display -->
+    {% if customers %}
+    <div class="mt-3 d-flex justify-content-between align-items-center">
+        <span class="text-muted">Tổng cộng: <strong>{{ customers|length }} khách hàng</strong></span>
+        <div class="text-muted small">
+            {% set active_count = customers | selectattr('status', 'equalto', 'active') | list | length %}
+            {% set inactive_count = customers | selectattr('status', 'equalto', 'inactive') | list | length %}
+            <span class="me-3"><i class="fas fa-circle text-success me-1"></i>Hoạt động: {{ active_count }}</span>
+            <span><i class="fas fa-circle text-secondary me-1"></i>Không hoạt động: {{ inactive_count }}</span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Custom CSS -->
+<style>
+.hover-row {
+    transition: all 0.2s ease;
+}
+
+.hover-row:hover {
+    background-color: #f8f9fa !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.modal-content {
+    border-radius: 10px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+    padding-top: 0;
+}
+
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.info-item label {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.table-responsive .row {
+    margin: 0;
+}
+
+.table-responsive .col-1,
+.table-responsive .col-2 {
+    padding: 0.5rem;
+}
+
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+    color: black;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .table-responsive .row {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .table-responsive .col-1,
+    .table-responsive .col-2 {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<!-- JavaScript for Search Highlighting -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const customerRows = document.querySelectorAll('.customer-row');
+    
+    // Function to highlight text
+    function highlightText(element, text) {
+        if (!text) {
+            // Remove all highlights if search is empty
+            const highlightedElements = element.querySelectorAll('.highlight');
+            highlightedElements.forEach(el => {
+                const parent = el.parentNode;
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+                parent.normalize();
+            });
+            return;
+        }
+        
+        const regex = new RegExp(text, 'gi');
+        const nodes = element.childNodes;
+        
+        nodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+                const matches = node.textContent.match(regex);
+                if (matches) {
+                    const span = document.createElement('span');
+                    span.className = 'highlight';
+                    span.innerHTML = node.textContent.replace(regex, match => `<span class="highlight">${match}</span>`);
+                    node.replaceWith(span);
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('highlight')) {
+                highlightText(node, text);
+            }
+        });
+    }
+    
+    // Function to filter and highlight rows
+    function filterAndHighlight() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        
+        customerRows.forEach(row => {
+            const name = row.querySelector('.customer-name').textContent.toLowerCase();
+            const email = row.querySelector('.customer-email').textContent.toLowerCase();
+            const phone = row.querySelector('.customer-phone').textContent.toLowerCase();
+            
+            // Check if any field matches the search term
+            const matches = name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+            
+            if (searchTerm === '') {
+                // Show all rows and remove highlights when search is empty
+                row.style.display = '';
+                highlightText(row, '');
+            } else if (matches) {
+                // Show matching rows and highlight the search term
+                row.style.display = '';
+                highlightText(row, searchTerm);
+            } else {
+                // Hide non-matching rows
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Event listeners
+    searchInput.addEventListener('input', filterAndHighlight);
+    
+    // Handle form submission to prevent page reload for client-side search
+    const searchForm = searchInput.closest('form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterAndHighlight();
+        });
+    }
+});
+</script>
+
+{% endblock content %}

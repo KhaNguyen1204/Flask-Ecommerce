@@ -1,115 +1,158 @@
+{% set show_footer = False %}
 {% extends 'base.html' %}
+
 {% block content %}
+{% include '_messages.html' %}
 <div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/warehouse">Sản phẩm</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_warehouse">Kho</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/inbound_receipt">Phiếu nhập</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/categories">Phiếu xuất</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Tài khoản
+    {% include '_navbar_admin.html' %}
+    {% include '_navbar_warehouse.html' %}
+
+    <!-- Page Title -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">
+                            <i class="fas fa-warehouse me-3"></i>Quản Lý Kho Hàng
+                        </h1>
+                        <p class="text-muted mb-0">Quản lý thông tin các kho hàng trong hệ thống</p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('warehouse_add') }}" class="btn btn-success btn-lg shadow-sm">
+                            <i class="fas fa-plus me-2"></i>Thêm Kho Mới
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/change_password">Đổi mật khẩu</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search" id="search-input">
-                    <button class="btn btn-outline-success" type="submit">Tìm</button>
-                </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="row mt-5">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý kho</h4>
-                    <a href="{{ url_for('warehouse_add') }}" class="btn btn-success">
-                        <i class="fa fa-plus"></i> Thêm kho mới
-                    </a>
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="fas fa-filter me-2"></i>Tìm Kiếm & Bộ Lọc
+                    </h5>
                 </div>
                 <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Tìm kiếm</label>
+                            <input class="form-control" type="search" placeholder="Tên kho, địa điểm..." 
+                                   aria-label="Search" id="search-input">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Trạng thái</label>
+                            <select class="form-select" id="status-filter">
+                                <option value="">Tất cả</option>
+                                <option value="active">Hoạt động</option>
+                                <option value="inactive">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Sắp xếp</label>
+                            <select class="form-select" id="sort-filter">
+                                <option value="">Mặc định</option>
+                                <option value="newest">Mới nhất</option>
+                                <option value="oldest">Cũ nhất</option>
+                                <option value="capacity_high">Sức chứa (cao-thấp)</option>
+                                <option value="capacity_low">Sức chứa (thấp-cao)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary flex-fill">
+                                    <i class="fas fa-search me-1"></i>Tìm
+                                </button>
+                                <button id="reset-filter" class="btn btn-outline-secondary">
+                                    <i class="fas fa-redo me-1"></i>Reset
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Warehouses Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="fas fa-warehouse me-2"></i>Danh Sách Kho Hàng
+                        </h5>
+                        <small class="text-muted">Tổng cộng: {{ warehouses|length }} kho</small>
+                    </div>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered">
+                        <table class="table table-hover mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Tên kho</th>
-                                    <th scope="col">Địa điểm</th>
-                                    <th scope="col">Sức chứa</th>
-                                    <th scope="col">Người quản lý</th>
-                                    <th scope="col">Trạng thái</th>
-                                    <th scope="col">Ngày tạo</th>
-                                    <th scope="col">Thao tác</th>
+                                    <th class="text-center" style="width: 60px;">STT</th>
+                                    <th style="width: 200px;">Tên Kho</th>
+                                    <th style="width: 200px;">Địa Điểm</th>
+                                    <th class="text-center" style="width: 120px;">Sức Chứa</th>
+                                    <th style="width: 150px;">Người Quản Lý</th>
+                                    <th class="text-center" style="width: 120px;">Trạng Thái</th>
+                                    <th class="text-center" style="width: 120px;">Ngày Tạo</th>
+                                    <th class="text-center" style="width: 180px;">Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if warehouses %}
                                 {% for warehouse in warehouses %}
-                                <tr>
-                                    <th scope="row">{{ loop.index }}</th>
-                                    <td>{{ warehouse.name }}</td>
-                                    <td>{{ warehouse.location }}</td>
-                                    <td>{{ warehouse.capacity }}</td>
+                                <tr class="align-middle warehouse-row"
+                                    data-status="{{ warehouse.status }}">
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ loop.index }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-dark fw-medium">{{ warehouse.name }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ warehouse.location }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="fw-bold">{{ warehouse.capacity }}</span>
+                                    </td>
                                     <td>
                                         {% if warehouse.manager %}
-                                            {{ warehouse.manager.username }}
+                                            <span class="badge bg-info text-dark">{{ warehouse.manager.username }}</span>
                                         {% else %}
-                                            <span class="text-muted">Chưa có</span>
+                                            <span class="badge bg-secondary">Chưa có</span>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         {% if warehouse.status == 'active' %}
-                                            <span class="badge bg-success">Hoạt động</span>
+                                        <span class="badge bg-success">Hoạt động</span>
                                         {% else %}
-                                            <span class="badge bg-danger">Không hoạt động</span>
+                                        <span class="badge bg-danger">Không hoạt động</span>
                                         {% endif %}
                                     </td>
-                                    <td>{{ warehouse.date_created.strftime('%d/%m/%Y') }}</td>
-                                    <td>
+                                    <td class="text-center">
+                                        <span class="text-muted">{{ warehouse.date_created.strftime('%d/%m/%Y') }}</span>
+                                    </td>
+                                    <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ url_for('warehouse_edit', id=warehouse.id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fa fa-edit"></i> Sửa
+                                            <a href="{{ url_for('warehouse_edit', id=warehouse.id) }}" 
+                                               class="btn btn-primary btn-sm px-3"
+                                               title="Chỉnh sửa kho">
+                                                <i class="fas fa-edit me-1"></i>Sửa
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal-{{ warehouse.id }}">
-                                                <i class="fa fa-trash"></i> Xóa
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm px-3" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal-{{ warehouse.id }}"
+                                                    title="Xóa kho">
+                                                <i class="fas fa-trash me-1"></i>Xóa
                                             </button>
                                         </div>
                                     </td>
@@ -117,7 +160,11 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="8" class="text-center">Không tìm thấy dữ liệu kho.</td>
+                                    <td colspan="8" class="text-center py-5">
+                                        <i class="fas fa-warehouse text-muted" style="font-size: 3rem;"></i>
+                                        <h5 class="text-muted mt-3">Chưa có kho hàng nào</h5>
+                                        <p class="text-muted">Hãy thêm kho hàng mới!</p>
+                                    </td>
                                 </tr>
                                 {% endif %}
                             </tbody>
@@ -135,18 +182,22 @@
 <div class="modal fade" id="deleteModal-{{ warehouse.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-danger">Bạn có chắc chắn muốn xóa kho "{{ warehouse.name }}"?</p>
-                <p>Hành động này không thể hoàn tác.</p>
+                <p class="fw-bold">Bạn có chắc chắn muốn xóa kho "{{ warehouse.name }}"?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến kho này sẽ bị xóa.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <form action="{{ url_for('warehouse_delete', id=warehouse.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Xác nhận xóa
+                    </button>
                 </form>
             </div>
         </div>
@@ -154,4 +205,99 @@
 </div>
 {% endfor %}
 {% endif %}
-{% endblock %}
+
+<!-- Custom CSS -->
+<style>
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-group .btn {
+    border-radius: 0.375rem !important;
+    margin: 0 2px;
+    font-size: 0.875rem;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.display-5 {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.table th {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.table td {
+    font-size: 0.875rem;
+}
+
+.nav-link.active {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Lọc kho theo trạng thái
+    document.getElementById('status-filter').addEventListener('change', filterWarehouses);
+
+    // Sắp xếp kho
+    document.getElementById('sort-filter').addEventListener('change', filterWarehouses);
+
+    // Reset bộ lọc
+    document.getElementById('reset-filter').addEventListener('click', function() {
+        document.getElementById('status-filter').value = '';
+        document.getElementById('sort-filter').value = '';
+        document.getElementById('search-input').value = '';
+        filterWarehouses();
+    });
+
+    // Tìm kiếm kho
+    document.getElementById('search-input').addEventListener('keyup', filterWarehouses);
+
+    function filterWarehouses() {
+        const statusFilter = document.getElementById('status-filter').value;
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+        document.querySelectorAll('.warehouse-row').forEach(function(row) {
+            let showRow = true;
+
+            if (statusFilter && row.dataset.status !== statusFilter) {
+                showRow = false;
+            }
+
+            if (searchTerm) {
+                const warehouseName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const warehouseLocation = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                if (!warehouseName.includes(searchTerm) && !warehouseLocation.includes(searchTerm)) {
+                    showRow = false;
+                }
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+});
+</script>
+
+{% endblock content %}

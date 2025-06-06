@@ -1,0 +1,78 @@
+<!-- Warehouse Navigation Bar -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/warehouse">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/manager_warehouse">Kho</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/inbound_receipt">Phiếu nhập</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/outbound_receipt">Phiếu xuất</a>
+                </li>
+                <li class="nav-item dropdown">
+
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/change_password">Đổi mật khẩu</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lấy đường dẫn hiện tại
+    const currentPath = window.location.pathname;
+    
+    // Tìm tất cả các nav-link
+    const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle)');
+    
+    // Duyệt qua từng nav-link để kiểm tra
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            // Thêm class active cho nav-item cha
+            link.classList.add('active');
+            link.closest('.nav-item').classList.add('active');
+        }
+    });
+    
+    // Xử lý dropdown item nếu cần
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => {
+        if (item.getAttribute('href') === currentPath) {
+            // Thêm active cho dropdown item và dropdown toggle
+            item.classList.add('active');
+            const dropdownToggle = item.closest('.dropdown-menu').previousElementSibling;
+            if (dropdownToggle && dropdownToggle.classList.contains('dropdown-toggle')) {
+                dropdownToggle.classList.add('active');
+            }
+        }
+    });
+});
+</script>
+
+<style>
+/* Thêm style để làm nổi bật hơn nếu cần */
+.navbar .nav-link.active,
+.navbar .dropdown-item.active {
+    font-weight: bold;
+    color: #0d6efd !important; /* Màu của Bootstrap primary */
+    background-color: rgba(13, 110, 253, 0.1);
+}
+</style>

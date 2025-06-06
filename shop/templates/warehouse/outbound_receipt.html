@@ -1,117 +1,170 @@
+{% set show_footer = False %}
 {% extends 'base.html' %}
 {% block content %}
+{% include '_messages.html' %}
 <div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/warehouse">Sản phẩm</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_warehouse">Kho</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/inbound_receipt">Phiếu nhập</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/outbound_receipt">Phiếu xuất</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Tài khoản
+    {% include '_navbar_admin.html' %}
+    {% include '_navbar_warehouse.html' %}
+
+    <!-- Page Title -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="display-5 fw-bold text-primary mb-2">
+                            <i class="fas fa-file-import me-3"></i>Quản Lý Phiếu Xuất kho 
+                        </h1>
+                        <p class="text-muted mb-0">Theo dõi và quản lý các phiếu xuất kho trong hệ thống</p>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('outbound_receipt_add') }}" class="btn btn-success btn-lg shadow-sm">
+                            <i class="fas fa-plus me-2"></i>Tạo Phiếu Mới
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/change_password">Đổi mật khẩu</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Tìm kiếm" aria-label="Search" id="search-input">
-                    <button class="btn btn-outline-success" type="submit">Tìm</button>
-                </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <div class="row mt-5">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Quản lý phiếu xuất kho</h4>
-                    <a href="{{ url_for('outbound_receipt_add') }}" class="btn btn-success">
-                        <i class="fa fa-plus"></i> Tạo phiếu xuất mới
-                    </a>
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="fas fa-filter me-2"></i>Tìm Kiếm & Bộ Lọc
+                    </h5>
                 </div>
                 <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Tìm kiếm</label>
+                            <input class="form-control" type="search" placeholder="Số phiếu, nhà cung cấp..." 
+                                   aria-label="Search" id="search-input">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold">Kho</label>
+                            <select class="form-select" id="warehouse-filter">
+                                <option value="">Tất cả</option>
+                                {% for warehouse in warehouses %}
+                                <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold">Trạng thái</label>
+                            <select class="form-select" id="status-filter">
+                                <option value="">Tất cả</option>
+                                <option value="pending">Chờ xử lý</option>
+                                <option value="completed">Hoàn thành</option>
+                                <option value="cancelled">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Khoảng thời gian</label>
+                            <input type="date" class="form-control" id="date-from" placeholder="Từ ngày">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label fw-semibold">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary flex-fill">
+                                    <i class="fas fa-search me-1"></i>Tìm
+                                </button>
+                                <button id="reset-filter" class="btn btn-outline-secondary">
+                                    <i class="fas fa-redo me-1"></i>Reset
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Receipts Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="fas fa-list me-2"></i>Danh Sách Phiếu Nhập Kho
+                        </h5>
+                        <small class="text-muted">Tổng cộng: {{ receipts|length }} phiếu</small>
+                    </div>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered">
+                        <table class="table table-hover mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Số phiếu</th>
-                                    <th scope="col">Ngày xuất</th>
-                                    <th scope="col">Người nhận</th>
-                                    <th scope="col">Kho</th>
-                                    <th scope="col">Tổng tiền</th>
-                                    <th scope="col">Người tạo</th>
-                                    <th scope="col">Trạng thái</th>
-                                    <th scope="col">Thao tác</th>
+                                    <th class="text-center" style="width: 60px;">STT</th>
+                                    <th style="width: 120px;">Số Phiếu</th>
+                                    <th class="text-center" style="width: 120px;">Ngày Nhập</th>
+                                    <th style="width: 200px;">Nhà Cung Cấp</th>
+                                    <th style="width: 150px;">Kho</th>
+                                    <th class="text-end" style="width: 150px;">Tổng Tiền</th>
+                                    <th style="width: 150px;">Người Tạo</th>
+                                    <th class="text-center" style="width: 120px;">Trạng Thái</th>
+                                    <th class="text-center" style="width: 200px;">Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if receipts %}
                                 {% for receipt in receipts %}
-                                <tr>
-                                    <th scope="row">{{ loop.index }}</th>
-                                    <td>{{ receipt.receipt_number }}</td>
-                                    <td>{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</td>
-                                    <td>{{ receipt.recipient }}</td>
-                                    <td>{{ receipt.warehouse.name }}</td>
-                                    <td>{{ "{:,.0f}".format(receipt.total_amount) }} đ</td>
-                                    <td>{{ receipt.creator.username }}</td>
+                                <tr class="align-middle receipt-row"
+                                    data-status="{{ receipt.status }}"
+                                    data-warehouse="{{ receipt.warehouse_id }}">
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ loop.index }}</span>
+                                    </td>
                                     <td>
+                                        <span class="fw-medium">{{ receipt.receipt_number }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-muted">{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</span>
+                                    </td>
+                                    <td>
+                                        {{ receipt.supplier }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">{{ receipt.warehouse.name }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="text-success fw-semibold">{{ "{:,.0f}".format(receipt.total_amount) }} đ</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ receipt.creator.username }}</span>
+                                    </td>
+                                    <td class="text-center">
                                         {% if receipt.status == 'pending' %}
-                                            <span class="badge bg-warning">Chờ xử lý</span>
+                                            <span class="badge bg-warning text-dark">Chờ xử lý</span>
                                         {% elif receipt.status == 'completed' %}
                                             <span class="badge bg-success">Hoàn thành</span>
                                         {% else %}
                                             <span class="badge bg-danger">Đã hủy</span>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ url_for('outbound_receipt_detail', id=receipt.id) }}" class="btn btn-sm btn-info">
-                                                <i class="fa fa-eye"></i> Chi tiết
+                                            <a href="{{ url_for('inbound_receipt_detail', id=receipt.id) }}" 
+                                               class="btn btn-info btn-sm px-3"
+                                               title="Xem chi tiết">
+                                                <i class="fas fa-eye me-1"></i>Chi tiết
                                             </a>
                                             {% if receipt.status == 'pending' %}
-                                            <a href="{{ url_for('outbound_receipt_edit', id=receipt.id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fa fa-edit"></i> Sửa
+                                            <a href="{{ url_for('inbound_receipt_edit', id=receipt.id) }}" 
+                                               class="btn btn-primary btn-sm px-3"
+                                               title="Chỉnh sửa">
+                                                <i class="fas fa-edit me-1"></i>Sửa
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal-{{ receipt.id }}">
-                                                <i class="fa fa-trash"></i> Xóa
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm px-3" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal-{{ receipt.id }}"
+                                                    title="Xóa phiếu">
+                                                <i class="fas fa-trash me-1"></i>Xóa
                                             </button>
                                             {% endif %}
                                         </div>
@@ -120,7 +173,11 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="9" class="text-center">Không tìm thấy phiếu xuất nào.</td>
+                                    <td colspan="9" class="text-center py-5">
+                                        <i class="fas fa-file-import text-muted" style="font-size: 3rem;"></i>
+                                        <h5 class="text-muted mt-3">Chưa có phiếu nhập kho nào</h5>
+                                        <p class="text-muted">Hãy tạo phiếu nhập kho mới!</p>
+                                    </td>
                                 </tr>
                                 {% endif %}
                             </tbody>
@@ -138,18 +195,22 @@
 <div class="modal fade" id="deleteModal-{{ receipt.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-danger">Bạn có chắc chắn muốn xóa phiếu xuất "{{ receipt.receipt_number }}"?</p>
-                <p>Hành động này không thể hoàn tác.</p>
+                <p class="fw-bold">Bạn có chắc chắn muốn xóa phiếu nhập "{{ receipt.receipt_number }}"?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến phiếu này sẽ bị xóa.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <form action="{{ url_for('outbound_receipt_delete', id=receipt.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                <form action="{{ url_for('inbound_receipt_delete', id=receipt.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Xác nhận xóa
+                    </button>
                 </form>
             </div>
         </div>
@@ -157,4 +218,105 @@
 </div>
 {% endfor %}
 {% endif %}
-{% endblock %}
+
+<!-- Custom CSS -->
+<style>
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-group .btn {
+    border-radius: 0.375rem !important;
+    margin: 0 2px;
+    font-size: 0.875rem;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.display-5 {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.table th {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.table td {
+    font-size: 0.875rem;
+}
+
+.nav-link.active {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Lọc phiếu theo trạng thái
+    document.getElementById('status-filter').addEventListener('change', filterReceipts);
+
+    // Lọc phiếu theo kho
+    document.getElementById('warehouse-filter').addEventListener('change', filterReceipts);
+
+    // Reset bộ lọc
+    document.getElementById('reset-filter').addEventListener('click', function() {
+        document.getElementById('status-filter').value = '';
+        document.getElementById('warehouse-filter').value = '';
+        document.getElementById('search-input').value = '';
+        document.getElementById('date-from').value = '';
+        filterReceipts();
+    });
+
+    // Tìm kiếm phiếu
+    document.getElementById('search-input').addEventListener('keyup', filterReceipts);
+
+    function filterReceipts() {
+        const statusFilter = document.getElementById('status-filter').value;
+        const warehouseFilter = document.getElementById('warehouse-filter').value;
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+        document.querySelectorAll('.receipt-row').forEach(function(row) {
+            let showRow = true;
+
+            if (statusFilter && row.dataset.status !== statusFilter) {
+                showRow = false;
+            }
+
+            if (warehouseFilter && row.dataset.warehouse !== warehouseFilter) {
+                showRow = false;
+            }
+
+            if (searchTerm) {
+                const receiptNumber = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const supplier = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                if (!receiptNumber.includes(searchTerm) && !supplier.includes(searchTerm)) {
+                    showRow = false;
+                }
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+});
+</script>
+
+{% endblock content %}
