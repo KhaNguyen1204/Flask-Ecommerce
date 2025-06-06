@@ -6,9 +6,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold">Chi tiết đơn hàng</h2>
 
-        <a href="{{ url_for('get_pdf', invoice=invoice) }}" class="btn btn-success btn-lg">
-            <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn
-        </a>
+        <a href="javascript:window.print()" class="btn btn-success btn-lg">
+    <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn
+</a>
     </div>
 
     <!-- Thông tin đơn hàng -->
@@ -107,6 +107,33 @@
 </div>
 
 <style>
+@media print {
+    .no-print, .btn, .mt-4 {
+        display: none !important;
+    }
+    
+    body {
+        padding: 20px;
+        background: white;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .table th {
+        background-color: #f8f9fa !important;
+    }
+    
+    .badge {
+        border: 1px solid #000;
+    }
+    
+    
+    /* Thêm các style in ấn khác nếu cần */
+}
+
 .card {
     border: none;
     border-radius: 10px;
