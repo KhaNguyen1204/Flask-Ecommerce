@@ -2,444 +2,410 @@
 {% extends "base.html" %}
 
 {% block title %}
-{% if title %} {{ title }} {% else %} Brand or Category {% endif %}
+{% if brands %}Quản Lý Thương Hiệu{% else %}Quản Lý Danh Mục{% endif %}
 {% endblock title %}
 
 {% block content %}
 {% include '_messages.html' %}
-
 <div class="container">
     {% include '_navbar_admin.html' %}
 </div>
+<div class="container mt-4">
+    {% if brands %}
+        <a href="{{ url_for('addbrand') }}" class="btn btn-success mb-3">Thêm Thương Hiệu</a>
+    {% else %}
+        <a href="{{ url_for('addcategory') }}" class="btn btn-success mb-3">Thêm Danh Mục</a>
+    {% endif %}
+</div>
 
-<!-- Main Header -->
-<div class="container mt-4 mb-4">
-    <div class="d-flex justify-content-between align-items-start">
-        <div class="flex-grow-1">
+<!-- Main Content -->
+<div class="container mt-1">
+    <div>
+        <h2 class="text-primary fw-bold mb-1">
+            {% if brands %}Quản Lý Thương Hiệu{% else %}Quản Lý Danh Mục{% endif %}
+        </h2>
+        <p class="text-muted mb-0">
             {% if brands %}
-                <h2 class="text-primary fw-bold mb-1">Quản Lý Thương Hiệu</h2>
-                <p class="text-muted mb-0">Danh sách và quản lý tất cả thương hiệu trong hệ thống</p>
+                Danh sách và quản lý tất cả thương hiệu trong hệ thống
             {% else %}
-                <h2 class="text-primary fw-bold mb-1">Quản Lý Danh Mục</h2>
-                <p class="text-muted mb-0">Danh sách và quản lý tất cả danh mục trong hệ thống</p>
+                Danh sách và quản lý tất cả danh mục sản phẩm
             {% endif %}
-        </div>
-        
-        <!-- Search Section -->
-        <div class="d-flex align-items-center gap-3 ms-4">
-            <div class="search-section d-flex align-items-center gap-2">
-                <span class="text-muted fw-medium">Tìm kiếm:</span>
-                <div class="search-container">
-                    <div class="input-group">
-                        {% if brands %}
-                            <input type="text" 
-                                   class="form-control form-control-sm" 
-                                   id="searchInput" 
-                                   placeholder="Tìm thương hiệu..." 
-                                   style="min-width: 200px;">
-                        {% else %}
-                            <input type="text" 
-                                   class="form-control form-control-sm" 
-                                   id="searchInput" 
-                                   placeholder="Tìm danh mục..." 
-                                   style="min-width: 200px;">
-                        {% endif %}
-                        <button class="btn btn-outline-secondary btn-sm" type="button" id="clearSearch">
-                            <i class="fas fa-times"></i>
-                        </button>
+        </p>
+    </div>
+<div class="container mt-4">
+    {% if brands %}
+        <a href="{{ url_for('addbrand') }}" class="btn btn-success mb-3">Add Brand</a>
+    {% else %}
+        <a href="{{ url_for('addcategory') }}" class="btn btn-success mb-3">Add Category</a>
+    {% endif %}
+</div>
+
+<!-- Brands/Categories Table -->
+
+<div class="container mt-1">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <h5 class="card-title mb-0 text-dark">
+                                <i class="fas fa-list me-2"></i>Tìm kiếm {% if brands %}thương hiệu{% else %}danh mục{% endif %}
+                            </h5>
+                            <div class="search-container">
+                                <div class="input-group has-search" style="max-width: 350px;">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0 ps-0" 
+                                           id="searchInput" 
+                                           placeholder="Tìm kiếm..."
+                                           style="border-radius: 0 6px 6px 0 !important;">
+                                    <button class="btn btn-outline-secondary" 
+                                            type="button" 
+                                            id="clearSearch"
+                                            style="border-radius: 0 6px 6px 0; display: none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span id="totalItems">Tổng cộng: {{ (brands or categories)|length }} {% if brands %}thương hiệu{% else %}danh mục{% endif %}</span>
+                            <span id="searchResults" class="text-primary" style="display: none;"></span>
+                        </small>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Add Button -->
-            <div>
-                {% if brands %}
-                    <a href="{{ url_for('addbrand') }}" class="btn btn-success px-4 py-2">
-                        <i class="fas fa-plus me-2"></i>Thêm Thương Hiệu
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="itemsTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="text-center" style="width: 60px;">STT</th>
+                                    <th style="width: 200px;">Tên {% if brands %}Thương Hiệu{% else %}Danh Mục{% endif %}</th>
+                                    <th class="text-center" style="width: 100px;">Hình Ảnh</th>
+                                    <th class="text-center" style="width: 180px;">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if brands %}
+                                {% for brand in brands %}
+                                <tr class="align-middle item-row" data-item-name="{{ brand.name|lower }}">
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ loop.index }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-dark item-name">{{ brand.name }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if brand.image %}
+                                        <div class="position-relative d-inline-block">
+                                            <img src="{{ url_for('static', filename='images/brands/' + brand.image) }}" 
+                                                 alt="{{ brand.name }}" 
+                                                 class="rounded shadow-sm item-thumbnail"
+                                                 style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
+                                                 data-bs-toggle="modal" 
+                                                 data-bs-target="#imageModal-{{ brand.id }}">
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
+                                                  style="font-size: 0.6rem;">
+                                                <i class="fas fa-search-plus"></i>
+                                            </span>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted">Không có</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('updatebrand', id=brand.id) }}" 
+                                               class="btn btn-primary btn-sm px-3" 
+                                               data-bs-toggle="tooltip" 
+                                               title="Chỉnh sửa thương hiệu">
+                                                <i class="fas fa-edit me-1"></i>Sửa
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm px-3" 
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal-{{ brand.id }}"
+                                                    title="Xóa thương hiệu">
+                                                <i class="fas fa-trash me-1"></i>Xóa
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Image Preview Modal -->
+                                {% if brand.image %}
+                                <div class="modal fade" id="imageModal-{{ brand.id }}" tabindex="-1"
+                                     aria-labelledby="imageModalLabel-{{ brand.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="imageModalLabel-{{ brand.id }}">
+                                                    {{ brand.name }}
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img src="{{ url_for('static', filename='images/brands/' + brand.image) }}" 
+                                                     alt="{{ brand.name }}" 
+                                                     class="img-fluid rounded shadow">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal-{{ brand.id }}" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel-{{ brand.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="deleteModalLabel-{{ brand.id }}">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Xác Nhận Xóa
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="text-center">
+                                                    <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
+                                                    <h6 class="mt-3 mb-3">Bạn có chắc chắn muốn xóa thương hiệu này?</h6>
+                                                    <p class="text-muted mb-0">
+                                                        <strong>{{ brand.name }}</strong>
+                                                    </p>
+                                                    <small class="text-danger">Hành động này không thể hoàn tác!</small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="fas fa-times me-2"></i>Hủy
+                                                </button>
+                                                <form action="{{ url_for('deletebrand', id=brand.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash me-2"></i>Xóa
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% else %}
+                                {% for category in categories %}
+                                <tr class="align-middle item-row" data-item-name="{{ category.name|lower }}">
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ loop.index }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="text-dark item-name">{{ category.name }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if category.image %}
+                                        <div class="position-relative d-inline-block">
+                                            <img src="{{ url_for('static', filename='images/categories/' + category.image) }}" 
+                                                 alt="{{ category.name }}" 
+                                                 class="rounded shadow-sm item-thumbnail"
+                                                 style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
+                                                 data-bs-toggle="modal" 
+                                                 data-bs-target="#imageModal-{{ category.id }}">
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
+                                                  style="font-size: 0.6rem;">
+                                                <i class="fas fa-search-plus"></i>
+                                            </span>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted">Không có</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('updatecat', id=category.id) }}" 
+                                               class="btn btn-primary btn-sm px-3" 
+                                               data-bs-toggle="tooltip" 
+                                               title="Chỉnh sửa danh mục">
+                                                <i class="fas fa-edit me-1"></i>Sửa
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm px-3" 
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal-{{ category.id }}"
+                                                    title="Xóa danh mục">
+                                                <i class="fas fa-trash me-1"></i>Xóa
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Image Preview Modal -->
+                                {% if category.image %}
+                                <div class="modal fade" id="imageModal-{{ category.id }}" tabindex="-1"
+                                     aria-labelledby="imageModalLabel-{{ category.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="imageModalLabel-{{ category.id }}">
+                                                    {{ category.name }}
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img src="{{ url_for('static', filename='images/categories/' + category.image) }}" 
+                                                     alt="{{ category.name }}" 
+                                                     class="img-fluid rounded shadow">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal-{{ category.id }}" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel-{{ category.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="deleteModalLabel-{{ category.id }}">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Xác Nhận Xóa
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="text-center">
+                                                    <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
+                                                    <h6 class="mt-3 mb-3">Bạn có chắc chắn muốn xóa danh mục này?</h6>
+                                                    <p class="text-muted mb-0">
+                                                        <strong>{{ category.name }}</strong>
+                                                    </p>
+                                                    <small class="text-danger">Hành động này không thể hoàn tác!</small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="fas fa-times me-2"></i>Hủy
+                                                </button>
+                                                <form action="{{ url_for('deletecat', id=category.id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash me-2"></i>Xóa
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- No results message -->
+                    <div id="noResultsMessage" class="text-center py-5" style="display: none;">
+                        <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted mt-3">Không tìm thấy {% if brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
+                        <p class="text-muted">Hãy thử từ khóa khác hoặc xóa bộ lọc</p>
+                    </div>
+                </div>
+                {% if (brands or categories)|length == 0 %}
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="text-muted mt-3">Chưa có {% if brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
+                    <p class="text-muted">Hãy thêm {% if brands %}thương hiệu{% else %}danh mục{% endif %} đầu tiên của bạn!</p>
+                    <a href="{{ url_for('addbrand' if brands else 'addcategory') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm {% if brands %}Thương Hiệu{% else %}Danh Mục{% endif %}
                     </a>
-                {% else %}
-                    <a href="{{ url_for('addcategory') }}" class="btn btn-success px-4 py-2">
-                        <i class="fas fa-plus me-2"></i>Thêm Danh Mục
-                    </a>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
-
-<!-- Results Counter -->
-<div class="container mb-3">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            {% if brands %}
-                <span id="totalCount" class="text-muted">Tổng cộng: <strong>{{ brands|length }} thương hiệu</strong></span>
-                <span id="searchResults" class="text-primary" style="display: none;"></span>
-            {% else %}
-                <span id="totalCount" class="text-muted">Tổng cộng: <strong>{{ categories|length }} danh mục</strong></span>
-                <span id="searchResults" class="text-primary" style="display: none;"></span>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- Data Table -->
-<div class="container">
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            {% if brands %}
-                <!-- Brand Table Header -->
-                <div class="bg-dark text-white p-3">
-                    <div class="row align-items-center fw-bold">
-                        <div class="col-1 text-center">STT</div>
-                        <div class="col-4">Tên Thương Hiệu</div>
-                        <div class="col-7 text-center">Thao Tác</div>
-                    </div>
-                </div>
-                
-                <!-- Brand Table Body -->
-                <div id="dataTable">
-                    {% for brand in brands %}
-                    <div class="row align-items-center border-bottom py-3 {% if loop.index % 2 == 0 %}bg-light{% endif %} hover-row data-row" 
-                         data-name="{{ brand.name|lower }}">
-                        <div class="col-1 text-center">
-                            <span class="badge bg-secondary rounded-circle px-2 py-1">{{loop.index}}</span>
-                        </div>
-                        <div class="col-4">
-                            <h6 class="mb-0 fw-semibold item-name">{{brand.name}}</h6>
-                        </div>
-                        <div class="col-7 text-center">
-                            <a href="{{url_for('updatebrand', id=brand.id)}}" class="btn btn-primary btn-sm me-2">
-                                <i class="fas fa-edit me-1"></i>Sửa
-                            </a>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal-{{brand.id}}">
-                                <i class="fas fa-trash me-1"></i>Xóa
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Delete Modal for Brand -->
-                    <div class="modal fade" id="deleteModal-{{brand.id}}" tabindex="-1"
-                         aria-labelledby="deleteModalLabel-{{brand.id}}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title" id="deleteModalLabel-{{brand.id}}">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
-                                    </div>
-                                    <h6 class="mb-2">Bạn có chắc chắn muốn xóa thương hiệu này?</h6>
-                                    <p class="text-muted mb-0">
-                                        Thương hiệu: <strong class="text-danger">{{brand.name}}</strong>
-                                    </p>
-                                    <small class="text-muted">Hành động này không thể hoàn tác!</small>
-                                </div>
-                                <div class="modal-footer justify-content-center">
-                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i>Hủy
-                                    </button>
-                                    <form action="{{url_for('deletebrand', id=brand.id)}}" method="POST" class="d-inline">
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fas fa-trash me-1"></i>Xóa
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <!-- Category Table Header -->
-                <div class="bg-dark text-white p-3">
-                    <div class="row align-items-center fw-bold">
-                        <div class="col-1 text-center">STT</div>
-                        <div class="col-4">Tên Danh Mục</div>
-                        <div class="col-7 text-center">Thao Tác</div>
-                    </div>
-                </div>
-                
-                <!-- Category Table Body -->
-                <div id="dataTable">
-                    {% for category in categories %}
-                    <div class="row align-items-center border-bottom py-3 {% if loop.index % 2 == 0 %}bg-light{% endif %} hover-row data-row"
-                         data-name="{{ category.name|lower }}">
-                        <div class="col-1 text-center">
-                            <span class="badge bg-secondary rounded-circle px-2 py-1">{{loop.index}}</span>
-                        </div>
-                        <div class="col-4">
-                            <h6 class="mb-0 fw-semibold item-name">{{category.name}}</h6>
-                        </div>
-                        <div class="col-7 text-center">
-                            <a href="{{url_for('updatecat', id=category.id)}}" class="btn btn-primary btn-sm me-2">
-                                <i class="fas fa-edit me-1"></i>Sửa
-                            </a>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal-{{category.id}}">
-                                <i class="fas fa-trash me-1"></i>Xóa
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Delete Modal for Category -->
-                    <div class="modal fade" id="deleteModal-{{category.id}}" tabindex="-1"
-                         aria-labelledby="deleteModalLabel-{{category.id}}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title" id="deleteModalLabel-{{category.id}}">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-question-circle text-warning" style="font-size: 3rem;"></i>
-                                    </div>
-                                    <h6 class="mb-2">Bạn có chắc chắn muốn xóa danh mục này?</h6>
-                                    <p class="text-muted mb-0">
-                                        Danh mục: <strong class="text-danger">{{category.name}}</strong>
-                                    </p>
-                                    <small class="text-muted">Hành động này không thể hoàn tác!</small>
-                                </div>
-                                <div class="modal-footer justify-content-center">
-                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i>Hủy
-                                    </button>
-                                    <form action="{{url_for('deletecat', id=category.id)}}" method="POST" class="d-inline">
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fas fa-trash me-1"></i>Xóa
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            
-            <!-- No results message -->
-            <div id="noResultsMessage" class="text-center py-5" style="display: none;">
-                <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
-                {% if brands %}
-                    <h5 class="text-muted mt-3">Không tìm thấy thương hiệu nào</h5>
-                {% else %}
-                    <h5 class="text-muted mt-3">Không tìm thấy danh mục nào</h5>
-                {% endif %}
-                <p class="text-muted">Hãy thử từ khóa khác hoặc xóa bộ lọc</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Custom CSS for hover effects and search -->
-<style>
-/* Tắt thanh cuộn ngang */
-body {
-    overflow-x: hidden;
-}
-
-.container {
-    overflow-x: hidden;
-}
-
-.table-container {
-    overflow-x: auto;
-    max-width: 100%;
-}
-
-.table {
-    min-width: 100%;
-    margin-bottom: 0;
-}
-
-.table td {
-    white-space: nowrap;
-    border-top: 1px solid #dee2e6;
-    vertical-align: middle;
-}
-
-.table tr:hover {
-    background-color: #f8f9fa !important;
-}
-
-.hover-row {
-    transition: all 0.2s ease;
-}
-
-.hover-row:hover {
-    background-color: #f8f9fa !important;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.card {
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-
-.btn {
-    border-radius: 6px;
-    font-weight: 500;
-}
-
-.modal-content {
-    border-radius: 10px;
-    border: none;
-}
-
-.modal-header {
-    border-bottom: none;
-}
-
-.modal-footer {
-    border-top: none;
-    padding-top: 0;
-}
-
-.search-container {
-    position: relative;
-}
-
-.search-container .input-group {
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
-.search-container .form-control {
-    border-right: none;
-}
-
-.search-container .btn {
-    border-left: none;
-    background-color: #f8f9fa;
-}
-
-.search-container .btn:hover {
-    background-color: #e9ecef;
-}
-
-.search-section {
-    white-space: nowrap;
-}
-
-.highlight {
-    background-color: #fff3cd;
-    padding: 1px 3px;
-    border-radius: 3px;
-}
-
-.data-row.filtered {
-    display: none;
-}
-</style>
-
-<!-- Search functionality -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
-    const clearSearchBtn = document.getElementById('clearSearch');
-    const dataRows = document.querySelectorAll('.data-row');
-    const totalCount = document.getElementById('totalCount');
-    const searchResults = document.getElementById('searchResults');
+    const clearSearch = document.getElementById('clearSearch');
+    const itemRows = document.querySelectorAll('.item-row');
     const noResultsMessage = document.getElementById('noResultsMessage');
-    const dataTable = document.getElementById('dataTable');
+    const totalItemsSpan = document.getElementById('totalItems');
+    const searchResultsSpan = document.getElementById('searchResults');
     
-    {% if brands %}
-        const totalItems = {{ brands|length }};
-        const itemType = 'thương hiệu';
-    {% else %}
-        const totalItems = {{ categories|length }};
-        const itemType = 'danh mục';
-    {% endif %}
-
-    function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        let visibleCount = 0;
-
-        // Clear previous highlights
-        document.querySelectorAll('.highlight').forEach(el => {
-            el.outerHTML = el.innerHTML;
-        });
-
-        dataRows.forEach(row => {
-            const itemName = row.getAttribute('data-name');
+    // Xử lý tìm kiếm
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.trim().toLowerCase();
+        let matchedItems = 0;
+        
+        // Hiển thị nút xóa khi có nội dung
+        clearSearch.style.display = searchTerm ? 'block' : 'none';
+        
+        itemRows.forEach(row => {
+            const itemName = row.getAttribute('data-item-name');
+            const nameCell = row.querySelector('.item-name');
+            const originalName = nameCell.dataset.original || nameCell.textContent;
             
+            // Lưu tên gốc nếu chưa có
+            if (!nameCell.dataset.original) {
+                nameCell.dataset.original = originalName;
+            }
+            
+            // Highlight và lọc
             if (searchTerm === '' || itemName.includes(searchTerm)) {
                 row.style.display = '';
-                visibleCount++;
-
-                // Highlight matching text
-                if (searchTerm !== '') {
-                    highlightText(row.querySelector('.item-name'), searchTerm);
+                matchedItems++;
+                
+                // Highlight từ khóa nếu có
+                if (searchTerm) {
+                    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+                    nameCell.innerHTML = originalName.replace(regex, '<span class="bg-warning">$1</span>');
+                } else {
+                    nameCell.textContent = originalName;
                 }
             } else {
                 row.style.display = 'none';
+                nameCell.textContent = originalName;
             }
         });
-
-        // Update result counter
-        if (searchTerm === '') {
-            totalCount.style.display = '';
-            searchResults.style.display = 'none';
-            noResultsMessage.style.display = 'none';
-            dataTable.style.display = '';
+        
+        // Hiển thị thông báo khi không có kết quả
+        if (searchTerm && matchedItems === 0) {
+            noResultsMessage.style.display = 'block';
+            searchResultsSpan.style.display = 'none';
         } else {
-            totalCount.style.display = 'none';
-            searchResults.style.display = '';
-            searchResults.textContent = `Tìm thấy: ${visibleCount} ${itemType}`;
+            noResultsMessage.style.display = 'none';
             
-            if (visibleCount === 0) {
-                noResultsMessage.style.display = 'block';
-                dataTable.style.display = 'none';
+            // Cập nhật số lượng kết quả
+            if (searchTerm) {
+                searchResultsSpan.textContent = `Tìm thấy: ${matchedItems}`;
+                searchResultsSpan.style.display = 'inline';
+                totalItemsSpan.style.display = 'none';
             } else {
-                noResultsMessage.style.display = 'none';
-                dataTable.style.display = '';
+                searchResultsSpan.style.display = 'none';
+                totalItemsSpan.style.display = 'inline';
             }
         }
-    }
-
-    function highlightText(element, searchTerm) {
-        if (!element) return;
-        
-        const text = element.textContent;
-        const regex = new RegExp(`(${searchTerm})`, 'gi');
-        const highlightedText = text.replace(regex, '<span class="highlight">$1</span>');
-        element.innerHTML = highlightedText;
-    }
-
-    // Event listeners
-    searchInput.addEventListener('input', performSearch);
-    searchInput.addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
     });
-
-    clearSearchBtn.addEventListener('click', function() {
+    
+    // Xóa tìm kiếm
+    clearSearch.addEventListener('click', function() {
         searchInput.value = '';
-        performSearch();
+        searchInput.dispatchEvent(new Event('input'));
         searchInput.focus();
     });
-
-    // Show/hide clear button based on input
-    searchInput.addEventListener('input', function() {
-        clearSearchBtn.style.display = this.value ? 'block' : 'none';
-    });
-
-    // Initialize clear button visibility
-    clearSearchBtn.style.display = 'none';
+    
+    // Hàm escape ký tự đặc biệt cho regex
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 });
 </script>
+
+<style>
+.bg-warning {
+    background-color: #ffc107;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+</style>
 
 {% endblock content %}

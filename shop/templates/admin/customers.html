@@ -21,19 +21,18 @@
         </div>
 
         <!-- Right: Search and Add Button -->
-        <div class="d-flex gap-2 align-items-center">
-            <!-- Search Form -->
-            <form method="GET" action="" class="d-flex align-items-center">
-                
-                <input type="text" name="search" id="searchInput" class="form-control" placeholder="Tìm khách hàng..." value="{{ request.args.get('search', '') }}">
-                <button class="btn btn-outline-primary ms-2" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
+         <!-- Search Form -->
+        <div class="position-relative">
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên, email hoặc số điện thoại..." value="{{ request.args.get('search', '') }}">
+            <button id="clearSearch" class="btn position-absolute end-0 top-0" style="display: none;">
+                <i class="fas fa-times text-muted"></i>
+            </button>
+        </div>
 
-            <!-- Add Button -->
-            <a href="/add_customer" class="btn btn-success px-3">
-                <i class="fas fa-user-plus me-1"></i>Thêm Khách hàng
+        <div class="d-flex align-items-center gap-2">
+            <!-- Add Customer Button -->
+            <a href="{{ url_for('add_customer') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-2"></i>Thêm Khách Hàng
             </a>
         </div>
     </div>
@@ -351,62 +350,104 @@
         margin-bottom: 0.5rem;
     }
 }
-</style>
+.highlight {
+    background-color: #FFEB3B;
+    padding: 0 1px;
+    border-radius: 2px;
+    font-weight: bold;
+    color: #000;
+}
 
+#clearSearch {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+#searchInput {
+    padding-right: 35px; /* Space for clear button */
+}
+</style>
+<!-- JavaScript for Search Highlighting -->
 <!-- JavaScript for Search Highlighting -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
     const customerRows = document.querySelectorAll('.customer-row');
     
     // Function to highlight text
     function highlightText(element, text) {
         if (!text) {
             // Remove all highlights if search is empty
-            const highlightedElements = element.querySelectorAll('.highlight');
-            highlightedElements.forEach(el => {
-                const parent = el.parentNode;
-                parent.replaceChild(document.createTextNode(el.textContent), el);
-                parent.normalize();
-            });
+            element.innerHTML = element.innerHTML.replace(/<span class="highlight">([^<]*)<\/span>/gi, '$1');
             return;
         }
         
-        const regex = new RegExp(text, 'gi');
-        const nodes = element.childNodes;
+        const regex = new RegExp(escapeRegExp(text), 'gi');
+        
+        // Only process text nodes and skip elements that shouldn't be highlighted
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        let nodes = [];
+        while (walker.nextNode()) {
+            if (walker.currentNode.textContent.trim() !== '') {
+                nodes.push(walker.currentNode);
+            }
+        }
         
         nodes.forEach(node => {
-            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                const matches = node.textContent.match(regex);
-                if (matches) {
-                    const span = document.createElement('span');
-                    span.className = 'highlight';
-                    span.innerHTML = node.textContent.replace(regex, match => `<span class="highlight">${match}</span>`);
-                    node.replaceWith(span);
-                }
-            } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('highlight')) {
-                highlightText(node, text);
+            const parent = node.parentNode;
+            if (parent.nodeName === 'SCRIPT' || parent.nodeName === 'STYLE' || parent.classList.contains('highlight')) {
+                return;
+            }
+            
+            const newHTML = node.textContent.replace(regex, match => `<span class="highlight">${match}</span>`);
+            if (newHTML !== node.textContent) {
+                const newSpan = document.createElement('span');
+                newSpan.innerHTML = newHTML;
+                parent.replaceChild(newSpan, node);
             }
         });
     }
     
+    // Helper function to escape regex special characters
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
     // Function to filter and highlight rows
     function filterAndHighlight() {
-        const searchTerm = searchInput.value.trim().toLowerCase();
+        const searchTerm = searchInput.value.trim();
         
+        // Show/hide clear button
+        clearSearch.style.display = searchTerm ? 'block' : 'none';
+        
+        if (!searchTerm) {
+            // Show all rows and remove highlights when search is empty
+            customerRows.forEach(row => {
+                row.style.display = '';
+                highlightText(row, '');
+            });
+            return;
+        }
+        
+        const searchTermLower = searchTerm.toLowerCase();
         customerRows.forEach(row => {
             const name = row.querySelector('.customer-name').textContent.toLowerCase();
             const email = row.querySelector('.customer-email').textContent.toLowerCase();
             const phone = row.querySelector('.customer-phone').textContent.toLowerCase();
             
             // Check if any field matches the search term
-            const matches = name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+            const matches = name.includes(searchTermLower) || email.includes(searchTermLower) || phone.includes(searchTermLower);
             
-            if (searchTerm === '') {
-                // Show all rows and remove highlights when search is empty
-                row.style.display = '';
-                highlightText(row, '');
-            } else if (matches) {
+            if (matches) {
                 // Show matching rows and highlight the search term
                 row.style.display = '';
                 highlightText(row, searchTerm);
@@ -420,15 +461,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listeners
     searchInput.addEventListener('input', filterAndHighlight);
     
-    // Handle form submission to prevent page reload for client-side search
-    const searchForm = searchInput.closest('form');
-    if (searchForm) {
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            filterAndHighlight();
-        });
-    }
+    // Clear search
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        filterAndHighlight();
+        searchInput.focus();
+    });
+    
+    // Initial filter in case there's a search term in the input on page load
+    filterAndHighlight();
 });
 </script>
+
 
 {% endblock content %}

@@ -3,59 +3,100 @@
 {% include 'navbar.html' %}
 {% include '_messages.html' %}
 {% block content %}
-<div class="container">
+<div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
-            Invoice: {{order.invoice}}
-            <br>
-            Status: {{order.status}}
-            <br>
-            Customer name: {{customer.username}}
-            <br>
-            Customer email: {{customer.email}}
-            <br>
-            Customer contact: {{customer.phone}}
-            <br>
-        <table class="table table-sm">
-            <thead>
-                <th>Sr</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Discount</th>
-                <th>Subtotal</th>
-            </thead>
-            <tbody>
-                {% for item in order_details %}
-                {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
-                <tr>
-                    <td>{{loop.index}}</td>
-                    <td>{{item.product_name}}</td>
-                    <td>{{"%.2f"|format(item.price)}}$</td>
-                    <td>{{item.quantity}}</td>
-                    {% if item.discount > 0 %}
-                    <td>{{item.discount}}% is {{discount}}$</td>
-                    {% else %}
-                    <td>0%</td>
-                    {% endif %}
-                    <td>{{"%0.2f"|format(item.subtotal)}}$</td>
-                </tr>
-                {% endfor %}
-                <tr>
-                    <td><a href="#" class="btn btn-success">Check out!</a> </td>
-                    <td></td>
-                    <td colspan="2"><h4>Tax: {{"%.2f"|format(tax)}}$</h4></td>
-                    <td colspan="2"><h4>Total: {{"%.2f"|format(grand_total)}}$</h4></td>
-                    <td>
-                        <form action="{{url_for('get_pdf', invoice=invoice)}}" method="post">
-                        <button type="submit" class="btn btn-info">Get PDF</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <!-- Khung thông tin đơn hàng -->
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-body bg-light">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Mã đơn hàng:</strong> {{order.invoice}}</p>
+                            <p class="mb-1"><strong>Trạng thái:</strong> 
+                                <span class="badge bg-{% if order.status == 'Completed' %}success{% else %}warning{% endif %}">
+                                    {{order.status}}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Khách hàng:</strong> {{customer.username}}</p>
+                            <p class="mb-1"><strong>Email:</strong> {{customer.email}}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Điện thoại:</strong> {{customer.phone}}</p>
+                            <p class="mb-1"><strong>Ngày đặt:</strong> {{order.date_created}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng sản phẩm -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead class="table-primary">
+                        <tr>
+                            <th class="text-center">STT</th>
+                            <th>Tên sản phẩm</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-center">SL</th>
+                            <th class="text-end">Giảm giá</th>
+                            <th class="text-end">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_details %}
+                        {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
+                        <tr>
+                            <td class="text-center">{{loop.index}}</td>
+                            <td>{{item.product_name}}</td>
+                            <td class="text-end">{{"%.0f"|format(item.price)}}₫</td>
+                            <td class="text-center">{{item.quantity}}</td>
+                            <td class="text-end">
+                                {% if item.discount > 0 %}
+                                {{item.discount}}% ({{discount}}₫)
+                                {% else %}
+                                0₫
+                                {% endif %}
+                            </td>
+                            <td class="text-end">{{"%0.2f"|format(item.subtotal)}}₫</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-group-divider">
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold">Thuế (VAT):</td>
+                            <td class="text-end">{{"%.2f"|format(tax)}}₫</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="text-end fw-bold">Tổng cộng:</td>
+                            <td class="text-end fw-bold text-primary">{{"%.2f"|format(grand_total)}}₫</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="text-end border-0 pt-3">
+                                <form action="{{url_for('get_pdf', invoice=invoice)}}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-file-pdf"></i> Xuất PDF
+                                    </button>
+                                </form>
+                                <a href="/" class="btn btn-sm btn-success">
+                                    <i class="fas fa-credit-card"></i> Checkout
+                                </a>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-</div>
-{% endblock content %}
 
+<style>
+    .table th {
+        white-space: nowrap;
+    }
+    .badge {
+        font-size: 0.85em;
+        padding: 3px 8px;
+    }
+</style>
+{% endblock content %}

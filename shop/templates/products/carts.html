@@ -316,7 +316,7 @@
                           {% endfor %}
                         </select>
                       </td>
-                      <td>{{ product.price }}$</td>
+                      <td>{{ product.price }}đ</td>
                       <td>
                         <input type="number" 
                                name="quantity" 
@@ -327,12 +327,12 @@
                       </td>
                       <td>
                         {% if product.discount > 0 %}
-                          {{ product.discount }}% <br><small>({{ discount }}$)</small>
+                          {{ product.discount }}% <br><small>({{ discount }}đ)</small>
                         {% else %}
                           –
                         {% endif %}
                       </td>
-                      <td><strong>{{ final_subtotal }}$</strong></td>
+                      <td><strong>{{ final_subtotal }}đ</strong></td>
                       <td>
                         <button type="submit" class="btn-action btn-update">
                           <i class="bi bi-arrow-repeat"></i>
@@ -352,8 +352,8 @@
                       <i class="bi bi-cash-coin me-2"></i> ĐẶT HÀNG NGAY
                     </a>
                   </td>
-                  <td colspan="3"><h5 class="text-start">Thuế: {{ tax }}$</h5></td>
-                  <td colspan="3"><h5 class="text-start">Tổng Cộng: {{ grandtotal }}$</h5></td>
+                  <td colspan="3"><h5 class="text-start">Thuế: {{ tax }}đ</h5></td>
+                  <td colspan="3"><h5 class="text-start">Tổng Cộng: {{ grandtotal }}đ</h5></td>
                   <td>
                     <a href="{{ url_for('clearCart') }}" class="btn-clear">
                       <i class="bi bi-x-circle-fill"></i>
