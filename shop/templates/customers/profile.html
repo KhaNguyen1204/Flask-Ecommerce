@@ -168,7 +168,7 @@
         <!-- Nút quay lại -->
         <div class="row mb-4">
             <div class="col-12">
-                <a href="javascript:history.back()" class="btn back-btn d-inline-flex align-items-center">
+                <a href="/" class="btn back-btn d-inline-flex align-items-center">
                     <i class="bi bi-arrow-left me-2 icon-bounce"></i>
                     <span>Quay lại</span>
                 </a>
@@ -183,7 +183,7 @@
                         <div class="mb-4">
                             {% if customer.profile %}
                             <div class="avatar-container">
-                                <img src="{{ url_for('static', filename='images/' + customer.profile) }}"
+                                <img src="{{ url_for('static', filename='images/admin_pictures/admin.jpg') }}"
                                      class="rounded-circle img-fluid border border-3 border-light shadow"
                                      style="width: 4cm; height: 4cm; object-fit: cover;" alt="Profile Image">
                             </div>
