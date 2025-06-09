@@ -49,7 +49,7 @@ def admin_register():
     if admin_exists:
         # Nếu đã có admin mà chưa đăng nhập thì yêu cầu đăng nhập
         if not current_user.is_authenticated or current_user.role.name != 'admin':
-            flash('You do not have permission to access this page.', 'danger')
+            flash('Bạn không có quyền truy cập vào trang này.', 'danger')
             return redirect(url_for('login'))
 
     form = StaffRegistrationForm(request.form)
@@ -62,19 +62,19 @@ def admin_register():
             email = form.email.data
             phone = form.phone.data
             if not email or not phone:
-                flash('Email and phone are required', 'danger')
+                flash('Email và số điện thoại phải được nhập', 'danger')
                 return redirect(url_for('admin_register'))
 
             # Kiểm tra email đã tồn tại chưa
             user = User.query.filter_by(email=form.email.data).first()
             if user:
-                flash(f'Warning {form.email.data} has been registered already', 'danger')
+                flash(f'Cảnh báo! Email {form.email.data} đã tồn tại!', 'danger')
                 return redirect(url_for('admin_register'))
 
             # Kiểm tra phone đã được sử dụng chưa
             phone_user = User.query.filter_by(phone=form.phone.data).first()
             if phone_user:
-                flash(f'Phone number {form.phone.data} is already registered', 'danger')
+                flash(f'Cảnh báo! Số điện thoại {form.phone.data} đã tồn tại', 'danger')
                 return redirect(url_for('admin_register'))
 
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -88,7 +88,7 @@ def admin_register():
             )
             db.session.add(admin)
             db.session.commit()
-            flash(f'Welcome {form.username.data}! Admin account created successfully.', 'success')
+            flash(f'Chào mừng {form.username.data}! Tài khoản admin đã được tạo thành công.', 'success')
             return redirect(url_for('login'))
         else:
             # Hiển thị lỗi xác thực chi tiết
@@ -96,7 +96,7 @@ def admin_register():
                 for error in errors:
                     flash(f'Lỗi ở trường {field}: {error}', 'danger')
 
-    return render_template('admin/register.html', form=form, title='Register Page')
+    return render_template('admin/register.html', form=form, title='Đăng ký Admin')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -108,7 +108,7 @@ def login():
             session['email'] = user.email
             session['role'] = user.role.name
 
-            flash(f'Welcome {user.username}! You are logged in.', 'success')
+            flash(f'Chào mừng {user.username}! Bạn đã đăng nhập thành công!', 'success')
 
             # Redirect based on role
             if user.role.name == 'admin':
@@ -122,16 +122,16 @@ def login():
             elif user.role.name == 'customer':
                 return redirect(url_for('home'))
             else:
-                flash('You do not have permission to access this page.', 'danger')
+                flash('Bạn không có quyền truy cập trang này.', 'danger')
                 return redirect(url_for('login'))
         else:
-            flash('Login Unsuccessful. Please check email and password.', 'danger')
-    return render_template('login.html', form=form, title='Login Page')
+            flash('Đăng nhập thất bại, vui lòng kiểm tra email và mật khẩu.', 'danger')
+    return render_template('login.html', form=form, title='Đăng nhập')
 
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     if 'email' not in session:
-        flash('Please login to access this page.', 'danger')
+        flash('Vui lòng đăng nhập để truy cập trang này', 'danger')
         return redirect(url_for('login'))
     form = ChangePasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -140,7 +140,7 @@ def change_password():
             hashed_password = bcrypt.generate_password_hash(form.new_password.data)
             user.password = hashed_password
             db.session.commit()
-            flash('Password are updated!', 'success')
+            flash('Mật khẩu đã được cập nhật!', 'success')
             if user.role.name == 'admin':
                 return redirect(url_for('admin'))
             elif user.role.name == 'storekeeper':
@@ -149,22 +149,24 @@ def change_password():
                 return redirect(url_for('sales'))
             elif user.role.name == 'accountancy':
                 return redirect(url_for('finance_management'))
+            elif user.role.name == 'customer':
+                return redirect(url_for('customer_profile'))
         else:
-            flash('Password is incorrect!', 'danger')
+            flash('Mật khẩu không đúng!', 'danger')
 
-    return render_template('admin/change_password.html', form=form, title='Change Password Page')
+    return render_template('admin/change_password.html', form=form, title='Thay dổi mật khẩu')
 
 @app.route('/logout')
 def logout():
     session.pop('email', None)
-    flash('You have been logged out.', 'success')
+    flash('Bạn đã đăng xuất thành công.', 'success')
     return redirect(url_for('login'))
 
 @app.route('/manager_roles')
 @role_required(['admin'])
 def roles():
     roles = Role.query.order_by(Role.id.desc()).all()
-    return render_template('admin/roles.html', title='Roles Page', roles=roles)
+    return render_template('admin/roles.html', title='Quản lý vai trò', roles=roles)
 
 @app.route('/addrole', methods=['GET', 'POST'])
 @role_required(['admin'])
@@ -175,7 +177,7 @@ def add_role():
         # Check if role already exists
         role = Role.query.filter_by(name=form.name.data).first()
         if role:
-            flash(f'Role {form.name.data} already exists!', 'danger')
+            flash(f'Vai trò {form.name.data} đã tồn tại!', 'danger')
             return redirect(url_for('roles'))
 
         # Create new role
@@ -185,17 +187,17 @@ def add_role():
         )
         db.session.add(new_role)
         db.session.commit()
-        flash(f'Role {form.name.data} added successfully!', 'success')
+        flash(f'Vai trò {form.name.data} đã được thêm thành công!', 'success')
         return redirect(url_for('roles'))
     else:
-        return render_template('admin/add_role.html', form=form, title='Add Role Page')
+        return render_template('admin/add_role.html', form=form, title='Thêm vai trò')
 
 @app.route('/updaterole/<int:id>', methods=['GET', 'POST'])
 @role_required(['admin'])
 def update_role(id):
     role = Role.query.get_or_404(id)
     form = RoleForm(request.form)
-    form.submit.label.text = 'Update Role'
+    form.submit.label.text = 'Cập nhật vai trò'
 
     # For GET requests, populate form with existing data
     if request.method == 'GET':
@@ -206,7 +208,7 @@ def update_role(id):
         # Check if role name already exists with another role
         existing_role = Role.query.filter_by(name=form.name.data).first()
         if existing_role and existing_role.id != id:
-            flash(f'Role {form.name.data} already exists!', 'danger')
+            flash(f'Vai trò {form.name.data} đã tồn tại!', 'danger')
             return redirect(url_for('roles'))
 
         # Update role information
@@ -214,10 +216,10 @@ def update_role(id):
         role.description = form.description.data
 
         db.session.commit()
-        flash('Role updated successfully', 'success')
+        flash('Vai trò đã được cập nhật thành công', 'success')
         return redirect(url_for('roles'))
 
-    return render_template('admin/add_role.html', form=form, title='Update Role Page')
+    return render_template('admin/add_role.html', form=form, title='Cập nhật vai trò')
 
 @app.route('/deleterole/<int:id>', methods=['GET', 'POST'])
 @role_required(['admin'])
@@ -225,26 +227,27 @@ def delete_role(id):
     role = Role.query.get_or_404(id)
     # Check if the role is being used by any staff
     if Staff.query.filter_by(role_id=role.id).first():
-        flash('Cannot delete this role as it is assigned to staff members.', 'danger')
+        flash('Không thể xóa vai trò này vì nó đang được sử dụng.', 'danger')
         return redirect(url_for('roles'))
 
     db.session.delete(role)
     db.session.commit()
-    flash('Role deleted successfully', 'success')
+    flash('Xóa vai trò thành công', 'success')
     return redirect(url_for('roles'))
 
 @app.route('/manager_staffs')
 @role_required(['admin'])
 def staff():
     staffs = Staff.query.order_by(Staff.id.desc()).all()
-    return render_template('admin/staff.html', staffs=staffs, title='Staff Page')
+    return render_template('admin/staff.html', staffs=staffs, title='Quản lý nhân viên')
+
 @app.route('/addstaff', methods=['GET', 'POST'])
 @role_required(['admin'])
 def add_staff():
     roles = Role.query.all()
     # Redundant session check removed as role_required decorator already handles this
     form = StaffRegistrationForm(request.form)
-    form.submit.label.text = 'Add Staff'
+    form.submit.label.text = 'Thêm nhân viên'
     form.role_id.choices = [(role.id, role.name) for role in roles]
     if request.method == 'POST' and form.validate():
         # Check if staff with this email already exists
@@ -256,8 +259,8 @@ def add_staff():
         # Check if phone is already used
         phone_staff = Staff.query.filter_by(phone=form.phone.data).first()
         if phone_staff:
-            flash(f'Phone number {form.phone.data} is already registered', 'danger')
-            return render_template('admin/add_staff.html', form=form, title='Add Staff Member')
+            flash(f'Số điện thoại {form.phone.data} đã được đăng ký!', 'danger')
+            return render_template('admin/add_staff.html', form=form, title='Thêm nhân viên')
 
         # Create password hash
         hashed_password = bcrypt.generate_password_hash(form.password.data)
@@ -274,10 +277,10 @@ def add_staff():
 
         db.session.add(staff)
         db.session.commit()
-        flash(f'Staff member {form.username.data} added successfully!', 'success')
+        flash(f'Nhân viên {form.username.data} được thêm thành công!', 'success')
         return redirect(url_for('staff'))
 
-    return render_template('admin/add_staff.html', form=form, title='Add Staff Member')
+    return render_template('admin/add_staff.html', form=form, title='Thêm nhân viên')
 
 
 @app.route('/updatestaff/<int:id>', methods=['GET', 'POST'])
@@ -285,7 +288,7 @@ def add_staff():
 def update_staff(id):
     staff = Staff.query.get_or_404(id)
     form = StaffRegistrationForm(request.form)
-    form.submit.label.text = 'Update Staff'
+    form.submit.label.text = 'Cập nhật thông tin'
     roles = Role.query.all()
     form.role_id.choices = [(role.id, role.name) for role in roles]
     # For GET requests, populate form with existing data
@@ -300,13 +303,13 @@ def update_staff(id):
         # Check if email already exists with another staff
         existing_staff = Staff.query.filter_by(email=form.email.data).first()
         if existing_staff and existing_staff.id != id:
-            flash(f'Email {form.email.data} already exists!', 'danger')
+            flash(f'Email {form.email.data} đã tồn tại!', 'danger')
             return redirect(url_for('staff'))
 
         # Check if phone already exists with another staff
         phone_staff = Staff.query.filter_by(phone=form.phone.data).first()
         if phone_staff and phone_staff.id != id:
-            flash(f'Phone {form.phone.data} already exists!', 'danger')
+            flash(f'Số điện thoại {form.phone.data} đã tồn tại!', 'danger')
             return redirect(url_for('staff'))
 
         # Update staff information
@@ -322,10 +325,10 @@ def update_staff(id):
             staff.password = hashed_password
 
         db.session.commit()
-        flash('Staff member updated successfully', 'success')
+        flash('Thông tin nhân viên đã được cập nhật thành công', 'success')
         return redirect(url_for('staff'))
 
-    return render_template('admin/add_staff.html', form=form, title='Update Staff Member')
+    return render_template('admin/add_staff.html', form=form, title='Chỉnh sửa thông tin nhân viên')
 
 @app.route('/deletestaff/<int:id>', methods=['POST'])
 @role_required(['admin'])
@@ -336,31 +339,31 @@ def delete_staff(id):
     if user:
         db.session.delete(user)
     db.session.commit()
-    flash('Staff member deleted successfully', 'success')
+    flash('Xóa nhân viên thành công', 'success')
     return redirect(url_for('staff'))
 
 @app.route('/manager_customers', methods=['GET', 'POST'])
 @role_required(['admin'])
 def customers_manager():
     customers = User.query.filter_by(role_id=Role.query.filter_by(name='customer').first().id).all()
-    return render_template('admin/customers.html', title='Customers Page', customers=customers)
+    return render_template('admin/customers.html', title='Quản lý khách hàng', customers=customers)
 
 @app.route('/add_customer', methods=['GET', 'POST'])
 @role_required(['admin'])
 def add_customer():
     form = CustomerRegisterForm()
-    form.submit.label.text = 'Add Customer'
+    form.submit.label.text = 'Thêm khách hàng'
     if request.method == 'POST' and form.validate():
         # Check if user with this email already exists
         user_email = User.query.filter_by(email=form.email.data).first()
         if user_email:
-            flash(f'Warning {form.email.data} has been registered already', 'danger')
+            flash(f'Cảnh báo! {form.email.data} đã tồn tại!', 'danger')
             return redirect(url_for('customers_manager'))
 
         # Check if user with this phone already exists
         user_phone = User.query.filter_by(phone=form.phone.data).first()
         if user_phone:
-            flash(f'Warning {form.phone.data} has been registered already', 'danger')
+            flash(f'Cảnh báo! {form.phone.data} đã tồn tại!', 'danger')
             return redirect(url_for('customers_manager'))
 
         # Hash password and create customer
@@ -389,7 +392,7 @@ def add_customer():
 
         db.session.add(customer)
         db.session.commit()
-        flash(f'Welcome {form.username.data}, Thanks for registering', 'success')
+        flash(f'Khách hàng {form.username.data} được thêm thành công!', 'success')
         return redirect(url_for('customers_manager'))
 
     return render_template('customers/register.html', form=form, title='Add Customer Page')
@@ -403,6 +406,6 @@ def delete_customer(id):
     if user:
         db.session.delete(user)
     db.session.commit()
-    flash('Customer deleted successfully', 'success')
+    flash('Xóa nhân viên thành công', 'success')
     return redirect(url_for('customers_manager'))
 

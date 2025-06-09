@@ -70,7 +70,8 @@
                     <div class="col-2">Khách Hàng</div>
                     <div class="col-2">Ngày Tạo</div>
                     <div class="col-2 text-center">Trạng Thái</div>
-                    <div class="col-3 text-center">Thao Tác</div>
+                    <div class="col-2 text-center">Chi tiết</div>
+                    <div class="col-1">Thao Tác</div>
                 </div>
             </div>
             
@@ -106,18 +107,19 @@
                         </div>
                         <div class="col-2 text-center">
                             {% if order.status == 'pending' %}
-                                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
                             {% elif order.status == 'accepted' %}
                                 <span class="badge bg-info">Đã duyệt</span>
                             {% else %}
                                 <span class="badge bg-success">Hoàn thành</span>
                             {% endif %}
                         </div>
-                        <div class="col-3 text-center">
+                        <div class="col-2 text-center">
                             <a href="{{ url_for('order_detail', id=order.id) }}" class="btn btn-info btn-sm me-2" title="Xem chi tiết">
                                 <i class="fas fa-eye me-1"></i>Chi tiết
                             </a>
-                            
+                        </div>
+                        <div class="col-1">
                             {% if order.status == 'pending' %}
                                 <button type="button" class="btn btn-success btn-sm" title="Duyệt đơn hàng" data-bs-toggle="modal" data-bs-target="#acceptModal-{{order.id}}">
                                     <i class="fas fa-check me-1"></i>Duyệt
@@ -128,7 +130,7 @@
                                 </button>
                             {% else %}
                                 <span class="badge bg-light text-muted">
-                                    <i class="fas fa-check-double me-1"></i>Đã hoàn thành
+                                    <i class="fas fa-check-double me-1"></i>Hoàn thành
                                 </span>
                             {% endif %}
                         </div>

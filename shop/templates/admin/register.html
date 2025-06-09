@@ -1,55 +1,48 @@
 {% extends 'base.html' %}
 {% block title %}
-{% if title %} {{ title }} {% else %} Register {% endif %}
+{% if title %} {{ title }} {% else %} Đăng ký Admin {% endif %}
 {% endblock title %}
 
 {% block content %}
 <div class="container mt-5">
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-7 col-lg-6">
       <div class="card shadow-lg border-0 rounded-lg animate__animated animate__fadeIn">
-        <div class="card-header bg-primary text-white text-center py-4">
-          <h2 class="mb-0">REGISTER</h2>
+        <div class="card-header bg-gradient-primary text-white text-center py-4">
+          <h2 class="mb-0">ĐĂNG KÝ ADMIN</h2>
         </div>
         <div class="card-body">
           {% include '_messages.html' %}
           {% from "_formhelpers.html" import render_field %}
-          
-          <form method="post" enctype="multipart/form-data" class="animate__animated animate__fadeInUp animate__delay-1s">
+          <form method="post" class="animate__animated animate__fadeInUp animate__delay-1s" autocomplete="off" id="adminRegisterForm">
             <div class="mb-3">
-              {{ render_field(form.username, class_="form-control rounded-pill border-primary") }}
+              {{ render_field(form.username, class_="form-control rounded-pill border-primary", placeholder="Nhập họ và tên") }}
             </div>
-            
             <div class="mb-3">
-              {{ render_field(form.email, class_="form-control rounded-pill border-primary") }}
+              {{ render_field(form.email, class_="form-control rounded-pill border-primary", placeholder="Nhập email") }}
             </div>
-            
             <div class="mb-3">
-              {{ render_field(form.password, class_="form-control rounded-pill border-primary") }}
+              {{ render_field(form.phone, class_="form-control rounded-pill border-primary", placeholder="Nhập số điện thoại") }}
             </div>
-            
             <div class="mb-3">
-              {{ render_field(form.confirm, class_="form-control rounded-pill border-primary") }}
+              {{ render_field(form.position, class_="form-control rounded-pill border-primary", placeholder="Nhập vị trí công tác") }}
             </div>
-            
-            <div class="mb-4">
-              <label for="photo" class="form-label text-primary">Profile Photo</label>
-              <div class="input-group">
-                <input type="file" name="photo" id="photo" class="form-control border-primary">
-              </div>
+            <div class="mb-3">
+              {{ render_field(form.password, class_="form-control rounded-pill border-primary", placeholder="Nhập mật khẩu") }}
             </div>
-            
+            <div class="mb-3">
+              {{ render_field(form.confirm, class_="form-control rounded-pill border-primary", placeholder="Xác nhận mật khẩu") }}
+            </div>
             <div class="d-grid gap-2">
               <button type="submit" class="btn btn-primary btn-lg rounded-pill animate__animated animate__pulse animate__infinite animate__slower">
-                Register
+                Đăng ký
               </button>
             </div>
           </form>
         </div>
         <div class="card-footer text-center py-3 bg-light">
           <div class="small">
-            <a href="{{ url_for('login') }}" class="text-primary">Have an account? Sign in!</a>
-
+            <a href="{{ url_for('login') }}" class="text-primary">Đã có tài khoản? Đăng nhập!</a>
           </div>
         </div>
       </div>
@@ -59,51 +52,113 @@
 
 <!-- Add Animate.css for animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <!-- Custom styles -->
 <style>
+  body {
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    min-height: 100vh;
+  }
   .card {
     transition: all 0.3s ease-in-out;
     overflow: hidden;
+    border-radius: 1.5rem !important;
   }
-  
   .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0, 123, 255, 0.2) !important;
   }
-  
-  .card-header {
+  .card-header.bg-gradient-primary {
     background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%) !important;
+    border-top-left-radius: 1.5rem !important;
+    border-top-right-radius: 1.5rem !important;
   }
-  
   .form-control:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    transform: translateY(-2px);
   }
-  
   .btn-primary {
     background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
     border: none;
     transition: all 0.3s ease;
   }
-  
   .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
   }
-  
-  /* Input field animations */
   .form-control {
     transition: all 0.3s ease;
+    font-size: 1.1rem;
+    padding: 0.75rem 1.25rem;
   }
-  
-  .form-control:focus {
-    transform: translateY(-2px);
-  }
-  
-  /* Add a subtle blue glow to the form on hover */
   form:hover {
-    box-shadow: 0 0 20px rgba(13, 110, 253, 0.1);
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.08);
+  }
+  .card-footer {
+    border-bottom-left-radius: 1.5rem !important;
+    border-bottom-right-radius: 1.5rem !important;
+  }
+  .form-label {
+    font-weight: 500;
+    color: #0d6efd;
+  }
+  .input-group-text {
+    background: #e9ecef;
+    border: none;
+  }
+  @media (max-width: 768px) {
+    .card {
+      margin: 0 1rem;
+    }
   }
 </style>
+
+<!-- Custom JS for password toggle and validation -->
+<script>
+  // Toggle password visibility
+  document.addEventListener('DOMContentLoaded', function() {
+    const passwordField = document.querySelector('input[name="password"]');
+    const confirmField = document.querySelector('input[name="confirm"]');
+    if(passwordField && confirmField) {
+      [passwordField, confirmField].forEach(field => {
+        const wrapper = field.parentElement;
+        if(wrapper && !wrapper.querySelector('.toggle-password')) {
+          const toggle = document.createElement('span');
+          toggle.className = 'toggle-password bi bi-eye-slash';
+          toggle.style.position = 'absolute';
+          toggle.style.right = '20px';
+          toggle.style.top = '50%';
+          toggle.style.transform = 'translateY(-50%)';
+          toggle.style.cursor = 'pointer';
+          toggle.onclick = function() {
+            if(field.type === 'password') {
+              field.type = 'text';
+              toggle.classList.remove('bi-eye-slash');
+              toggle.classList.add('bi-eye');
+            } else {
+              field.type = 'password';
+              toggle.classList.remove('bi-eye');
+              toggle.classList.add('bi-eye-slash');
+            }
+          };
+          wrapper.style.position = 'relative';
+          wrapper.appendChild(toggle);
+        }
+      });
+    }
+  });
+  // Simple client-side validation
+  document.getElementById('adminRegisterForm').addEventListener('submit', function(e) {
+    const phone = document.querySelector('input[name="phone"]');
+    if(phone && !/^\d{5,15}$/.test(phone.value)) {
+      alert('Số điện thoại phải là số và có độ dài từ 10 đến 15 ký tự!');
+      phone.focus();
+      e.preventDefault();
+    }
+  });
+</script>
 {% endblock content %}
+

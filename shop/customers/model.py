@@ -16,7 +16,6 @@ class Customer(User):
     country = db.Column(db.String(50), unique=False)
     city = db.Column(db.String(50), unique=False)
     address = db.Column(db.String(200), unique=False)
-    zipcode = db.Column(db.String(50), unique=False, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'customer',
@@ -27,10 +26,10 @@ class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     invoice = db.Column(db.String(100), unique=True, nullable=False)
-    status = db.Column(db.String(100), unique=False, nullable=False, default='pending')  # Trạng thái đơn hàng: pending, accepted
-    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
+    status = db.Column(db.String(100), unique=False, nullable=False, default='pending')  # Trạng thái đơn hàng: pending, accepted, completed, cancelled
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id', ondelete='SET NULL'), nullable=True)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id', ondelete='SET NULL'), nullable=True)
 
     # Các thông tin tổng hợp của đơn hàng
     subtotal = db.Column(db.Float, default=0.0)
@@ -49,10 +48,10 @@ class Order(db.Model):
 class OrderDetail(db.Model):
     __tablename__ = 'order_details'
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=False)
 
     # Thông tin sản phẩm
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='SET NULL'), nullable=True) # Khi xóa sản phẩm thì không xóa chi tiết đơn hàng mà set lại product_id thành NULL
     product_name = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
@@ -70,15 +69,15 @@ class OrderDetail(db.Model):
 class Review(db.Model):
     __tablename__ = 'reviews'
     id = db.Column(db.Integer, primary_key=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id', ondelete='CASCADE'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='CASCADE'), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id', ondelete='CASCADE'), nullable=False) # Khi xóa khách hàng thì xóa review để đam bảo dữ liệu khách hàng
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='SET NULL'), nullable=True) # Khi xóa sản phẩm thì không xóa review mà set lại product_id thành NULL
     rating = db.Column(db.Integer, nullable=False)  # Điểm đánh giá (1-5 sao)
     comment = db.Column(db.Text, nullable=True)  # Bình luận
     created_at = db.Column(db.DateTime, default=datetime.now, nullable= False)
 
     # Quan hệ với các bảng khác
     customer = db.relationship('Customer', backref=db.backref('reviews', lazy=True, cascade="all, delete-orphan"))
-    product = db.relationship('AddProduct', backref=db.backref('reviews', lazy=True, cascade="all, delete-orphan"))
+    product = db.relationship('AddProduct', backref=db.backref('reviews', lazy=True))
 
     def __repr__(self):
         return f'<Review {self.id}: {self.rating} stars>'

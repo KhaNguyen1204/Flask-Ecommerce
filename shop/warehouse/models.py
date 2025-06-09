@@ -9,14 +9,14 @@ class Warehouse(db.Model):
     location = db.Column(db.String(255), nullable=False)
     capacity = db.Column(db.Integer, nullable=True)
     description = db.Column(db.Text, nullable=True)
-    manager_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=True)
+    manager_id = db.Column(db.Integer, db.ForeignKey('staff.id', ondelete='SET NULL'), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.now)
     status = db.Column(db.String(20), default='active')  # Active, Inactive
 
     # Relationships
     manager = db.relationship('Staff', backref='managed_warehouses', foreign_keys=[manager_id])
-    inbound_receipts = db.relationship('InboundReceipt', backref='warehouse', lazy=True)
-    outbound_receipts = db.relationship('OutboundReceipt', backref='warehouse', lazy=True)
+    inbound_receipts = db.relationship('InboundReceipt', backref='warehouse', lazy=True, cascade='all, delete-orphan')
+    outbound_receipts = db.relationship('OutboundReceipt', backref='warehouse', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<Warehouse {self.name}>'
@@ -30,9 +30,9 @@ class InboundReceipt(db.Model):
     supplier = db.Column(db.String(100), nullable=True)
     total_amount = db.Column(db.Float, default=0)
     notes = db.Column(db.Text, nullable=True)
-    created_by = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=False)
-    warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouses.id'), nullable=False)
-    status = db.Column(db.String(20), default='Đang xử lý')  # Đang xử lý, Đã hoàn thành, Đã hủy
+    created_by = db.Column(db.Integer, db.ForeignKey('staff.id', ondelete='SET NULL'), nullable=True)
+    warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouses.id', ondelete='CASCADE'), nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
 
     # Relationships
     creator = db.relationship('Staff', backref='created_inbound_receipts', foreign_keys=[created_by])
@@ -45,8 +45,8 @@ class InboundReceipt(db.Model):
 class InboundReceiptDetail(db.Model):
     __tablename__ = 'inbound_receipt_details'
     id = db.Column(db.Integer, primary_key=True)
-    inbound_receipt_id = db.Column(db.Integer, db.ForeignKey('inbound_receipts.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    inbound_receipt_id = db.Column(db.Integer, db.ForeignKey('inbound_receipts.id', ondelete='CASCADE'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='SET NULL'), nullable=True)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     subtotal = db.Column(db.Float, default=0)
@@ -67,9 +67,9 @@ class OutboundReceipt(db.Model):
     recipient = db.Column(db.String(100), nullable=True)
     total_amount = db.Column(db.Float, default=0)
     notes = db.Column(db.Text, nullable=True)
-    created_by = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=False)
-    warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouses.id'), nullable=False)
-    status = db.Column(db.String(20), default='Đang xử lý')  # Đang xử lý, Đã hoàn thành, Đã hủy
+    created_by = db.Column(db.Integer, db.ForeignKey('staff.id', ondelete="SET NULL"), nullable=True)
+    warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouses.id', ondelete='CASCADE'), nullable=False)
+    status = db.Column(db.String(20), default='pending')  # pending, completed, cancelled
 
     # Relationships
     creator = db.relationship('Staff', backref='created_outbound_receipts', foreign_keys=[created_by])
@@ -82,8 +82,8 @@ class OutboundReceipt(db.Model):
 class OutboundReceiptDetail(db.Model):
     __tablename__ = 'outbound_receipt_details'
     id = db.Column(db.Integer, primary_key=True)
-    outbound_receipt_id = db.Column(db.Integer, db.ForeignKey('outbound_receipts.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    outbound_receipt_id = db.Column(db.Integer, db.ForeignKey('outbound_receipts.id', ondelete='CASCADE'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='SET NULL'), nullable=True)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     subtotal = db.Column(db.Float, default=0)

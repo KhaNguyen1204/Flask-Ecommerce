@@ -127,15 +127,15 @@ def revenue_report():
 def export_revenue(start_date, end_date, report_type):
     try:
         start = datetime.strptime(start_date, '%Y-%m-%d')
-        end = datetime.strptime(end_date, '%Y-%m-%d')
+        # Include the whole end day
+        end = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1) - timedelta(seconds=1)
 
-        # Query orders within date range
         orders = Order.query.filter(
             Order.date_created.between(start, end),
             Order.status == 'completed'
-        ).all()
+        ).order_by(Order.date_created.desc()).all()
 
-        # Calculate statistics based on report type
+        # Calculate statistics
         if report_type == 'daily':
             stats = calculate_daily_revenue(orders, start, end)
         elif report_type == 'monthly':
@@ -145,37 +145,51 @@ def export_revenue(start_date, end_date, report_type):
         else:
             stats = calculate_summary_revenue(orders, start, end)
 
-        # Create CSV file
+        # Prepare CSV with UTF-8 BOM
         output = io.StringIO()
         writer = csv.writer(output)
 
-        # Write headers
-        if report_type == 'daily':
-            writer.writerow(['Date', 'Orders', 'Revenue', 'Average Order Value'])
-            for date, data in stats.items():
-                writer.writerow([date, data['count'], data['revenue'], data['average']])
-        elif report_type == 'monthly':
-            writer.writerow(['Month', 'Orders', 'Revenue', 'Average Order Value'])
-            for month, data in stats.items():
-                writer.writerow([month, data['count'], data['revenue'], data['average']])
-        elif report_type == 'yearly':
-            writer.writerow(['Year', 'Orders', 'Revenue', 'Average Order Value'])
-            for year, data in stats.items():
-                writer.writerow([year, data['count'], data['revenue'], data['average']])
+        # Write statistics
+        if report_type in ['daily', 'monthly', 'yearly']:
+            writer.writerow(['Loại', 'Số đơn', 'Doanh thu', 'Giá trị TB'])
+            for key, data in stats.items():
+                writer.writerow([
+                    key,
+                    data.get('count', 0),
+                    data.get('revenue', 0),
+                    data.get('average', 0)
+                ])
+            writer.writerow([])
         else:
-            writer.writerow(['Metric', 'Value'])
-            writer.writerow(['Total Orders', stats['total_orders']])
-            writer.writerow(['Total Revenue', stats['total_revenue']])
-            writer.writerow(['Average Order Value', stats['average_order_value']])
+            writer.writerow(['Tổng số đơn hàng', stats.get('total_orders', 0)])
+            writer.writerow(['Tổng doanh thu', stats.get('total_revenue', 0)])
+            writer.writerow(['Giá trị đơn TB', stats.get('average_order_value', 0)])
+            writer.writerow([])
 
-        # Prepare response
-        response = make_response(output.getvalue())
-        response.headers[
-            "Content-Disposition"] = f"attachment; filename=revenue_report_{report_type}_{start_date}_{end_date}.csv"
-        response.headers["Content-type"] = "text/csv"
+        # Write order details
+        writer.writerow(['STT', 'Sản phẩm', 'Số lượng', 'Đơn giá', 'Thành tiền', 'Mã đơn hàng', 'Ngày bán'])
+        idx = 1
+        for order in orders:
+            for item in getattr(order, 'order_details', []):
+                writer.writerow([
+                    idx,
+                    getattr(item, 'product_name', ''),
+                    getattr(item, 'quantity', ''),
+                    getattr(item, 'price', ''),
+                    getattr(item, 'subtotal', ''),
+                    order.id,
+                    order.date_created.strftime('%d/%m/%Y')
+                ])
+                idx += 1
 
+        # Encode as UTF-8 with BOM for Excel
+        csv_data = output.getvalue()
+        bom = '\ufeff'
+        response = make_response(bom + csv_data)
+        response.headers["Content-Disposition"] = f"attachment; filename=revenue_report_{report_type}_{start_date}_{end_date}.csv"
+        response.headers["Content-type"] = "text/csv; charset=utf-8"
         return response
 
     except Exception as e:
-        flash(f'Error exporting report: {str(e)}', 'danger')
+        flash(f'Lỗi xuất báo cáo: {str(e)}', 'danger')
         return redirect(url_for('revenue_report'))

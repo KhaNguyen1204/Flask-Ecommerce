@@ -48,11 +48,11 @@ def AddCart():
                 # Create a new cart if it doesn't exist
                 session['ShopCart'] = DictItem
 
-            flash("Product added to cart successfully", 'success')
+            flash("Sản phẩm đã được thêm vào giỏ hàng!", 'success')
             return redirect(request.referrer)
     except Exception as e:
         print(e)
-        flash("Error adding product to cart", 'danger')
+        flash("Lỗi khi thêm sản phẩm vào giỏ hàng!", 'danger')
     finally:
         return redirect(request.referrer)
 
@@ -83,7 +83,7 @@ def updateCart(code):
                 if int(key) == code:
                     item['quantity'] = int(quantity)
                     item['colors'] = color
-                    flash('Cart updated successfully', 'success')
+                    flash('Giỏ hàng đã được cập nhật!', 'success')
                     return redirect(url_for('getCart'))
         except Exception as e:
             print(e)
@@ -98,7 +98,7 @@ def deleteItem(code):
         for key, item in session['ShopCart'].items():
             if int(key) == code:
                 session['ShopCart'].pop(key, None)
-                flash('Product removed from cart', 'success')
+                flash('Sản phẩm đã được xóa khỏi giỏ hàng!', 'success')
                 return redirect(url_for('getCart'))
     except Exception as e:
         print(e)

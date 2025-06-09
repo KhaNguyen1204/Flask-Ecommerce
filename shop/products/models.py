@@ -13,10 +13,10 @@ class AddProduct(db.Model):
     description = db.Column(db.Text, nullable=False)
     pub_date = db.Column(db.DateTime, nullable=False, default=db.func.current_timestamp())
 
-    brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'), nullable=False)
+    brand_id = db.Column(db.Integer, db.ForeignKey('brand.id', ondelete="SET NULL"), nullable=True)
     brand = db.relationship('Brand', backref=db.backref('brands', lazy=True))
 
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id', ondelete="SET NULL"), nullable=True)
     category = db.relationship('Category', backref=db.backref('posts', lazy=True))
 
     image_1 = db.Column(db.String(150), nullable=False, default='image.jpg')
@@ -40,7 +40,7 @@ class ReviewReply(db.Model):
     __tablename__ = 'review_reply'
     id = db.Column(db.Integer, primary_key=True)
     review_id = db.Column(db.Integer, db.ForeignKey('reviews.id', ondelete='CASCADE'), nullable=False)
-    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id', ondelete='CASCADE'), nullable=False)
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id', ondelete='SET NULL'), nullable=True)
     reply = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 

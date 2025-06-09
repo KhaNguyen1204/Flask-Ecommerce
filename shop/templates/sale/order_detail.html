@@ -493,9 +493,22 @@
                 
                 <div class="info-item">
                     <span class="info-label">Trạng thái</span>
+                    {% if order.status == 'pending' %}
                     <span class="info-value">
-                        <span class="status-badge status-pending">{{ order.status }}</span>
+                        <span class="status-badge status-pending">Đang chờ duyệt</span>
                     </span>
+                    {% elif order.status == 'completed' %}
+                    <span class="info-value">
+                        <span class="status-badge status-completed">Đã hoàn thành</span>
+                    </span>
+                    {% elif order.status == 'cancelled' %}
+                    <span class="info-value">
+                        <span class="status-badge status-pending">Đã hủy</span>
+                    {% else %}
+                    <span class="info-value">
+                        <span class="status-badge">Đã duyệt</span>
+                    </span>
+                    {% endif %}
                 </div>
                 
                 <div class="info-item">
