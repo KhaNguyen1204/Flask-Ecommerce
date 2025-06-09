@@ -10,18 +10,11 @@
 <div class="container">
     {% include '_navbar_admin.html' %}
 </div>
-<div class="container mt-4">
-    {% if brands %}
-        <a href="{{ url_for('addbrand') }}" class="btn btn-success mb-3">Thêm Thương Hiệu</a>
-    {% else %}
-        <a href="{{ url_for('addcategory') }}" class="btn btn-success mb-3">Thêm Danh Mục</a>
-    {% endif %}
-</div>
 
 <!-- Main Content -->
 <div class="container mt-1">
     <div>
-        <h2 class="text-primary fw-bold mb-1">
+        <h2 class="text-primary fw-bold mt-3 mb-1">
             {% if brands %}Quản Lý Thương Hiệu{% else %}Quản Lý Danh Mục{% endif %}
         </h2>
         <p class="text-muted mb-0">
@@ -34,9 +27,9 @@
     </div>
 <div class="container mt-4">
     {% if brands %}
-        <a href="{{ url_for('addbrand') }}" class="btn btn-success mb-3">Add Brand</a>
+        <a href="{{ url_for('addbrand') }}" class="btn btn-primary  mb-3">Thêm thương hiệu</a>
     {% else %}
-        <a href="{{ url_for('addcategory') }}" class="btn btn-success mb-3">Add Category</a>
+        <a href="{{ url_for('addcategory') }}" class="btn btn-primary  mb-3">Thêm danh mục</a>
     {% endif %}
 </div>
 

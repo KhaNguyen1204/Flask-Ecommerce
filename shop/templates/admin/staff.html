@@ -2,89 +2,268 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
+<div class="container py-0">
     {% include '_navbar_admin.html' %}
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center mt-4 mb-4">Staff Management</h1>
-            <div class="mb-3">
-                <a href="{{url_for('add_staff')}}" class="btn btn-primary">Add New Staff</a>
+    
+<!-- Main Header with Search -->
+<div class="container mt-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        
+        <!-- Left: Title -->
+        <div class="mt-2 mb-4">
+            <h2 class="text-primary fw-bold mb-1">🧑‍💼Quản lý nhân viên</h2>
+            <p class="text-muted">Danh sách và quản lý tất cả nhân viên trong hệ thống</p>
+        </div>
+
+
+        <!-- Right: Search Bar and Add Button -->
+        <div class="d-flex align-items-center gap-3">
+            <div class="position-relative">
+                <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm..." 
+                       style="padding-left: 35px; min-width: 250px;">
+                <i class="bi bi-search position-absolute" style="left: 12px; top: 10px; color: #6c757d;"></i>
             </div>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
+            <a href="{{url_for('add_staff')}}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Thêm nhân viên
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
             {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
+            <div class="alert alert-{{ category }} alert-dismissible fade show mb-4">
+                <i class="bi bi-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }} me-2"></i>
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %}
-            {% endif %}
-            {% endwith %}
+        {% endif %}
+    {% endwith %}
 
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Position</th>
-                    <th>Status</th>
-                    <th>Hire Date</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if staffs %}
-                {% for staff in staffs %}
-                <tr>
-                    <td>{{loop.index}}</td>
-                    <td>{{staff.username}}</td>
-                    <td>{{staff.email}}</td>
-                    <td>{{staff.phone}}</td>
-                    <td>{{staff.position}}</td>
-                    <td>{{staff.status}}</td>
-                    <td>{{staff.hire_date.strftime('%Y-%m-%d')}}</td>
-                    <td><a href="{{url_for('update_staff', id=staff.id)}}" class="btn btn-sm btn-info">Edit</a></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#staffModal-{{staff.id}}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="staffModal-{{staff.id}}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Delete Staff Member</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="customerTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" style="width: 5%">#</th>
+                            <th style="width: 15%">Tên nhân viên</th>
+                            <th style="width: 20%">Email</th>
+                            <th style="width: 12%">Số điện thoại</th>
+                            <th style="width: 10%">Vị trí</th>
+                            <th class="text-center" style="width: 10%">Trạng thái</th>
+                            <th style="width: 12%">Ngày vào làm</th>
+                            <th class="text-center" style="width: 16%">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if staffs %}
+                            {% for staff in staffs %}
+                            <tr>
+                                <td class="text-center">{{ loop.index }}</td>
+                                <td class="searchable">{{ staff.username }}</td>
+                                <td class="searchable">{{ staff.email }}</td>
+                                <td class="searchable">{{ staff.phone }}</td>
+                                <td class="searchable">{{ staff.position }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-{{ 'success' if staff.status == 'Active' else 'secondary' }}">
+                                        {{ staff.status }}
+                                    </span>
+                                </td>
+                                <td>{{ staff.hire_date.strftime('%d/%m/%Y') }}</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ url_for('update_staff', id=staff.id) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="Chỉnh sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal-{{ staff.id }}"
+                                                title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Delete Confirmation Modal -->
+                            <div class="modal fade" id="deleteModal-{{ staff.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header border-0">
+                                            <h5 class="modal-title text-danger">
+                                                <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body py-4">
+                                            Bạn có chắc chắn muốn xóa nhân viên <strong>{{ staff.username }}</strong>?
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                            <form action="{{ url_for('delete_staff', id=staff.id) }}" method="POST">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-trash me-1"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="modal-body">
-                                <span class="text-danger">Are you sure you want to delete staff member "{{staff.username}}"?</span>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <form action="{{url_for('delete_staff', id=staff.id)}}" method="POST">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="8" class="text-center">No staff members found.</td>
-                </tr>
-                {% endif %}
-                </tbody>
-            </table>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    <i class="bi bi-people display-6 d-block mb-2"></i>
+                                    Không có nhân viên nào
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Đồng bộ style với trang báo cáo */
+    body {
+        background: #f8fafc;
+    }
+    
+    .card {
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        border: none;
+    }
+    
+    .table thead {
+        background: #e9ecef;
+    }
+    
+    .table tbody tr:hover {
+        background: #f1f3f6;
+    }
+    
+    .btn-primary, .btn-success {
+        border-radius: 8px;
+    }
+    
+    .badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 500;
+    }
+    
+    /* Navbar style */
+    .navbar {
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    
+    .nav-link {
+        transition: all 0.2s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd !important;
+    }
+    
+    .nav-link.active-nav {
+        background-color: rgba(13, 110, 253, 0.15);
+        color: #0d6efd !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Highlight style for search results */
+    .highlight {
+        background-color: #fff3cd;
+        font-weight: bold;
+        padding: 0 2px;
+        border-radius: 3px;
+    }
+    
+    /* Hide rows that don't match search */
+    tr[data-visible="false"] {
+        display: none;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Active nav item
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith('/manager_staffs')) {
+        document.getElementById('nav-staff').classList.add('active-nav');
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const customerTable = document.getElementById('customerTable');
+    const rows = customerTable.querySelectorAll('tbody tr');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        rows.forEach(row => {
+            // Skip if this is the "no results" row
+            if (row.querySelector('td[colspan]')) return;
+            
+            const searchableCells = row.querySelectorAll('.searchable');
+            let rowMatches = false;
+            
+            // Remove previous highlights
+            searchableCells.forEach(cell => {
+                cell.innerHTML = cell.textContent;
+            });
+            
+            // Check each searchable cell for matches
+            searchableCells.forEach(cell => {
+                const cellText = cell.textContent.toLowerCase();
+                
+                if (searchTerm && cellText.includes(searchTerm)) {
+                    rowMatches = true;
+                    
+                    // Highlight matching text
+                    const regex = new RegExp(searchTerm, 'gi');
+                    const highlightedText = cell.textContent.replace(regex, match => 
+                        `<span class="highlight">${match}</span>`
+                    );
+                    cell.innerHTML = highlightedText;
+                }
+            });
+            
+            // Show/hide row based on match
+            if (searchTerm === '' || rowMatches) {
+                row.setAttribute('data-visible', 'true');
+                row.style.display = '';
+            } else {
+                row.setAttribute('data-visible', 'false');
+                row.style.display = 'none';
+            }
+        });
+        
+        // Check if any rows are visible
+        const visibleRows = Array.from(rows).filter(row => 
+            row.getAttribute('data-visible') === 'true' || row.querySelector('td[colspan]')
+        );
+        
+        // Show "no results" message if no matches
+        const noResultsRow = customerTable.querySelector('td[colspan]')?.closest('tr');
+        if (noResultsRow) {
+            if (searchTerm && visibleRows.length === 0) {
+                noResultsRow.style.display = '';
+            } else {
+                noResultsRow.style.display = 'none';
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

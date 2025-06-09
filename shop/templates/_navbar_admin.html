@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-gradient-orange border-bottom shadow-sm">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold fs-4 text-dark" href="/admin">
-            <i class="bi bi-grid-3x3-gap me-2 text-warning"></i>Admin
+            <i class="bi bi-grid-3x3-gap me-2 text-warning"></i>ADMIN
         </a>
         <button class="navbar-toggler border-0 navbar-toggler-orange" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
@@ -30,6 +30,12 @@
                         <i class="bi bi-people me-2"></i>Khách hàng
                     </a>
                 </li>
+                <!-- Thêm nút Quản lý nhân viên vào đây -->
+                <li class="nav-item">
+                    <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/manager_staffs" id="nav-staff">
+                        <i class="bi bi-person-gear me-2"></i>Nhân viên
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link px-3 py-2 rounded-2 text-dark nav-link-hover fw-bold fs-6" href="/manager_orders" id="nav-order">
                         <i class="bi bi-receipt me-2"></i>Đơn hàng
@@ -50,7 +56,7 @@
             <div class="d-flex align-items-center">
                 <div class="dropdown">
                     <a class="btn btn-outline-dark btn-sm dropdown-toggle d-flex align-items-center text-dark fw-bold" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle me-2"></i>Tài khoản
+                        <i class="bi bi-person-circle me-2"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end mt-2 border-1 shadow-sm">
                         <li>
@@ -71,19 +77,18 @@
     </div>
 </nav>
 
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Lấy đường dẫn hiện tại
     const currentPath = window.location.pathname;
     
-    // Danh sách các nav item và đường dẫn tương ứng
+    // Danh sách các nav item và đường dẫn tương ứng (đã thêm manager_staffs)
     const navItems = {
         '/admin': 'nav-product',
         '/brands': 'nav-brand',
         '/categories': 'nav-category',
         '/manager_customers': 'nav-customer',
+        '/manager_staffs': 'nav-staff',  // Thêm đường dẫn quản lý nhân viên
         '/manager_orders': 'nav-order',
         '/warehouse': 'nav-warehouse',
         '/finance_management': 'nav-report',
@@ -113,11 +118,47 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* Tăng chiều cao tổng thể của navbar */
+.navbar {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    min-height: 60px; /* hoặc giá trị bạn muốn */
+}
+
+/* Tăng padding cho các nav-link */
+.nav-link {
+    padding-top: 0.8rem !important;
+    padding-bottom: 0.8rem !important;
+}
+
+/* Tăng kích thước cho dropdown toggle */
+.btn-outline-dark {
+    padding: 0.5rem 1rem;
+}
+
+/* Đảm bảo logo cũng cân đối */
+.navbar-brand {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 1.25rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .navbar {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 1rem !important;
+    }
+}
+
 /* Orange gradient background cho navbar */
 .bg-gradient-orange {
     background: #fbe87e;
 }
-
 
 /* Style cho nav links với hover effect */
 .nav-link-hover {

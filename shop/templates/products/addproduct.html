@@ -41,9 +41,9 @@
     
     /* Container chính */
     .form-container {
-        margin: 80px auto;
+        margin: 60px auto; /* Giảm margin để bố cục gọn hơn */
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px); /* Giảm khoảng cách dịch chuyển để mượt hơn */
         animation: fadeInUp 0.6s 0.3s forwards;
     }
     
@@ -58,21 +58,21 @@
     .form-card {
         background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(10px);
-        border-radius: 25px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        border-radius: 20px; /* Giảm radius để gọn gàng hơn */
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1); /* Giảm shadow để nhẹ nhàng */
         border: 1px solid rgba(255,255,255,0.2);
         overflow: hidden;
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     
     .form-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        transform: translateY(-3px); /* Giảm độ nâng để hiệu ứng mượt hơn */
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
     }
     
     /* Header */
     .form-header {
-        padding: 30px;
+        padding: 25px; /* Giảm padding để cân đối */
         text-align: center;
         background: linear-gradient(45deg, #17a2b8, #138496);
         color: white;
@@ -92,8 +92,8 @@
     }
     
     .form-header i {
-        font-size: 2.5rem;
-        margin-bottom: 15px;
+        font-size: 2.2rem; /* Giảm kích thước icon */
+        margin-bottom: 10px;
         display: inline-block;
         transition: transform 0.3s ease;
         position: relative;
@@ -102,7 +102,7 @@
     
     .form-header h2 {
         font-weight: 700;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px; /* Giảm letter-spacing để gọn */
         margin: 0;
         position: relative;
         z-index: 1;
@@ -111,15 +111,15 @@
     
     /* Form body */
     .form-body {
-        padding: 40px;
+        padding: 30px; /* Giảm padding để bố cục gọn hơn */
     }
     
     /* Input fields */
     .form-control, .form-select {
         background: rgba(255,255,255,0.8);
         border: 2px solid #e9ecef;
-        border-radius: 12px;
-        padding: 15px;
+        border-radius: 10px; /* Giảm radius */
+        padding: 12px; /* Giảm padding để cân đối */
         transition: all 0.3s ease;
         box-shadow: none;
         height: auto;
@@ -133,21 +133,21 @@
     .form-label {
         font-weight: 600;
         color: #495057;
-        margin-bottom: 8px;
+        margin-bottom: 6px; /* Giảm margin để gọn hơn */
         display: block;
     }
     
     /* File input custom */
     .form-control[type="file"] {
-        padding: 10px;
+        padding: 8px; /* Giảm padding */
     }
     
     .form-control[type="file"]::file-selector-button {
         background: #e9ecef;
         border: none;
-        padding: 8px 15px;
-        border-radius: 8px;
-        margin-right: 10px;
+        padding: 6px 12px; /* Giảm padding */
+        border-radius: 6px;
+        margin-right: 8px;
         transition: all 0.3s ease;
     }
     
@@ -159,22 +159,22 @@
     .submit-btn {
         background: linear-gradient(45deg, #17a2b8, #138496);
         border: none;
-        padding: 15px;
+        padding: 12px; /* Giảm padding */
         font-weight: 600;
-        letter-spacing: 1px;
-        border-radius: 12px;
-        box-shadow: 0 10px 20px rgba(23, 162, 184, 0.3);
+        letter-spacing: 0.5px; /* Giảm letter-spacing */
+        border-radius: 10px;
+        box-shadow: 0 8px 15px rgba(23, 162, 184, 0.3);
         transition: all 0.3s ease;
         width: 100%;
         position: relative;
         overflow: hidden;
         color: white;
-        font-size: 1.1rem;
+        font-size: 1rem; /* Giảm font-size */
     }
     
     .submit-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 30px rgba(23, 162, 184, 0.4);
+        transform: translateY(-2px); /* Giảm độ nâng */
+        box-shadow: 0 10px 20px rgba(23, 162, 184, 0.4);
         background: linear-gradient(45deg, #138496, #17a2b8);
     }
     
@@ -187,21 +187,21 @@
     }
     
     .submit-btn:hover i {
-        transform: scale(1.2);
+        transform: scale(1.1); /* Giảm độ phóng to */
     }
     
     /* Responsive */
     @media (max-width: 768px) {
         .form-container {
-            margin: 40px auto;
+            margin: 30px auto; /* Giảm margin */
         }
         
         .form-body {
-            padding: 30px;
+            padding: 20px; /* Giảm padding */
         }
         
         .form-header {
-            padding: 25px;
+            padding: 20px; /* Giảm padding */
         }
     }
 </style>
@@ -212,15 +212,14 @@
     <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
 </div>
 
-<div class="mb-4">
-    <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i> Quay lại
-    </a>
-</div>
-
 <div class="container form-container">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
+            <div class="mb-4">
+                <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i> Quay lại
+                </a>
+            </div>
             <div class="form-card">
                 <div class="form-header">
                     <i class="bi bi-box-seam-fill"></i>
@@ -231,13 +230,12 @@
                     {% from "_formhelpers.html" import render_field %}
                     
                     <form method="post" enctype="multipart/form-data">
-                        <!-- Tên sản phẩm -->
+                        <!-- Thông tin cơ bản -->
                         <div class="mb-4">
                             <label class="form-label">Tên Sản Phẩm</label>
                             {{ render_field(form.name, class_="form-control", placeholder="Nhập tên sản phẩm") }}
                         </div>
 
-                        <!-- Giá, giảm giá, tồn kho -->
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
                                 <label class="form-label">Giá</label>
@@ -253,7 +251,7 @@
                             </div>
                         </div>
 
-                        <!-- Brand và Category -->
+                        <!-- Phân loại -->
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label">Thương Hiệu</label>
@@ -275,16 +273,15 @@
                             </div>
                         </div>
 
-                        <!-- Màu sắc -->
-                        <div class="mb-4">
-                            <label class="form-label">Màu Sắc (phân cách bằng dấu phẩy)</label>
-                            {{ render_field(form.colors, class_="form-control", placeholder="Ví dụ: Đỏ,Xanh,Vàng") }}
-                        </div>
-
-                        <!-- Mô tả -->
+                        <!-- Chi tiết sản phẩm -->
                         <div class="mb-4">
                             <label class="form-label">Mô Tả Sản Phẩm</label>
                             {{ render_field(form.description, class_="form-control", placeholder="Mô tả chi tiết sản phẩm...", rows=6) }}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Màu Sắc (phân cách bằng dấu phẩy)</label>
+                            {{ render_field(form.colors, class_="form-control", placeholder="Ví dụ: Đỏ,Xanh,Vàng") }}
                         </div>
 
                         <!-- Hình ảnh -->
@@ -307,7 +304,7 @@
                         </div>
 
                         <!-- Nút submit -->
-                        <div class="mt-5">
+                        <div class="mt-4">
                             <button type="submit" class="submit-btn">
                                 <i class="bi bi-upload me-2"></i> Thêm Sản Phẩm
                             </button>
@@ -318,6 +315,7 @@
         </div>
     </div>
 </div>
+
 <script>
     // Thêm hiệu ứng nổi
     const floatingContainer = document.querySelector('.floating-elements');
@@ -360,5 +358,4 @@
         });
     });
 </script>
-
 {% endblock content %}

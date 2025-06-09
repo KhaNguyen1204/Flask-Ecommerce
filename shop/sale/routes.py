@@ -48,10 +48,10 @@ def accept_order(id):
         order.staff_id = current_user.id
         order.status = 'accepted'
         db.session.commit()
-        flash('Order status changed successfully', 'success')
+        flash('Trạng thái đơn hàng đã thay đổi thành công', 'success')
         return redirect(url_for('manager_order'))
     else:
-        flash('You need to be logged in to change order status', 'danger')
+        flash('Bạn cần đăng nhập để thay đổi trạng thái đơn hàng', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/complete_order/<int:id>', methods=['POST'])
@@ -63,10 +63,10 @@ def complete_order(id):
         order.is_completed = True
         order.staff_id = current_user.id
         db.session.commit()
-        flash('Order completed successfully', 'success')
+        flash('Đơn hàng đã được hoàn thành', 'success')
         return redirect(url_for('manager_order'))
     else:
-        flash('You need to be logged in to complete an order', 'danger')
+        flash('Bạn cần đăng nhập để hoàn thành đơn hàng', 'danger')
         return redirect(url_for('login'))
 @app.route('/manage_comments')
 @role_required(['admin', 'sale'])

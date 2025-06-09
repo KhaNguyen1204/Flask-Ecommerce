@@ -96,14 +96,15 @@ def get_categories(id):
 @app.route('/addbrand', methods=['GET', 'POST'])
 def addbrand():
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập trước khi thực hiện!', 'danger')
+
         return redirect(url_for('login'))
     if request.method == 'POST':
         getbrand = request.form.get('brand')
         brand = Brand(name=getbrand)
         db.session.add(brand)
         db.session.commit()
-        flash(f'Brand {getbrand} added successfully!', 'success')
+        flash(f'Thương hiệu {getbrand} đã được thêm thành công!', 'success')
         return redirect(url_for('addbrand'))
 
     return render_template('products/addbrand.html', brands='brands')
@@ -112,13 +113,13 @@ def addbrand():
 @app.route('/updatebrand/<int:id>', methods=['GET', 'POST'])
 def updatebrand(id):
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập!', 'danger')
     updatebrand = Brand.query.get_or_404(id)
     brand = request.form.get('brand')
     if request.method == 'POST':
         updatebrand.name = request.form.get('name')
         db.session.add(updatebrand)
-        flash(f'Brand {updatebrand} updated successfully!', 'success')
+        flash(f'Thương hiệu {updatebrand} đã được cập nhật thành công!', 'success')
         db.session.commit()
         return redirect(url_for('brands'))
     return render_template('products/updatebrand.html', title='Update Brand Page', updatebrand=updatebrand)
@@ -127,27 +128,27 @@ def updatebrand(id):
 @app.route('/deletebrand/<int:id>', methods=['GET', 'POST'])
 def deletebrand(id):
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập', 'danger')
         return redirect(url_for('login'))
     brand = Brand.query.get_or_404(id)
     if request.method == 'POST':
         db.session.delete(brand)
         db.session.commit()
-    flash(f'Brand {brand.name} deleted successfully!', 'success')
+    flash(f'Thương hiệu {brand.name} đã được xóa thành công!', 'success')
     return redirect(url_for('brands'))
 
 
 @app.route('/addcat', methods=['GET', 'POST'])
 def addcategory():
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập!', 'danger')
         return redirect(url_for('login'))
     if request.method == 'POST':
         get_category = request.form.get('category')
         category = Category(name=get_category)
         db.session.add(category)
         db.session.commit()
-        flash(f'Category {get_category} added successfully!', 'success')
+        flash(f'Danh mục {get_category} được thêm thành công!', 'success')
         return redirect(url_for('addcategory'))
 
     return render_template('products/addbrand.html', title='Add Category')
@@ -156,14 +157,14 @@ def addcategory():
 @app.route('/updatecat/<int:id>', methods=['GET', 'POST'])
 def updatecat(id):
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập!', 'danger')
         return redirect(url_for('login'))
     updatecat = Category.query.get_or_404(id)
     brand = request.form.get('brand')
     if request.method == 'POST':
         updatecat.name = request.form.get('name')
         db.session.add(updatebrand)
-        flash(f'Category {updatecat} updated successfully!', 'success')
+        flash(f'Danh mục {updatecat} dã được cập nhật thành công!', 'success')
         db.session.commit()
         return redirect(url_for('categories'))
     return render_template('products/updatebrand.html', title='Update Category Page', updatecat=updatecat)
@@ -172,20 +173,20 @@ def updatecat(id):
 @app.route('/deletecat/<int:id>', methods=['GET', 'POST'])
 def deletecat(id):
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập!', 'danger')
         return redirect(url_for('login'))
     category = Category.query.get_or_404(id)
     if request.method == 'POST':
         db.session.delete(category)
         db.session.commit()
-    flash(f'Category {category.name} deleted successfully!', 'success')
+    flash(f'Danh mục {category.name} đã được xóa thành công!', 'success')
     return redirect(url_for('categories'))
 
 
 @app.route('/addproduct', methods=['GET', 'POST'])
 def addproduct():
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập!', 'danger')
         return redirect(url_for('login'))
     brands = Brand.query.all()
     categories = Category.query.all()
@@ -208,7 +209,7 @@ def addproduct():
                             image_3=image_3)
         db.session.add(addpro)
         db.session.commit()
-        flash(f'Product {name} added successfully!', 'success')
+        flash(f'sản phẩm {name} được thêm thành công!', 'success')
         return redirect(url_for('admin'))
 
     return render_template('products/addproduct.html', title='Add Product', form=form, brands=brands,
@@ -218,7 +219,7 @@ def addproduct():
 @app.route('/updateproduct/<int:id>', methods=['GET', 'POST'])
 def updateproduct(id):
     if 'email' not in session:
-        flash('Please login first', 'danger')
+        flash('Vui lòng đăng nhập!', 'danger')
         return redirect(url_for('login'))
     brands = Brand.query.all()
     categories = Category.query.all()
@@ -257,7 +258,7 @@ def updateproduct(id):
                 product.image_1 = photos.save(request.files.get('image_3'), name=secrets.token_hex(10) + '.')
 
         db.session.add(product)
-        flash(f'Product {product} updated successfully!', 'success')
+        flash(f'Sản phẩm {product} đã được cập nhật thành công!', 'success')
         db.session.commit()
         return redirect(url_for('admin'))
 
@@ -283,8 +284,8 @@ def deleteproduct(id):
             print(e)
         db.session.delete(product)
         db.session.commit()
-        flash(f'Product {product} deleted successfully!', 'success')
+        flash(f'Sản phẩm {product} đã được xóa thành công', 'success')
         return redirect(url_for('admin'))
-    flash(f'Can not delete this product {product}!', 'danger')
+    flash(f'Không thể xóa sản phẩm {product}!', 'danger')
     return redirect(url_for('admin'))
 

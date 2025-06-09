@@ -8,6 +8,7 @@
 
     <!-- Page Title -->
     <div class="container mt-4">
+        
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -37,46 +38,49 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-semibold">Tìm kiếm</label>
-                            <input class="form-control" type="search" placeholder="Số phiếu, nhà cung cấp..." 
-                                   aria-label="Search" id="search-input">
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-semibold">Kho</label>
-                            <select class="form-select" id="warehouse-filter">
-                                <option value="">Tất cả</option>
-                                {% for warehouse in warehouses %}
-                                <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-semibold">Trạng thái</label>
-                            <select class="form-select" id="status-filter">
-                                <option value="">Tất cả</option>
-                                <option value="pending">Chờ xử lý</option>
-                                <option value="completed">Hoàn thành</option>
-                                <option value="cancelled">Đã hủy</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-semibold">Khoảng thời gian</label>
-                            <input type="date" class="form-control" id="date-from" placeholder="Từ ngày">
-                        </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-semibold">&nbsp;</label>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary flex-fill">
-                                    <i class="fas fa-search me-1"></i>Tìm
-                                </button>
-                                <button id="reset-filter" class="btn btn-outline-secondary">
-                                    <i class="fas fa-redo me-1"></i>Reset
-                                </button>
-                            </div>
-                        </div>
+                    <div class="row align-items-end g-2">
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Tìm kiếm</label>
+                    <input class="form-control" type="search" placeholder="Số phiếu..." aria-label="Search" id="search-input">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Kho</label>
+                    <select class="form-select" id="warehouse-filter">
+                        <option value="">Tất cả</option>
+                        {% for warehouse in warehouses %}
+                        <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Trạng thái</label>
+                    <select class="form-select" id="status-filter">
+                        <option value="">Tất cả</option>
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="completed">Hoàn thành</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Từ ngày</label>
+                    <input type="date" class="form-control" id="date-from">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Đến ngày</label>
+                    <input type="date" class="form-control" id="date-to">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold d-block">&nbsp;</label>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search me-1"></i>Tìm
+                        </button>
+                        <button id="reset-filter" class="btn btn-outline-secondary">
+                            <i class="fas fa-redo me-1"></i>Reset
+                        </button>
                     </div>
+                </div>
+            </div>
+
                 </div>
             </div>
         </div>
@@ -89,7 +93,7 @@
                 <div class="card-header bg-light border-0 py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0 text-dark">
-                            <i class="fas fa-list me-2"></i>Danh Sách Phiếu Nhập Kho
+                            <i class="fas fa-list me-2"></i>Danh sách phiếu xuất kho
                         </h5>
                         <small class="text-muted">Tổng cộng: {{ receipts|length }} phiếu</small>
                     </div>
@@ -102,7 +106,6 @@
                                     <th class="text-center" style="width: 60px;">STT</th>
                                     <th style="width: 120px;">Số Phiếu</th>
                                     <th class="text-center" style="width: 120px;">Ngày Nhập</th>
-                                    <th style="width: 200px;">Nhà Cung Cấp</th>
                                     <th style="width: 150px;">Kho</th>
                                     <th class="text-end" style="width: 150px;">Tổng Tiền</th>
                                     <th style="width: 150px;">Người Tạo</th>
@@ -126,9 +129,6 @@
                                         <span class="text-muted">{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</span>
                                     </td>
                                     <td>
-                                        {{ receipt.supplier }}
-                                    </td>
-                                    <td>
                                         <span class="badge bg-info text-dark">{{ receipt.warehouse.name }}</span>
                                     </td>
                                     <td class="text-end">
@@ -148,13 +148,13 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ url_for('inbound_receipt_detail', id=receipt.id) }}" 
+                                            <a href="{{ url_for('outbound_receipt_detail', id=receipt.id) }}" 
                                                class="btn btn-info btn-sm px-3"
                                                title="Xem chi tiết">
                                                 <i class="fas fa-eye me-1"></i>Chi tiết
                                             </a>
                                             {% if receipt.status == 'pending' %}
-                                            <a href="{{ url_for('inbound_receipt_edit', id=receipt.id) }}" 
+                                            <a href="{{ url_for('outbound_receipt_edit', id=receipt.id) }}" 
                                                class="btn btn-primary btn-sm px-3"
                                                title="Chỉnh sửa">
                                                 <i class="fas fa-edit me-1"></i>Sửa
@@ -207,7 +207,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <form action="{{ url_for('inbound_receipt_delete', id=receipt.id) }}" method="POST">
+                <form action="{{ url_for('outbound_receipt_delete', id=receipt.id) }}" method="POST">
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-trash me-1"></i>Xác nhận xóa
                     </button>
@@ -226,9 +226,14 @@
 }
 
 .btn-group .btn {
-    border-radius: 0.375rem !important;
+    border-radius: 0.25rem !important;
     margin: 0 2px;
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* nhỏ hơn */
+    padding: 0.25rem 0.5rem; /* padding nhỏ lại */
+    white-space: nowrap; /* giữ nút không bị xuống dòng */
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .card {
@@ -260,22 +265,20 @@
     border-radius: 0.375rem;
     font-weight: 500;
 }
+
 </style>
 
 <!-- JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Lọc phiếu theo trạng thái
+    // Gắn sự kiện lọc
     document.getElementById('status-filter').addEventListener('change', filterReceipts);
-
-    // Lọc phiếu theo kho
     document.getElementById('warehouse-filter').addEventListener('change', filterReceipts);
+    document.getElementById('search-input').addEventListener('input', filterReceipts);
+    document.getElementById('date-from').addEventListener('change', filterReceipts);
+    document.getElementById('date-to').addEventListener('change', filterReceipts);
+
+    document.querySelector('button.btn-outline-primary').addEventListener('click', filterReceipts);
 
     // Reset bộ lọc
     document.getElementById('reset-filter').addEventListener('click', function() {
@@ -283,40 +286,48 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('warehouse-filter').value = '';
         document.getElementById('search-input').value = '';
         document.getElementById('date-from').value = '';
+        document.getElementById('date-to').value = '';
         filterReceipts();
     });
 
-    // Tìm kiếm phiếu
-    document.getElementById('search-input').addEventListener('keyup', filterReceipts);
-
     function filterReceipts() {
-        const statusFilter = document.getElementById('status-filter').value;
-        const warehouseFilter = document.getElementById('warehouse-filter').value;
-        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const status = document.getElementById('status-filter').value;
+        const warehouse = document.getElementById('warehouse-filter').value;
+        const search = document.getElementById('search-input').value.toLowerCase();
+        const dateFrom = document.getElementById('date-from').value;
+        const dateTo = document.getElementById('date-to') ? document.getElementById('date-to').value : '';
 
-        document.querySelectorAll('.receipt-row').forEach(function(row) {
-            let showRow = true;
+        const rows = document.querySelectorAll('.receipt-row');
 
-            if (statusFilter && row.dataset.status !== statusFilter) {
-                showRow = false;
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            const rowWarehouse = row.getAttribute('data-warehouse');
+            const receiptNumber = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
+            const dateText = row.querySelector('td:nth-child(3) span').innerText.trim(); // dd/mm/yyyy
+            const parts = dateText.split('/');
+            const rowDate = new Date(parts[2], parts[1] - 1, parts[0]);
+
+            let visible = true;
+
+            if (status && rowStatus !== status) visible = false;
+            if (warehouse && rowWarehouse !== warehouse) visible = false;
+            if (search && !receiptNumber.includes(search)) visible = false;
+
+            if (dateFrom) {
+                const from = new Date(dateFrom);
+                if (rowDate < from) visible = false;
             }
 
-            if (warehouseFilter && row.dataset.warehouse !== warehouseFilter) {
-                showRow = false;
+            if (dateTo) {
+                const to = new Date(dateTo);
+                if (rowDate > to) visible = false;
             }
 
-            if (searchTerm) {
-                const receiptNumber = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const supplier = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-                if (!receiptNumber.includes(searchTerm) && !supplier.includes(searchTerm)) {
-                    showRow = false;
-                }
-            }
-
-            row.style.display = showRow ? '' : 'none';
+            row.style.display = visible ? '' : 'none';
         });
     }
 });
 </script>
+
 
 {% endblock content %}

@@ -29,12 +29,12 @@ def customer_register():
         # Check if user with this email already exists
         user_email = User.query.filter_by(email=form.email.data).first()
         if user_email:
-            flash(f'Warning {form.email.data} has been registered already', 'danger')
+            flash(f'Cảnh báo {form.email.data} đã được đăng ký', 'danger')
             return redirect(url_for('login'))
         # Check if user with this phone already exists
         user_phone = User.query.filter_by(phone=form.phone.data).first()
         if user_phone:
-            flash(f'Warning {form.phone.data} has been registered already', 'danger')
+            flash(f'Cảnh báo {form.phone.data} đã được đăng ký', 'danger')
             return redirect(url_for('login'))
         # Hash password and create customer
         hash_password = bcrypt.generate_password_hash(form.password.data).decode('utf8')
@@ -62,7 +62,7 @@ def customer_register():
 
         db.session.add(customer)
         db.session.commit()
-        flash(f'Welcome {form.username.data}, Thanks for registering', 'success')
+        flash(f'Chào mừng {form.username.data}, Cảm ơn bạn đã đăng ký', 'success')
         return redirect(url_for('login'))
     return render_template('customers/register.html', form=form)
 
@@ -95,7 +95,7 @@ def get_order():
                 required_keys = ['name', 'price', 'quantity']  # Make 'id' optional
                 if not all(key in product for key in required_keys):
                     logging.error(f"Missing essential keys in product: {product}")
-                    flash('Invalid product data in cart', 'danger')
+                    flash('Dữ liệu sản phẩm không hợp lệ trong giỏ hàng', 'danger')
                     return redirect(url_for('getCart'))
 
                 # Set default values for missing keys
@@ -136,14 +136,14 @@ def get_order():
 
             # Xóa giỏ hàng sau khi đã đặt hàng thành công
             session.pop('ShopCart')
-            flash(f'Your order {order.invoice} has been sent successfully', 'success')
+            flash(f'Đơn hàng {order.invoice} đã được gửi thành công', 'success')
             return redirect(url_for('orders', invoice=invoice))
         except Exception as e:
             logging.error(f"Error occurred while processing order: {e}", exc_info=True)
-            flash('Error occurred while processing your order', 'danger')
+            flash('Đã xảy ra lỗi trong khi xử lý đơn hàng của bạn', 'danger')
             return redirect(url_for('getCart'))
     else:
-        flash('Please login to place an order', 'danger')
+        flash('Vui lòng đăng nhập để đặt hàng', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/orders/<invoice>')
@@ -165,7 +165,7 @@ def orders(invoice):
                                    tax=order.tax,
                                    invoice=invoice)
         else:
-            flash('No orders found', 'danger')
+            flash('Không tìm thấy đơn hàng', 'danger')
             return redirect(url_for('home'))
     else:
         return redirect(url_for('login'))
@@ -183,7 +183,7 @@ def get_pdf(invoice):
         customer = order.customer if order else None
 
     if not order:
-        flash('Order not found.', 'warning')
+        flash('Không tìm thấy đơn hàng.', 'warning')
         return redirect(url_for('home'))
 
     if order.status == 'completed':
@@ -205,7 +205,7 @@ def get_pdf(invoice):
             flash('Lỗi khi tạo PDF. Vui lòng thử lại.', 'danger')
             return redirect(url_for('orders', invoice=invoice))
     else:
-        flash('You can only download the invoice for completed orders.', 'warning')
+        flash('Bạn chỉ có thể tải hóa đơn cho các đơn hàng đã hoàn thành.', 'warning')
         return redirect(url_for('orders', invoice=invoice))
 @app.route('/customer/profile')
 @role_required(['customer'])
@@ -215,10 +215,10 @@ def customer_profile():
         if customer:
             return render_template('customers/profile.html', customer=customer)
         else:
-            flash('Customer not found', 'danger')
+            flash('Không tìm thấy Khách hàng', 'danger')
             return redirect(url_for('home'))
     else:
-        flash('Please login to view your profile', 'danger')
+        flash('Vui lòng đăng nhập để xem thông tin tài khoản', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/customer/update', methods=['GET', 'POST'])
@@ -242,13 +242,13 @@ def update_profile():
         # Check if user with this email already exists
         user_email = User.query.filter_by(email=form.email.data).first()
         if user_email and user_email.id != customer.id:
-            flash(f'Warning {form.email.data} has been registered already', 'danger')
+            flash(f'Cảnh báo {form.email.data} đã được đăng kí!', 'danger')
             return redirect(url_for('customer_profile'))
 
         # Check if user with this phone already exists
         user_phone = User.query.filter_by(phone=form.phone.data).first()
         if user_phone and user_phone.id != customer.id:
-            flash(f'Warning {form.phone.data} has been registered already', 'danger')
+            flash(f'Cảnh báo {form.phone.data} đã được đăng kí!', 'danger')
             return redirect(url_for('customer_profile'))
 
         # Update customer information
@@ -266,7 +266,7 @@ def update_profile():
             customer.profile = image
 
         db.session.commit()
-        flash(f'Account {form.username.data} updated successfully!', 'success')
+        flash(f'Tài khoản {form.username.data} cập nhật thành công!', 'success')
         return redirect(url_for('customer_profile'))
 
     return render_template('customers/update_profile.html', form=form, customer=customer ,title='Update Customer Page')
@@ -282,10 +282,10 @@ def history_orders():
         if orders:
             return render_template('customers/history_orders.html', customer=customer, orders=orders)
         else:
-            flash('No order history found', 'warning')
+            flash('Không tìm thấy lịch sử đặt hàng', 'warning')
             return redirect(url_for('home'))
     else:
-        flash('Please login to view your order history', 'danger')
+        flash('Vui lòng đăng nhập để xem lịch sử đơn hàng của bạn', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/product/<int:product_id>/review', methods=['POST'])
@@ -309,7 +309,7 @@ def add_review(product_id):
 
             db.session.add(review)
             db.session.commit()
-            flash('Cảm ơn bạn đã dánh giá sản phẩm', 'success')
+            flash('Cảm ơn bạn đã đánh giá sản phẩm', 'success')
             return redirect(url_for('single_page', id=product_id))
         else:
             flash('Nội dung bạn nhập chưa hợp lệ', 'danger')

@@ -1,67 +1,127 @@
 <!-- Modern Footer -->
+<style>
+    .modern-footer {
+        background: #0f4f71; /* Giữ màu xanh nhạt */
+        padding: 20px 0; /* Giữ padding nhỏ để footer gọn */
+    }
+
+    /* Đổi tất cả chữ thành màu đen, trừ tiêu đề được xử lý riêng */
+    .text-white-80, .text-white-70, .social-icon {
+        color: #ffffff; /* Màu đen */
+    }
+
+    /* Tiêu đề AzPhone */
+    .footer-logo span {
+        color: #f8f8f8; /* Màu đen */
+        display: inline-block; /* Để áp dụng animation */
+        animation: shake 2s ease-in-out infinite; /* Hiệu ứng lắc lư */
+    }
+
+    /* Tiêu đề các cột */
+    .modern-footer h5 {
+        color: #fafafa; /* Màu đen */
+        display: inline-block; /* Để áp dụng animation */
+        animation: shake 2s ease-in-out infinite; /* Hiệu ứng lắc lư */
+    }
+
+    /* Hiệu ứng lắc lư */
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-3px) rotate(-1deg);
+        }
+        50% {
+            transform: translateX(3px) rotate(1deg);
+        }
+        75% {
+            transform: translateX(-3px) rotate(-1deg);
+        }
+    }
+
+    .footer-link:hover {
+        color: #ff6f61; /* Giữ màu hover hiện tại */
+    }
+
+    .social-icon:hover {
+        color: #ff6f61; /* Giữ màu hover cho icon mạng xã hội */
+    }
+
+    .newsletter-btn {
+        background: #ff6f61; /* Giữ màu nút gửi email */
+        color: #fff; /* Giữ chữ trắng cho nút */
+    }
+
+    .newsletter-btn:hover {
+        background: #ff3b2e; /* Giữ hiệu ứng hover */
+    }
+
+    .border-secondary {
+        border-color: rgba(0, 0, 0, 0.2); /* Giữ border phù hợp */
+    }
+</style>
+
 <footer class="modern-footer">
   <div class="container">
-    <div class="row g-4">
+    <div class="row g-3">
       <!-- Brand Column -->
       <div class="col-lg-4 col-md-6">
         <div class="footer-logo">
           <i class="bi bi-shop"></i>
           <span>AzPhone</span>
         </div>
-            <p class="text-white-80 mb-4">
-              Chuyên cung cấp điện thoại thông minh mới nhất, giá cả cạnh tranh và bảo hành uy tín.<br>
-              Trải nghiệm mua sắm an tâm với dịch vụ hỗ trợ tận tình.<br><br>
-              🛡️ <strong>Cam kết chất lượng</strong><br>
-              ✔️ 100% hàng chính hãng<br>
-              ✔️ Bảo hành minh bạch
-            </p>
-
+        <p class="text-white-80 mb-3">
+          Chuyên cung cấp điện thoại thông minh mới nhất, giá cả cạnh tranh và bảo hành uy tín. Trải nghiệm mua sắm an tâm với dịch vụ hỗ trợ tận tình.<br>
+          🛡️ <strong>Cam kết chất lượng</strong><br>
+          ✔️ 100% hàng chính hãng<br>
+          ✔️ Bảo hành minh bạch
+        </p>
         <div class="d-flex align-items-center">
-          <div class="me-3">
+          <div class="me-2">
             <i class="bi bi-shield-check text-accent fs-5"></i>
           </div>
           <div>
-            <h6 class="text-white mb-1">Authentic Products</h6>
-            <p class="text-white-80 small mb-0">100% genuine with manufacturer warranty</p>
+            <h6 class="text-white-80 mb-1">Sản phẩm chính hãng</h6> <!-- Đổi thành text-white-80 để là màu đen -->
+            <p class="text-white-80 small mb-0">100% chính hãng với bảo hành từ nhà sản xuất</p>
           </div>
         </div>
       </div>
 
       <!-- Quick Links Column -->
       <div class="col-lg-2 col-md-6">
-        <h5 class="text-white fs-5 mb-3">Truy cập nhanh </h5>
+        <h5 class="fs-5 mb-2">Truy cập nhanh</h5>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Trang chủ </a></li>
-          <li class="mb-2"><a href="/" class="text-white-80 footer-link text-decoration-none">Sản phẩm </a></li>
-          <li class="mb-2"><a href="/aboutus" class="text-white-80 footer-link text-decoration-none">Về chúng tôi </a></li>
-          <li class="mb-2"><a href="/contact" class="text-white-80 footer-link text-decoration-none">Liên hệ </a></li>
-          <li class="mb-2"><a href="/fqa" class="text-white-80 footer-link text-decoration-none">FAQ</a></li>
+          <li class="mb-1"><a href="/" class="text-white-80 footer-link text-decoration-none">Trang chủ</a></li>
+          <li class="mb-1"><a href="/" class="text-white-80 footer-link text-decoration-none">Sản phẩm</a></li>
+          <li class="mb-1"><a href="/aboutus" class="text-white-80 footer-link text-decoration-none">Về chúng tôi</a></li>
+          <li class="mb-1"><a href="/contact" class="text-white-80 footer-link text-decoration-none">Liên hệ</a></li>
+          <li class="mb-1"><a href="/fqa" class="text-white-80 footer-link text-decoration-none">FAQ</a></li>
         </ul>
       </div>
 
       <!-- Contact Column -->
       <div class="col-lg-3 col-md-6">
-        <h5 class="text-white fs-5 mb-3">Thông tin liên hệ</h5>
+        <h5 class="fs-5 mb-2">Thông tin liên hệ</h5>
         <div class="contact-info">
-          <div class="d-flex mb-3">
+          <div class="d-flex mb-2">
             <i class="bi bi-geo-alt-fill"></i>
             <div>
-              <h6 class="text-white mb-0">Showroom</h6>
-              <p class="text-white-80 small mb-0">123 Đường Nguyễn Huệ, Quận 1
-                                                  TP. Hồ Chí Minh, Việt Nam</p>
+              <h6 class="text-white-80 mb-0">Showroom</h6> <!-- Đổi thành text-white-80 để là màu đen -->
+              <p class="text-white-80 small mb-0">123 Đường Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh, Việt Nam</p>
             </div>
           </div>
-          <div class="d-flex mb-3">
+          <div class="d-flex mb-2">
             <i class="bi bi-envelope-fill"></i>
             <div>
-              <h6 class="text-white mb-0">Email</h6>
-              <p class="text-white-80 small mb-0">contact@tgdd.com</p>
+              <h6 class="text-white-80 mb-0">Email</h6> <!-- Đổi thành text-white-80 để là màu đen -->
+              <p class="text-white-80 small mb-0">contact@azphone.com</p>
             </div>
           </div>
           <div class="d-flex">
             <i class="bi bi-telephone-fill"></i>
             <div>
-              <h6 class="text-white mb-0">SDT</h6>
+              <h6 class="text-white-80 mb-0">SDT</h6> <!-- Đổi thành text-white-80 để là màu đen -->
               <p class="text-white-80 small mb-0">+84 123 456 789</p>
             </div>
           </div>
@@ -70,17 +130,17 @@
 
       <!-- Newsletter Column -->
       <div class="col-lg-3 col-md-6">
-        <h5 class="text-white fs-5 mb-3">Tin tức mới nhất</h5>
-        <p class="text-white-80 mb-3">Hãy để lại email để nhận thông báo sớm nhất về khuyến mãi, sản phẩm mới và ưu đãi dành riêng cho bạn.</p>
-        <form class="mb-4">
-          <div class="input-group mb-3">
-            <input type="email" class="form-control newsletter-input rounded-start" placeholder="Your email" required>
-            <button class="btn newsletter-btn rounded-end" type="submit">
+        <h5 class="fs-5 mb-2">Tin tức mới nhất</h5>
+        <p class="text-white-80 mb-2">Hãy để lại email để nhận thông báo sớm nhất về khuyến mãi và sản phẩm mới.</p>
+        <form class="mb-3">
+          <div class="input-group mb-2">
+            <input type="email" class="form-control newsletter-input rounded-start" placeholder="Email của bạn" required style="padding: 8px;">
+            <button class="btn newsletter-btn rounded-end" type="submit" style="padding: 8px 12px;">
               <i class="bi bi-send-fill"></i>
             </button>
           </div>
         </form>
-        <h5 class="text-white fs-5 mb-3">Theo dõi chúng tôi</h5>
+        <h5 class="fs-5 mb-2">Theo dõi chúng tôi</h5>
         <div class="social-links">
           <a href="https://www.facebook.com/duy.luongvan.204" class="social-icon me-2 text-white">
             <i class="bi bi-facebook"></i>
@@ -99,8 +159,8 @@
     </div>
     
     <!-- Copyright -->
-    <div class="text-center pt-4 mt-4 border-top border-secondary">
-      <p class="text-white-70 mb-0">&copy; 2025 <span class="text-accent">AZPhone</span>. Luôn đồng hành cùng bạn trên từng bước công nghệ.</p>
+    <div class="text-center pt-3 mt-3 border-top border-secondary">
+      <p class="text-white-70 mb-0">© 2025 <span class="text-accent">AZPhone</span>. Luôn đồng hành cùng bạn trên từng bước công nghệ.</p>
     </div>
   </div>
 </footer>

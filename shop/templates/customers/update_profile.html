@@ -305,21 +305,7 @@
                   </div>
                 </div>
 
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="zipcode" class="form-label">
-                        <i class="bi bi-mailbox me-2 icon-bounce"></i>Mã bưu điện
-                    </label>
-                    {{ form.zipcode(class="form-control") }}
-                    {% if form.zipcode.errors %}
-                      <div class="text-danger mt-1">
-                        {% for error in form.zipcode.errors %}
-                          <small><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</small>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
+
               </div>
 
               <div class="mb-4">

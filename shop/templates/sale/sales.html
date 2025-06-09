@@ -1,7 +1,11 @@
+{% set show_footer = False %}
 {% extends 'base.html' %}
+
 {% block content %}
 {% include '_messages.html' %}
+
 <div class="container">
+    {% include '_navbar_admin.html' %}
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
