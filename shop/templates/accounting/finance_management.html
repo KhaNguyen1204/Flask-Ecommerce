@@ -117,15 +117,7 @@
 <body>
 
 <div class="container py-0">
-    <div class="d-flex justify-content-end align-items-center mt-3 mb-3 gap-2">
-    <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary">
-        <i class="bi bi-key"></i> Đổi mật khẩu
-    </a>
-    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
-        <i class="bi bi-box-arrow-right"></i> Đăng xuất
-    </a>
-</div>
-
+    {% include '_navbar_admin.html' %}
 
     <!-- Header Section -->
     <div class="main-header">

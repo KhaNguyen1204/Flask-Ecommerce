@@ -4,48 +4,9 @@
 {% block content %}
 {% include '_messages.html' %}
 
+
 <div class="container">
-    {% include '_navbar_admin.html' %}
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/sales">Product</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/brands">Brand</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/categories">Category</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/manager_orders">Order Management</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('manage_comments') }}">Manage Comments</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Account
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/change_password">Change Password</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    {% include '_navbar_sale.html' %}
 </div>
 
 <div class="container mt-5">

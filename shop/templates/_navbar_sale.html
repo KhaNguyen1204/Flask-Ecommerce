@@ -1,0 +1,73 @@
+<!-- templates/_admin_navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="/sales">
+            <i class="fas fa-chart-line me-2"></i>
+            <span class="fw-bold">Hệ thống Sales</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="adminNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if active_page == 'products' }}" href="/sales">
+                        <i class="fas fa-box-open me-1"></i> Sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if active_page == 'brands' }}" href="/brands">
+                        <i class="fas fa-tags me-1"></i> Thương hiệu
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if active_page == 'categories' }}" href="/categories">
+                        <i class="fas fa-layer-group me-1"></i> Danh mục
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if active_page == 'orders' }}" href="/manager_orders">
+                        <i class="fas fa-shopping-basket me-1"></i> Đơn hàng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if active_page == 'comments' }}" href="{{ url_for('manage_comments') }}">
+                        <i class="fas fa-comment-dots me-1"></i> Bình luận
+                    </a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center">
+                <form class="d-flex me-3" role="search">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control border-end-0" type="search" placeholder="Tìm kiếm..." aria-label="Search">
+                        <button class="btn btn-light border-start-0" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="dropdown">
+                    <a class="btn btn-light dropdown-toggle d-flex align-items-center py-1 px-3" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>
+                        <span class="d-none d-lg-inline">Tài khoản</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2 border-0 shadow-sm">
+                        <li>
+                            <a class="dropdown-item" href="/change_password">
+                                <i class="fas fa-lock me-2"></i> Đổi mật khẩu
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
