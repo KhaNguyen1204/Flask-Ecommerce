@@ -4,67 +4,166 @@
 {% block content %}
 {% include '_messages.html' %}
 
-
 <div class="container">
     {% include '_navbar_sale.html' %}
 </div>
 
-<div class="container mt-5">
-    <table class="table table-sm table-condensed table-striped">
-        <thead>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="text-primary mb-1 fw-bold">QUẢN LÝ SẢN PHẨM</h2>
+            <p class="text-muted">Quản lý tất cả các sản phẩm có trong cửa hàng</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <div class="mb-3 d-flex justify-content-start">
+    <div class="search-box w-50">
+        <div class="input-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
+            
+        </div>
+    </div>
+</div>
+
+<table class="table table-hover align-middle" id="productTable">
+    <thead class="table-dark">
         <tr>
-            <th>Sr</th>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Discount</th>
-            <th>Brand</th>
-            <th>Image</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            <th style="width: 5%">STT</th>
+            <th style="width: 20%">Sản phẩm</th>
+            <th style="width: 12%">Giá (VND)</th>
+            <th style="width: 10%">Giảm giá(%)</th>
+            <th style="width: 15%">Thương hiệu</th>
+            <th style="width: 15%">Ảnh</th>
+            <th style="width: 10%">Sửa</th>
+            <th style="width: 10%">Xóa</th>
         </tr>
-        </thead>
-        <tbody>
+    </thead>
+    <tbody id="productTableBody">
         {% for product in products %}
-        <tr>
+        <tr class="product-row" data-name="{{product.name|lower}}" data-brand="{{product.brand.name|lower}}">
             <td>{{loop.index}}</td>
-            <td>{{product.name}}</td>
-            <td>{{product.price}}</td>
-            <td>{{product.discount}}</td>
-            <td>{{product.brand.name}}</td>
-            <td><img src="{{url_for('static', filename='images/' + product.image_1)}}" alt="" width="30" height="40">
-            </td>
-            <td><a href="{{url_for('updateproduct', id=product.id)}}" class="btn btn-info btn-sm">Edit</a></td>
-            <!-- Button trigger modal -->
+            <td class="fw-semibold product-name">{{product.name}}</td>
+            <td>{{"{:,.0f}".format(product.price)}}</td>
             <td>
-                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal-{{product.id}}">Delete
+                {% if product.discount > 0 %}
+                <span class="badge bg-danger">{{product.discount}}%</span>
+                {% else %}
+                <span class="badge bg-secondary">0%</span>
+                {% endif %}
+            </td>
+            <td class="product-brand">{{product.brand.name}}</td>
+            <td>
+                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
+                     class="img-thumbnail" 
+                     alt="{{product.name}}" 
+                     style="width: 80px; height: auto;">
+            </td>
+            <td>
+                <a href="{{url_for('updateproduct', id=product.id)}}" 
+                   class="btn btn-outline-primary btn-sm">
+                   <i class="fas fa-edit"></i> Sửa
+                </a>
+            </td>
+            <td>
+                <button type="button" 
+                        class="btn btn-outline-danger btn-sm" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal-{{product.id}}">
+                    <i class="fas fa-trash-alt"></i> Xóa
                 </button>
             </td>
         </tr>
-        </tr>
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal-{{product.id}}" tabindex="-1"
-             aria-labelledby="exampleModalLabel-{{product.name}}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel-{{product.name}}">{{product.name}}</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <span class="text-danger">Are you sure that want to delete this is product {{product.name}}</span>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
-                        <form action="{{url_for('deleteproduct', id=product.id)}}" method="POST">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
         {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
+
+        <div id="noResults" class="text-center py-4 d-none">
+            <h5 class="text-muted">Không có kết quả phù hợp</h5>
+        </div>
+    </div>
 </div>
+
+<style>
+    .highlight {
+        background-color: #fff3cd;
+        padding: 0 2px;
+        border-radius: 3px;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    const productRows = document.querySelectorAll('.product-row');
+    const productTableBody = document.getElementById('productTableBody');
+    const noResults = document.getElementById('noResults');
+    
+    function highlightText(text, searchTerm) {
+        if (!searchTerm) return text;
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+    
+    function filterProducts() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        let hasResults = false;
+        
+        productRows.forEach(row => {
+            const productName = row.getAttribute('data-name');
+            const brandName = row.getAttribute('data-brand');
+            const nameCell = row.querySelector('.product-name');
+            const brandCell = row.querySelector('.product-brand');
+            
+            if (searchTerm === '' || 
+                productName.includes(searchTerm) || 
+                brandName.includes(searchTerm)) {
+                row.classList.remove('d-none');
+                hasResults = true;
+                
+                // Highlight matching text
+                if (searchTerm) {
+                    nameCell.innerHTML = highlightText(nameCell.textContent, searchTerm);
+                    brandCell.innerHTML = highlightText(brandCell.textContent, searchTerm);
+                } else {
+                    nameCell.innerHTML = nameCell.textContent;
+                    brandCell.innerHTML = brandCell.textContent;
+                }
+            } else {
+                row.classList.add('d-none');
+            }
+        });
+        
+        // Show/hide no results message
+        if (!hasResults && searchTerm) {
+            noResults.classList.remove('d-none');
+            productTableBody.classList.add('d-none');
+        } else {
+            noResults.classList.add('d-none');
+            productTableBody.classList.remove('d-none');
+        }
+    }
+    
+    // Search input event
+    searchInput.addEventListener('input', filterProducts);
+    
+    // Clear search button
+    clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        filterProducts();
+        searchInput.focus();
+    });
+    
+    // Press ESC to clear search
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            filterProducts();
+        }
+    });
+});
+</script>
+
 {% endblock content %}

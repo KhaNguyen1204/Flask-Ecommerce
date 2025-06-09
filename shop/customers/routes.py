@@ -51,7 +51,6 @@ def customer_register():
             country=form.country.data,
             city=form.city.data,
             address=form.address.data,
-            zipcode=form.zipcode.data,
             role_id=customer_role.id
         )
 
@@ -236,7 +235,6 @@ def update_profile():
         form.country.data = customer.country
         form.city.data = customer.city
         form.address.data = customer.address
-        form.zipcode.data = customer.zipcode
 
     if request.method == 'POST' and form.validate():
         # Check if user with this email already exists
@@ -258,7 +256,6 @@ def update_profile():
         customer.country = form.country.data
         customer.city = form.city.data
         customer.address = form.address.data
-        customer.zipcode = form.zipcode.data
 
         if form.profile.data:
             image = photos.save(form.profile.data,

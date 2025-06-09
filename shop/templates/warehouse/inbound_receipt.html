@@ -3,8 +3,11 @@
 {% block content %}
 {% include '_messages.html' %}
 <div class="container">
+{% if current_user.role_id == 1 %}
     {% include '_navbar_admin.html' %}
+{% endif %}
     {% include '_navbar_warehouse.html' %}
+
 
     <!-- Page Title -->
     <div class="container mt-4">
@@ -28,59 +31,60 @@
     </div>
 
     <!-- Search and Filter Section -->
-<!-- Search and Filter Section -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-light border-0 py-3">
-                <h5 class="card-title mb-0 text-dark">
-                    <i class="fas fa-filter me-2"></i>Tìm Kiếm & Bộ Lọc
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row align-items-end g-3 flex-wrap">
-                    <div class="col">
-                        <label class="form-label fw-semibold">Tìm kiếm</label>
-                        <input class="form-control" type="search" placeholder="Số phiếu" aria-label="Search" id="search-input">
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">Kho</label>
-                        <select class="form-select" id="warehouse-filter">
-                            <option value="">Tất cả</option>
-                            {% for warehouse in warehouses %}
-                            <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">Trạng thái</label>
-                        <select class="form-select" id="status-filter">
-                            <option value="">Tất cả</option>
-                            <option value="pending">Chưa nhập kho</option>
-                            <option value="completed">Hoàn thành</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">Từ ngày</label>
-                        <input class="form-control" type="date" id="start-date">
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">Đến ngày</label>
-                        <input class="form-control" type="date" id="end-date">
-                    </div>
-                    <div class="col d-flex gap-2 align-items-end">
-                        <button class="btn btn-primary fw-semibold" id="filter-button">Tìm</button>
-                        <button class="btn btn-outline-secondary" id="reset-button">Đặt lại</button>
-                    </div>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light border-0 py-3">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="fas fa-filter me-2"></i>Tìm Kiếm & Bộ Lọc
+                    </h5>
                 </div>
-
-
-
+                <div class="card-body">
+                    <div class="row align-items-end g-3 flex-wrap">
+                        <div class="col">
+                            <label class="form-label fw-semibold">Tìm kiếm</label>
+                            <div class="position-relative">
+                                <input class="form-control search-input" type="search" placeholder="Số phiếu, nhà cung cấp..." aria-label="Search" id="search-input">
+                                <i class="fas fa-search position-absolute search-icon"></i>
+                                <button class="btn btn-link position-absolute clear-search" id="clear-search" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-semibold">Kho</label>
+                            <select class="form-select" id="warehouse-filter">
+                                <option value="">Tất cả</option>
+                                {% for warehouse in warehouses %}
+                                <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-semibold">Trạng thái</label>
+                            <select class="form-select" id="status-filter">
+                                <option value="">Tất cả</option>
+                                <option value="pending">Chưa nhập kho</option>
+                                <option value="completed">Hoàn thành</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-semibold">Từ ngày</label>
+                            <input class="form-control" type="date" id="start-date">
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-semibold">Đến ngày</label>
+                            <input class="form-control" type="date" id="end-date">
+                        </div>
+                        <div class="col d-flex gap-2 align-items-end">
+                            <button class="btn btn-primary fw-semibold" id="filter-button">Tìm</button>
+                            <button class="btn btn-outline-secondary" id="reset-button">Đặt lại</button>
                         </div>
                     </div>
                 </div>
-
+            </div>
+        </div>
+    </div>
 
     <!-- Receipts Table -->
     <div class="row">
@@ -91,7 +95,13 @@
                         <h5 class="card-title mb-0 text-dark">
                             <i class="fas fa-list me-2"></i>Danh Sách Phiếu Nhập Kho
                         </h5>
-                        <small class="text-muted">Tổng cộng: {{ receipts|length }} phiếu</small>
+                        <div class="d-flex align-items-center gap-3">
+                            <div id="search-stats" class="text-muted small" style="display: none;">
+                                <i class="fas fa-search me-1"></i>
+                                <span id="visible-count">0</span> / <span id="total-count">{{ receipts|length }}</span> kết quả
+                            </div>
+                            <small class="text-muted" id="total-display">Tổng cộng: {{ receipts|length }} phiếu</small>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -116,17 +126,20 @@
                                 <tr class="align-middle receipt-row"
                                     data-status="{{ receipt.status }}"
                                     data-warehouse="{{ receipt.warehouse_id }}"
-                                    data-date="{{ receipt.receipt_date.strftime('%Y-%m-%d') }}">
+                                    data-date="{{ receipt.receipt_date.strftime('%Y-%m-%d') }}"
+                                    data-receipt-number="{{ receipt.receipt_number }}"
+                                    data-supplier="{{ receipt.supplier }}"
+                                    data-creator="{{ receipt.creator.username }}">
                                     <td class="text-center">
                                         <span class="badge bg-secondary">{{ loop.index }}</span>
                                     </td>
-                                    <td>
+                                    <td class="searchable-receipt-number">
                                         <span class="fw-medium">{{ receipt.receipt_number }}</span>
                                     </td>
                                     <td class="text-center">
                                         <span class="text-muted">{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</span>
                                     </td>
-                                    <td>
+                                    <td class="searchable-supplier">
                                         {{ receipt.supplier }}
                                     </td>
                                     <td>
@@ -135,7 +148,7 @@
                                     <td class="text-end">
                                         <span class="text-success fw-semibold">{{ "{:,.0f}".format(receipt.total_amount) }} đ</span>
                                     </td>
-                                    <td>
+                                    <td class="searchable-creator">
                                         <span class="badge bg-primary">{{ receipt.creator.username }}</span>
                                     </td>
                                     <td class="text-center">
@@ -173,7 +186,7 @@
                                 </tr>
                                 {% endfor %}
                                 {% else %}
-                                <tr>
+                                <tr id="no-data-row">
                                     <td colspan="9" class="text-center py-5">
                                         <i class="fas fa-file-import text-muted" style="font-size: 3rem;"></i>
                                         <h5 class="text-muted mt-3">Chưa có phiếu nhập kho nào</h5>
@@ -181,6 +194,15 @@
                                     </td>
                                 </tr>
                                 {% endif %}
+                                
+                                <!-- No search results row -->
+                                <tr id="no-results-row" style="display: none;">
+                                    <td colspan="9" class="text-center py-5">
+                                        <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+                                        <h5 class="text-muted mt-3">Không tìm thấy kết quả</h5>
+                                        <p class="text-muted">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -266,88 +288,346 @@
     border-radius: 0.375rem;
     font-weight: 500;
 }
-    #filter-button {
-        background-color: #0d6efd;
-        font-weight: 600;
-    }
 
-    #filter-button:hover {
-        background-color: #0b5ed7;
+#filter-button {
+    background-color: #0d6efd;
+    font-weight: 600;
+}
+
+#filter-button:hover {
+    background-color: #0b5ed7;
+}
+
+/* Enhanced Search Styles */
+.search-input {
+    padding-right: 70px !important;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+.search-icon {
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 10;
+}
+
+.clear-search {
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    padding: 0.25rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    border: none;
+    background: none;
+}
+
+.clear-search:hover {
+    color: #dc3545;
+}
+
+/* Highlight matching text */
+.highlight {
+    background-color: #fff3cd;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 3px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Smooth transitions for rows */
+.receipt-row {
+    transition: all 0.3s ease;
+}
+
+.receipt-row.fade-out {
+    opacity: 0.3;
+    transform: scale(0.98);
+}
+
+/* Search stats styling */
+#search-stats {
+    background-color: rgba(13, 110, 253, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid rgba(13, 110, 253, 0.2);
+}
+
+/* Loading animation */
+.loading-search {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-search::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.1), transparent);
+    animation: loading 1s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .search-input {
+        padding-right: 40px !important;
     }
+    
+    .search-icon {
+        right: 12px;
+    }
+    
+    .clear-search {
+        display: none !important;
+    }
+}
 </style>
 
-<!-- JavaScript -->
+<!-- Enhanced JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gắn sự kiện lọc
-    document.getElementById('status-filter').addEventListener('change', filterReceipts);
-    document.getElementById('warehouse-filter').addEventListener('change', filterReceipts);
-    document.getElementById('search-input').addEventListener('input', filterReceipts);
-    document.getElementById('start-date').addEventListener('change', filterReceipts);
-    document.getElementById('end-date').addEventListener('change', filterReceipts);
-    document.getElementById('filter-button').addEventListener('click', filterReceipts);
-    document.getElementById('reset-button').addEventListener('click', resetFilters);
+    const searchInput = document.getElementById('search-input');
+    const clearButton = document.getElementById('clear-search');
+    const filterButton = document.getElementById('filter-button');
+    const resetButton = document.getElementById('reset-button');
+    const searchStats = document.getElementById('search-stats');
+    const visibleCount = document.getElementById('visible-count');
+    const totalCount = document.getElementById('total-count');
+    const totalDisplay = document.getElementById('total-display');
+    const noResultsRow = document.getElementById('no-results-row');
+    
+    let searchTimeout;
+    let originalContent = new Map(); // Store original content for each searchable element
 
-    function resetFilters() {
-        document.getElementById('status-filter').value = '';
-        document.getElementById('warehouse-filter').value = '';
-        document.getElementById('search-input').value = '';
-        document.getElementById('start-date').value = '';
-        document.getElementById('end-date').value = '';
+    // Initialize
+    initializeSearch();
+    
+    function initializeSearch() {
+        // Store original content for highlighting
+        document.querySelectorAll('.searchable-receipt-number, .searchable-supplier, .searchable-creator').forEach(element => {
+            originalContent.set(element, element.textContent.trim());
+        });
+        
+        // Event listeners
+        searchInput.addEventListener('input', handleSearchInput);
+        clearButton.addEventListener('click', clearSearch);
+        document.getElementById('status-filter').addEventListener('change', debounceFilter);
+        document.getElementById('warehouse-filter').addEventListener('change', debounceFilter);
+        document.getElementById('start-date').addEventListener('change', debounceFilter);
+        document.getElementById('end-date').addEventListener('change', debounceFilter);
+        filterButton.addEventListener('click', filterReceipts);
+        resetButton.addEventListener('click', resetFilters);
+        
+        // Enter key support
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterReceipts();
+            }
+        });
+    }
+    
+    function handleSearchInput(e) {
+        const value = e.target.value.trim();
+        
+        // Show/hide clear button
+        clearButton.style.display = value ? 'block' : 'none';
+        
+        // Add loading effect
+        searchInput.classList.add('loading-search');
+        
+        // Clear existing timeout
+        clearTimeout(searchTimeout);
+        
+        // Debounce search
+        searchTimeout = setTimeout(() => {
+            searchInput.classList.remove('loading-search');
+            filterReceipts();
+        }, 300);
+    }
+    
+    function clearSearch() {
+        searchInput.value = '';
+        clearButton.style.display = 'none';
+        searchInput.focus();
+        clearTimeout(searchTimeout);
         filterReceipts();
     }
-
+    
+    function debounceFilter() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterReceipts, 150);
+    }
+    
+    function resetFilters() {
+        // Clear all filters
+        document.getElementById('status-filter').value = '';
+        document.getElementById('warehouse-filter').value = '';
+        searchInput.value = '';
+        document.getElementById('start-date').value = '';
+        document.getElementById('end-date').value = '';
+        
+        // Hide clear button
+        clearButton.style.display = 'none';
+        
+        // Reset and filter
+        clearTimeout(searchTimeout);
+        filterReceipts();
+        
+        // Focus search input
+        searchInput.focus();
+    }
+    
     function filterReceipts() {
         const status = document.getElementById('status-filter').value;
         const warehouse = document.getElementById('warehouse-filter').value;
-        const search = document.getElementById('search-input').value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase().trim();
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
-
+        
         const rows = document.querySelectorAll('.receipt-row');
-
+        let visibleRows = 0;
+        
+        // Clear all highlights first
+        clearHighlights();
+        
         rows.forEach(row => {
             const rowStatus = row.getAttribute('data-status');
             const rowWarehouse = row.getAttribute('data-warehouse');
-            const receiptNumber = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
             const rowDate = row.getAttribute('data-date');
-
+            const receiptNumber = row.getAttribute('data-receipt-number').toLowerCase();
+            const supplier = row.getAttribute('data-supplier').toLowerCase();
+            const creator = row.getAttribute('data-creator').toLowerCase();
+            
             let visible = true;
-
-            // Lọc theo trạng thái
+            let searchMatch = false;
+            
+            // Filter by status
             if (status && rowStatus !== status) {
                 visible = false;
             }
             
-            // Lọc theo kho
+            // Filter by warehouse
             if (warehouse && rowWarehouse !== warehouse) {
                 visible = false;
             }
             
-            // Lọc theo tìm kiếm
-            if (search && !receiptNumber.includes(search)) {
-                visible = false;
-            }
-            
-            // Lọc theo ngày bắt đầu
+            // Filter by date range
             if (startDate && rowDate < startDate) {
                 visible = false;
             }
-            
-            // Lọc theo ngày kết thúc
             if (endDate && rowDate > endDate) {
                 visible = false;
             }
-
-            row.style.display = visible ? '' : 'none';
+            
+            // Search filter with highlighting
+            if (searchTerm) {
+                searchMatch = receiptNumber.includes(searchTerm) || 
+                             supplier.includes(searchTerm) || 
+                             creator.includes(searchTerm);
+                
+                if (!searchMatch) {
+                    visible = false;
+                } else {
+                    // Highlight matching text
+                    highlightText(row.querySelector('.searchable-receipt-number'), searchTerm);
+                    highlightText(row.querySelector('.searchable-supplier'), searchTerm);
+                    highlightText(row.querySelector('.searchable-creator'), searchTerm);
+                }
+            }
+            
+            // Show/hide row with animation
+            if (visible) {
+                row.style.display = '';
+                row.classList.remove('fade-out');
+                visibleRows++;
+            } else {
+                row.classList.add('fade-out');
+                setTimeout(() => {
+                    if (row.classList.contains('fade-out')) {
+                        row.style.display = 'none';
+                    }
+                }, 300);
+            }
         });
-
-        // Cập nhật số lượng phiếu hiển thị
-        const visibleCount = document.querySelectorAll('.receipt-row[style=""]').length;
-        document.querySelector('.text-muted').textContent = `Tổng cộng: ${visibleCount} phiếu`;
+        
+        // Update counters and show/hide elements
+        updateSearchStats(visibleRows, rows.length, searchTerm || hasActiveFilters());
+        
+        // Show/hide no results message
+        if (visibleRows === 0 && rows.length > 0) {
+            noResultsRow.style.display = '';
+        } else {
+            noResultsRow.style.display = 'none';
+        }
     }
-
-    // Gọi filter lần đầu để hiển thị tất cả
+    
+    function clearHighlights() {
+        document.querySelectorAll('.searchable-receipt-number, .searchable-supplier, .searchable-creator').forEach(element => {
+            const original = originalContent.get(element);
+            if (original) {
+                element.innerHTML = original;
+            }
+        });
+    }
+    
+    function highlightText(element, searchTerm) {
+        if (!element || !searchTerm) return;
+        
+        const original = originalContent.get(element);
+        if (!original) return;
+        
+        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+        const highlighted = original.replace(regex, '<span class="highlight">$1</span>');
+        element.innerHTML = highlighted;
+    }
+    
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    function hasActiveFilters() {
+        return document.getElementById('status-filter').value ||
+               document.getElementById('warehouse-filter').value ||
+               document.getElementById('start-date').value ||
+               document.getElementById('end-date').value;
+    }
+    
+    function updateSearchStats(visible, total, showStats) {
+        visibleCount.textContent = visible;
+        totalCount.textContent = total;
+        
+        if (showStats) {
+            searchStats.style.display = 'block';
+            totalDisplay.style.display = 'none';
+        } else {
+            searchStats.style.display = 'none';
+            totalDisplay.style.display = 'block';
+            totalDisplay.textContent = `Tổng cộng: ${visible} phiếu`;
+        }
+    }
+    
+    // Initial filter
     filterReceipts();
 });
 </script>

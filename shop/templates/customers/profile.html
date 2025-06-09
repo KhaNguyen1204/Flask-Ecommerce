@@ -26,6 +26,9 @@
     .avatar-container {
         position: relative;
         transition: all 0.3s ease;
+        width: 3cm;
+        height: 3cm;
+        margin: 0 auto;
     }
     
     .avatar-container:hover {
@@ -48,6 +51,27 @@
     
     .avatar-container:hover::after {
         opacity: 1;
+    }
+    
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     
     /* Hiệu ứng cho nút */
@@ -183,15 +207,13 @@
                         <div class="mb-4">
                             {% if customer.profile %}
                             <div class="avatar-container">
-                                <img src="{{ url_for('static', filename='images/admin_pictures/admin.jpg') }}"
-                                     class="rounded-circle img-fluid border border-3 border-light shadow"
-                                     style="width: 4cm; height: 4cm; object-fit: cover;" alt="Profile Image">
+                                <img src="{{ url_for('static', filename='images/products/' + customer.profile ) }}"
+                                     class="avatar-img" alt="Profile Image">
                             </div>
                             {% else %}
                             <div class="avatar-container">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto border border-3 border-white shadow"
-                                     style="width: 4cm; height: 4cm;">
-                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="#6c757d">
+                                <div class="avatar-placeholder">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="#6c757d">
                                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                     </svg>
                                 </div>
@@ -307,8 +329,6 @@
                             </div>
                         </div>
                         <hr class="border-primary opacity-25">
-                        
-
                     </div>
                 </div>
             </div>

@@ -1,27 +1,95 @@
 <!-- shop/templates/sale/manage_comments.html -->
+{% set show_footer = False %}
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container mt-5">
-    <h3>Products with Comments</h3>
+    <button onclick="window.history.back()" class="btn btn-secondary mb-3">← Quay lại</button>
+    
+    <h1 class="text-primary fw-bold mb-3">QUẢN LÝ BÌNH LUẬN CỦA KHÁCH HÀNG</h1>
+    
+    <div class="mb-3" style="width: 33%;">
+        <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm sản phẩm...">
+    </div>
+    
     <table class="table">
-        <thead>
+        <thead class="table-dark">
             <tr>
-                <th>Product</th>
-                <th>Number of Comments</th>
-                <th>Action</th>
+                <th>Tên sản phẩm</th>
+                <th>Số lượng bình luận</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="productTableBody">
         {% for product in products %}
-            <tr>
-                <td>{{ product.name }}</td>
+            <tr data-product-name="{{ product.name.lower() }}">
+                <td class="product-name">{{ product.name }}</td>
                 <td>{{ product.reviews|length }}</td>
                 <td>
-                    <a href="{{ url_for('product_comments_detail', product_id=product.id) }}" class="btn btn-info btn-sm">View Details</a>
+                    <a href="{{ url_for('product_comments_detail', product_id=product.id) }}" class="btn btn-info btn-sm">Xem chi tiết</a>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    <div id="noResults" class="alert alert-warning" style="display: none;">
+        Không có kết quả phù hợp
+    </div>
 </div>
+
+<style>
+    .highlight {
+        background-color: yellow;
+        font-weight: bold;
+    }
+    h1 {
+        font-size: 2rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const productTableBody = document.getElementById('productTableBody');
+        const noResultsDiv = document.getElementById('noResults');
+        const originalRows = Array.from(productTableBody.querySelectorAll('tr'));
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim().toLowerCase();
+            let hasResults = false;
+            
+            // Reset all rows first
+            originalRows.forEach(row => {
+                row.style.display = 'none';
+                const productNameCell = row.querySelector('.product-name');
+                productNameCell.innerHTML = productNameCell.textContent; // Remove previous highlights
+            });
+            
+            if (searchTerm === '') {
+                originalRows.forEach(row => row.style.display = '');
+                noResultsDiv.style.display = 'none';
+                return;
+            }
+            
+            originalRows.forEach(row => {
+                const productName = row.getAttribute('data-product-name');
+                if (productName.includes(searchTerm)) {
+                    hasResults = true;
+                    row.style.display = '';
+                    
+                    // Highlight matching text
+                    const productNameCell = row.querySelector('.product-name');
+                    const text = productNameCell.textContent;
+                    const regex = new RegExp(searchTerm, 'gi');
+                    const highlightedText = text.replace(regex, match => 
+                        `<span class="highlight">${match}</span>`
+                    );
+                    productNameCell.innerHTML = highlightedText;
+                }
+            });
+            
+            noResultsDiv.style.display = hasResults ? 'none' : 'block';
+        });
+    });
+</script>
 {% endblock %}

@@ -1,66 +1,244 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 
-    <title>GET PDF</title>
+    <title>Hóa đơn bán hàng - Azphone</title>
+    <style>
+        body {
+            font-size: 14px;
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+        }
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .invoice-title {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 26px;
+        }
+        .store-info {
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .store-name {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .invoice-header {
+            margin-bottom: 20px;
+        }
+        .invoice-info {
+            margin-bottom: 25px;
+        }
+        .info-box {
+            border: 1px solid #000;
+            padding: 10px;
+            height: 100%;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 5px;
+        }
+        table th, table td {
+            vertical-align: middle !important;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            font-weight: bold;
+            text-align: center;
+        }
+        .table-bordered td, .table-bordered th {
+            border: 1px solid #dee2e6 !important;
+        }
+        .notes-section {
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .thank-you {
+            text-align: center;
+            margin: 30px 0;
+            font-style: italic;
+            font-size: 14px;
+        }
+        .signatures {
+            margin: 40px 0;
+        }
+        .signature-box {
+            display: inline-block;
+            width: 48%;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 40px;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
   </head>
   <body>
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <b style="float: right">Invoice: {{order.invoice}}</b>
-            <br>
-            Status: {{order.status}}
-            <br>
-            Customer name: {{customer.username}}
-            <br>
-            Customer email: {{customer.email}}
-            <br>
-            Customer phone: {{customer.phone}}
-            <br>
-        <table class="table table-sm">
+    <div class="container invoice-container">
+        <!-- Thông tin cửa hàng -->
+        <div class="store-info">
+            <div class="store-name">CỬA HÀNG AZPHONE</div>
+            <div>Chuyên cung cấp các loại điện thoại, phụ kiện chính hãng</div>
+            <div>Địa chỉ: 123 Nguyễn Huệ, P. Bến Nghé, Quận 1, TP.HCM</div>
+            <div>Hotline: 1900 1234 - Email: info@azphone.vn</div>
+            <div>Mã số thuế: 0123456789 - GPKD: 41A1234567</div>
+        </div>
+
+        <!-- Tiêu đề hóa đơn -->
+        <div class="invoice-title">
+            <h2>HÓA ĐƠN BÁN HÀNG</h2>
+        </div>
+
+        <!-- Thông tin hóa đơn -->
+        <div class="row invoice-header">
+            <div class="col-md-6">
+                <p><strong>Ngày xuất:</strong> {{ order.date_created.strftime('%d/%m/%Y %H:%M') }}</p>
+                <p><strong>Nhân viên bán hàng:</strong> Nguyễn Văn A</p>
+            </div>
+            <div class="col-md-6 text-right">
+                <p><strong>Mã hóa đơn:</strong> {{ order.invoice }}</p>
+                <p><strong>Hình thức thanh toán:</strong> {{ order.payment_method }}</p>
+            </div>
+        </div>
+
+        <!-- Thông tin khách hàng và giao hàng -->
+        <div class="row invoice-info">
+            <div class="col-md-6">
+                <div class="info-box">
+                    <div class="section-title">THÔNG TIN KHÁCH HÀNG</div>
+                    <p><strong>Tên khách hàng:</strong> {{ customer.username }}</p>
+                    <p><strong>Số điện thoại:</strong> {{ customer.phone }}</p>
+                    <p><strong>Email:</strong> {{ customer.email }}</p>
+                    <p><strong>Địa chỉ:</strong> {{ customer.address }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-box">
+                    <div class="section-title">THÔNG TIN GIAO HÀNG</div>
+                    <p><strong>Người nhận:</strong> {{ customer.username }}</p>
+                    <p><strong>SĐT người nhận:</strong> {{ customer.phone }}</p>
+                    <p><strong>Địa chỉ giao hàng:</strong> {{ customer.address }}</p>
+                    <p><strong>Ghi chú:</strong> Giao hàng trong giờ hành chính</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chi tiết hóa đơn -->
+        <div class="section-title">CHI TIẾT HÓA ĐƠN</div>
+        <table class="table table-bordered table-striped">
             <thead>
-                <th>Sr</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Discount</th>
-                <th>Subtotal</th>
+                <tr>
+                    <th width="5%">STT</th>
+                    <th width="40%">Tên sản phẩm</th>
+                    <th width="15%">Đơn giá (₫)</th>
+                    <th width="10%">Số lượng</th>
+                    <th width="15%">Giảm giá</th>
+                    <th width="15%">Thành tiền (₫)</th>
+                </tr>
             </thead>
             <tbody>
                 {% for item in order_details %}
                 {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
                 <tr>
-                    <td>{{loop.index}}</td>
-                    <td>{{item.product_name}}</td>
-                    <td>{{"%.2f"|format(item.price)}}$</td>
-                    <td>{{item.quantity}}</td>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td>{{ item.product_name }} ({{ item.product_code }})</td>
+                    <td class="text-right">{{ "{:,.0f}".format(item.price * 23000) }}₫</td>
+                    <td class="text-center">{{ item.quantity }}</td>
                     {% if item.discount > 0 %}
-                    <td>{{item.discount}}% is {{discount}}$</td>
+                    <td class="text-right">{{ item.discount }}% ({{ "{:,.0f}".format(discount|float * 23000) }}₫)</td>
                     {% else %}
-                    <td>0%</td>
+                    <td class="text-center">0%</td>
                     {% endif %}
-                    <td>{{"%0.2f"|format(item.subtotal)}}$</td>
+                    <td class="text-right">{{ "{:,.0f}".format(item.subtotal * 23000) }}₫</td>
                 </tr>
                 {% endfor %}
                 <tr>
-                    <td colspan="3"><h4>Tax: {{"%.2f"|format(tax)}}$</h4></td>
-                    <td colspan="3"><h4>Total: {{"%.2f"|format(grand_total)}}$</h4></td>
+                    <td colspan="5" class="text-right"><strong>Tạm tính:</strong></td>
+                    <td class="text-right">{{ "{:,.0f}".format((grand_total - tax) * 23000) }}₫</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right"><strong>Thuế VAT (10%):</strong></td>
+                    <td class="text-right">{{ "{:,.0f}".format(tax * 23000) }}₫</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right"><strong>Phí vận chuyển:</strong></td>
+                    <td class="text-right">0₫</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right"><strong>TỔNG CỘNG:</strong></td>
+                    <td class="text-right"><strong>{{ "{:,.0f}".format(grand_total * 23000) }}₫</strong></td>
                 </tr>
             </tbody>
         </table>
-    </div>
-</div>
-</div>
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
 
+        <!-- Ghi chú -->
+        <div class="notes-section">
+            <div class="section-title">GHI CHÚ</div>
+            <ul>
+                <li>Áp dụng chính sách bảo hành 12 tháng</li>
+                <li>Đổi trả trong vòng 7 ngày nếu lỗi nhà sản xuất</li>
+                <li>Xuất hóa đơn VAT khi có yêu cầu</li>
+            </ul>
+        </div>
+
+        <!-- Phương thức thanh toán -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="section-title">PHƯƠNG THỨC THANH TOÁN</div>
+                <p><strong>{{ order.payment_method }}</strong></p>
+                <p>Thanh toán tiền mặt khi nhận hàng</p>
+            </div>
+        </div>
+
+        <!-- Lời cảm ơn -->
+        <div class="thank-you">
+            <p>Cảm ơn Quý khách đã sử dụng dịch vụ của chúng tôi!</p>
+            <p>Hẹn gặp lại Quý khách trong các giao dịch tiếp theo</p>
+        </div>
+
+        <!-- Chữ ký -->
+        <div class="signatures">
+            <div class="signature-box">
+                <p><strong>Người mua hàng</strong></p>
+                <p>(Ký và ghi rõ họ tên)</p>
+                <p style="margin-top: 50px;">...................................</p>
+            </div>
+            <div class="signature-box" style="float: right;">
+                <p><strong>Người bán hàng</strong></p>
+                <p>(Ký và ghi rõ họ tên)</p>
+                <p style="margin-top: 50px;">...................................</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Mọi thắc mắc xin liên hệ Hotline: 1900 1234 - Email: info@azphone.vn</p>
+            <p>Thời gian làm việc: 8:00 - 20:00 từ Thứ 2 đến Chủ Nhật</p>
+        </div>
+    </div>
   </body>
 </html>
