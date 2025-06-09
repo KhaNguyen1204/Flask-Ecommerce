@@ -4,7 +4,9 @@
 {% block content %}
 {% include '_messages.html' %}
 <div class="container">
+{% if current_user.role_id == 1 %}
     {% include '_navbar_admin.html' %}
+{% endif %}
     {% include '_navbar_warehouse.html' %}
 
     <!-- Page Title -->

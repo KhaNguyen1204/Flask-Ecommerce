@@ -16,7 +16,7 @@ class Customer(User):
     country = db.Column(db.String(50), unique=False)
     city = db.Column(db.String(50), unique=False)
     address = db.Column(db.String(200), unique=False)
-    zipcode = db.Column(db.String(50), unique=False, nullable=False)
+    # zipcode = db.Column(db.String(50), unique=False, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'customer',

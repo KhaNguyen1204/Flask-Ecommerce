@@ -117,7 +117,12 @@
 <body>
 
 <div class="container py-0">
-    {% include '_navbar_admin.html' %}
+{% include '_messages.html' %}
+{% if current_user.role_id == 1 %}
+    <div class="container">
+        {% include '_navbar_admin.html' %}
+    </div>
+{% endif %}
 
     <!-- Header Section -->
     <div class="main-header">
