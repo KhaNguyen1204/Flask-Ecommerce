@@ -1,54 +1,76 @@
+{% set show_footer = false %}
 {% extends 'base.html' %}
+
 {% block title %}
-{% if title %} {{ title }} {% else %} Đăng ký {% endif %}
+{% if title %} {{ title }} {% else %} Đăng ký Admin {% endif %}
 {% endblock title %}
 
 {% block content %}
+
+
 <div class="container mt-5">
   <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
+    <div class="col-md-8 col-lg-6">
       <div class="card shadow-lg border-0 animate__animated animate__fadeIn">
         <div class="card-header text-white text-center py-4">
-          <h2 class="mb-0">ĐĂNG KÝ</h2>
+          <h2 class="mb-0">ĐĂNG KÝ ADMIN</h2>
         </div>
         <div class="card-body p-4">
           {% include '_messages.html' %}
           {% from "_formhelpers.html" import render_field %}
           
           <form method="post" enctype="multipart/form-data" class="animate__animated animate__fadeIn animate__delay-0.2s">
-            <div class="mb-4">
-              {{ render_field(form.username, class_="form-control border-primary shadow-sm") }}
+            <input type="hidden" name="csrf_token" value="{{ form.csrf_token._value() }}">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                {{ render_field(form.username, class_="form-control border-primary shadow-sm") }}
+              </div>
+              
+              <div class="col-md-6 mb-4">
+                {{ render_field(form.email, class_="form-control border-primary shadow-sm") }}
+              </div>
             </div>
             
-            <div class="mb-4">
-              {{ render_field(form.email, class_="form-control border-primary shadow-sm") }}
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                {{ render_field(form.phone, class_="form-control border-primary shadow-sm") }}
+              </div>
+              
+              <div class="col-md-6 mb-4">
+                {{ render_field(form.position, class_="form-control border-primary shadow-sm") }}
+              </div>
             </div>
             
-            <div class="mb-4">
-              {{ render_field(form.password, class_="form-control border-primary shadow-sm") }}
-            </div>
-            
-            <div class="mb-4">
-              {{ render_field(form.confirm, class_="form-control border-primary shadow-sm") }}
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                {{ render_field(form.password, class_="form-control border-primary shadow-sm") }}
+              </div>
+              
+              <div class="col-md-6 mb-4">
+                {{ render_field(form.confirm, class_="form-control border-primary shadow-sm") }}
+              </div>
             </div>
             
             <div class="mb-4">
               <label for="photo" class="form-label text-primary fw-bold">Ảnh đại diện</label>
               <div class="input-group">
-                <input type="file" name="photo" id="photo" class="form-control border-primary shadow-sm">
+                <input type="file" name="photo" id="photo" class="form-control border-primary shadow-sm" accept="image/*">
               </div>
+              <small class="form-text text-muted">Chọn ảnh đại diện (tùy chọn)</small>
             </div>
             
             <div class="d-grid gap-2">
               <button type="submit" class="btn btn-primary btn-lg">
-                Đăng ký
+                <i class="fas fa-user-plus me-2"></i>Đăng ký Admin
               </button>
             </div>
           </form>
         </div>
         <div class="card-footer text-center py-3 bg-light">
           <div class="small">
-            <a href="{{ url_for('login') }}" class="text-primary fw-bold">Đã có tài khoản? Đăng nhập!</a>
+            <a href="{{ url_for('login') }}" class="text-primary fw-bold">
+              <i class="fas fa-sign-in-alt me-1"></i>Đã có tài khoản? Đăng nhập!
+            </a>
           </div>
         </div>
       </div>
@@ -58,6 +80,8 @@
 
 <!-- Add Animate.css for animations -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
 <!-- Custom styles -->
 <style>
@@ -72,45 +96,56 @@
   }
   
   .card-header {
-    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%) !important;
+    background: linear-gradient(135deg, #5e74ce 0%, #635edc 100%) !important;
   }
   
   .form-control {
     transition: all 0.3s ease-in-out;
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
-    border-radius: 0;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
   }
   
   .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
     transform: translateY(-2px);
   }
   
   .btn-primary {
-    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
     border: none;
     padding: 0.75rem;
     font-size: 1.1rem;
     font-weight: 500;
     transition: all 0.3s ease-in-out;
-    border-radius: 0;
+    border-radius: 8px;
   }
   
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
-    background: linear-gradient(135deg, #0b5ed7 0%, #0cb4ce 100%);
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+    background: linear-gradient(135deg, #c82333 0%, #e55a12 100%);
   }
   
   .form-label {
     font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
     transition: color 0.3s ease-in-out;
   }
   
   .form-label:hover {
-    color: #0b5ed7;
+    color: #dc3545;
+  }
+  
+  .text-primary {
+    color: #dc3545 !important;
+  }
+  
+  .border-primary {
+    border-color: #dc3545 !important;
   }
   
   form {
@@ -118,23 +153,39 @@
   }
   
   form:hover {
-    box-shadow: 0 0 20px rgba(13, 110, 253, 0.15);
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.15);
   }
   
   .card-footer a {
     transition: color 0.3s ease-in-out;
-  }
-  
-  .card-footer a:hover {
-    color: #0b5ed7;
     text-decoration: none;
   }
   
+  .card-footer a:hover {
+    color: #c82333 !important;
+    text-decoration: underline;
+  }
+  
+  .form-text {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+  
+  /* Input group styling */
+  .input-group .form-control {
+    border-radius: 8px;
+  }
+  
   /* Responsive adjustments */
-  @media (max-width: 576px) {
+  @media (max-width: 768px) {
+    .col-md-6 {
+      margin-bottom: 1rem !important;
+    }
+    
     .form-control {
       padding: 0.6rem 1.2rem;
     }
+    
     .btn-primary {
       padding: 0.6rem;
       font-size: 1rem;
@@ -145,6 +196,18 @@
   .animate__fadeIn {
     --animate-duration: 0.5s;
     --animate-delay: 0.2s;
+  }
+  
+  /* Field validation styling */
+  .is-invalid {
+    border-color: #dc3545;
+  }
+  
+  .invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
   }
 </style>
 {% endblock content %}

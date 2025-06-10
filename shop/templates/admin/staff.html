@@ -73,27 +73,27 @@
                                 </td>
                                 <td>{{ staff.hire_date.strftime('%d/%m/%Y') }}</td>
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-1">
+                                    <div class="d-flex justify-content-center gap-2">
                                         <button type="button" 
-                                                class="btn btn-sm btn-outline-info" 
+                                                class="btn btn-info btn-action" 
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#detailModal-{{ staff.id }}"
                                                 title="Chi tiết">
-                                            <i class="bi bi-eye"></i>
+                                            Chi tiết
                                         </button>
                                         
                                         <a href="{{ url_for('update_staff', id=staff.id) }}" 
-                                           class="btn btn-sm btn-outline-primary" 
+                                           class="btn btn-primary btn-action" 
                                            title="Chỉnh sửa">
-                                            <i class="bi bi-pencil"></i>
+                                            Sửa
                                         </a>
                                         
                                         <button type="button" 
-                                                class="btn btn-sm btn-outline-danger" 
+                                                class="btn btn-danger btn-action" 
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal-{{ staff.id }}"
                                                 title="Xóa">
-                                            <i class="bi bi-trash"></i>
+                                            Xóa
                                         </button>
                                     </div>
                                 </td>
@@ -215,7 +215,7 @@
                                         </div>
                                         <div class="modal-footer border-0">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <form action="{{ url_for('delete_staff', id=staff.id) }}" method="POST">
+                                            <form action="{{ url_for('delete_staff', id=staff.id) }}" method="POST" style="display: inline;">
                                                 <button type="submit" class="btn btn-danger">
                                                     <i class="bi bi-trash me-1"></i> Xóa
                                                 </button>
@@ -324,6 +324,55 @@
     
     .modal-footer.bg-light {
         border-radius: 0 0 12px 12px;
+    }
+    
+    /* Custom action button styles */
+    .btn-action {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: none;
+        color: white;
+        min-width: 60px;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        color: white;
+    }
+    
+    .btn-info.btn-action {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+    
+    .btn-info.btn-action:hover {
+        background-color: #138496;
+        border-color: #117a8b;
+    }
+    
+    .btn-primary.btn-action {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .btn-primary.btn-action:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+    
+    .btn-danger.btn-action {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    .btn-danger.btn-action:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
     }
 </style>
 

@@ -324,7 +324,7 @@ def update_staff(id):
         flash('Staff member updated successfully', 'success')
         return redirect(url_for('staff'))
 
-    return render_template('admin/add_staff.html', form=form, title='Update Staff Member')
+    return render_template('admin/add_staff.html', form=form, title='Cập nhật nhân viên')
 
 @app.route('/deletestaff/<int:id>', methods=['POST'])
 @role_required(['admin'])
