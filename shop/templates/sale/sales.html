@@ -18,65 +18,103 @@
 
     <div class="table-responsive">
         <div class="mb-3 d-flex justify-content-start">
-    <div class="search-box w-50">
-        <div class="input-group">
-            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
-            
+            <div class="search-box w-50">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-<table class="table table-hover align-middle" id="productTable">
-    <thead class="table-dark">
-        <tr>
-            <th style="width: 5%">STT</th>
-            <th style="width: 20%">Sản phẩm</th>
-            <th style="width: 12%">Giá (VND)</th>
-            <th style="width: 10%">Giảm giá(%)</th>
-            <th style="width: 15%">Thương hiệu</th>
-            <th style="width: 15%">Ảnh</th>
-            <th style="width: 10%">Sửa</th>
-            <th style="width: 10%">Xóa</th>
-        </tr>
-    </thead>
-    <tbody id="productTableBody">
-        {% for product in products %}
-        <tr class="product-row" data-name="{{product.name|lower}}" data-brand="{{product.brand.name|lower}}">
-            <td>{{loop.index}}</td>
-            <td class="fw-semibold product-name">{{product.name}}</td>
-            <td>{{"{:,.0f}".format(product.price)}}</td>
-            <td>
-                {% if product.discount > 0 %}
-                <span class="badge bg-danger">{{product.discount}}%</span>
-                {% else %}
-                <span class="badge bg-secondary">0%</span>
-                {% endif %}
-            </td>
-            <td class="product-brand">{{product.brand.name}}</td>
-            <td>
-                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
-                     class="img-thumbnail" 
-                     alt="{{product.name}}" 
-                     style="width: 80px; height: auto;">
-            </td>
-            <td>
-                <a href="{{url_for('updateproduct', id=product.id)}}" 
-                   class="btn btn-outline-primary btn-sm">
-                   <i class="fas fa-edit"></i> Sửa
-                </a>
-            </td>
-            <td>
-                <button type="button" 
-                        class="btn btn-outline-danger btn-sm" 
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal-{{product.id}}">
-                    <i class="fas fa-trash-alt"></i> Xóa
-                </button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <table class="table table-hover align-middle" id="productTable">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 5%">STT</th>
+                    <th style="width: 20%">Sản phẩm</th>
+                    <th style="width: 12%">Giá (VND)</th>
+                    <th style="width: 10%">Giảm giá(%)</th>
+                    <th style="width: 15%">Thương hiệu</th>
+                    <th style="width: 15%">Ảnh</th>
+                    <th style="width: 10%">Sửa</th>
+                    <th style="width: 10%">Xóa</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                {% for product in products %}
+                <tr class="product-row" data-name="{{product.name|lower}}" data-brand="{{product.brand.name|lower}}">
+                    <td>{{loop.index}}</td>
+                    <td class="fw-semibold product-name">{{product.name}}</td>
+                    <td>{{"{:,.0f}".format(product.price)}}</td>
+                    <td>
+                        {% if product.discount > 0 %}
+                        <span class="badge bg-danger">{{product.discount}}%</span>
+                        {% else %}
+                        <span class="badge bg-secondary">0%</span>
+                        {% endif %}
+                    </td>
+                    <td class="product-brand">{{product.brand.name}}</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
+                             class="img-thumbnail" 
+                             alt="{{product.name}}" 
+                             style="width: 80px; height: auto;">
+                    </td>
+                    <td>
+                        <a href="{{url_for('updateproduct', id=product.id)}}" 
+                           class="btn btn-outline-primary btn-sm">
+                           <i class="fas fa-edit"></i> Sửa
+                        </a>
+                    </td>
+                    <td>
+                        <button type="button" 
+                                class="btn btn-outline-danger btn-sm" 
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal-{{product.id}}">
+                            <i class="fas fa-trash-alt"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal-{{product.id}}" tabindex="-1" aria-labelledby="deleteModalLabel-{{product.id}}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-danger" id="deleteModalLabel-{{product.id}}">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa sản phẩm
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center mb-3">
+                                    <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
+                                         class="img-thumbnail mb-3" 
+                                         alt="{{product.name}}" 
+                                         style="width: 100px; height: auto;">
+                                </div>
+                                <p class="text-center">
+                                    Bạn có chắc chắn muốn xóa sản phẩm <strong>"{{product.name}}"</strong>?
+                                </p>
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Hành động này không thể hoàn tác!
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Hủy
+                                </button>
+                                <form action="{{ url_for('deleteproduct', id=product.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash-alt me-1"></i>Xóa sản phẩm
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <div id="noResults" class="text-center py-4 d-none">
             <h5 class="text-muted">Không có kết quả phù hợp</h5>
@@ -91,12 +129,36 @@
         border-radius: 3px;
         font-weight: bold;
     }
+    
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
-    const clearSearch = document.getElementById('clearSearch');
     const productRows = document.querySelectorAll('.product-row');
     const productTableBody = document.getElementById('productTableBody');
     const noResults = document.getElementById('noResults');
@@ -149,19 +211,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Search input event
     searchInput.addEventListener('input', filterProducts);
     
-    // Clear search button
-    clearSearch.addEventListener('click', function() {
-        searchInput.value = '';
-        filterProducts();
-        searchInput.focus();
-    });
-    
     // Press ESC to clear search
     searchInput.addEventListener('keyup', function(e) {
         if (e.key === 'Escape') {
             searchInput.value = '';
             filterProducts();
         }
+    });
+    
+    // Confirm delete with double-click prevention
+    document.querySelectorAll('form[action*="deleteproduct"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang xóa...';
+        });
     });
 });
 </script>
