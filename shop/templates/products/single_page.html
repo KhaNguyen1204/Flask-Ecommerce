@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% include '_messages.html' %}
 {% block content %}
 {% include 'navbar.html' %}
 
@@ -55,6 +56,37 @@
 
     .main-image img:hover {
         transform: scale(1.05);
+    }
+
+    /* Back button styling */
+    .back-btn {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: linear-gradient(45deg, #ff6f61, #ff3b2e);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
+        z-index: 10;
+    }
+
+    .back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 111, 97, 0.4);
+        background: linear-gradient(45deg, #ff3b2e, #ff6f61);
+        color: white;
+    }
+
+    .back-btn i {
+        font-size: 1rem;
     }
 
     .thumbnail-container {
@@ -300,24 +332,16 @@
     .review-form label {
         font-weight: 600;
     }
+
     .reply-form {
         display: none;
         margin-left: 30px;
         margin-top: 10px;
     }
+
     .reply-toggle-btn {
         margin-left: 30px;
         margin-top: 5px;
-    }
-    @media (max-width: 768px) {
-        .product-container { padding: 20px;}
-        .main-image img { height: 350px;}
-        .product-info h1 { font-size: 1.5rem;}
-        .price-tag { font-size: 1.5rem;}
-    }
-    @media (max-width: 576px) {
-        .gallery-container { margin-bottom: 20px;}
-        .thumbnail-container img { width: 60px; height: 60px;}
     }
 </style>
 
@@ -326,6 +350,9 @@
         <!-- Image Gallery -->
         <div class="col-md-6 gallery-container">
             <div class="main-image">
+                <a href="{{ url_for('home') }}" class="back-btn">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
                 <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
                      alt="{{ product.name }}" class="img-fluid" id="main-image">
             </div>
@@ -358,7 +385,7 @@
                 <input type="hidden" name="product_id" value="{{ product.id }}">
 
                 <div class="form-group">
-                    <label for="quantity">Quantity</label>
+                    <label for="quantity">Số lượng</label>
                     <div class="quantity-selector">
                         <button type="button" class="decrement-btn">-</button>
                         <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}"
@@ -368,7 +395,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="colors">Color</label>
+                    <label for="colors">Màu sắc</label>
                     {% set colors = product.colors.split(',') %}
                     <select name="colors" id="colors" class="form-control">
                         {% for color in colors %}
@@ -378,7 +405,7 @@
                     </select>
                 </div>
 
-                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                <button type="submit" class="add-to-cart-btn">Thêm vào giỏ hàng</button>
             </form>
         </div>
     </div>
@@ -394,17 +421,17 @@
                 <div class="review-header">
                     <span class="review-user">{{ review.customer.username }}</span>
                     <span class="review-rating">
-                                {% for i in range(1, 6) %}
-                                    {% if i <= review.rating %}
-                                        <i class="fa fa-star text-warning"></i>
-                                    {% else %}
-                                        <i class="fa fa-star text-secondary"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </span>
+                        {% for i in range(1, 6) %}
+                            {% if i <= review.rating %}
+                                <i class="fa fa-star text-warning"></i>
+                            {% else %}
+                                <i class="fa fa-star text-secondary"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
                     <span class="review-date">
-                                {{ review.created_at.strftime('%d/%m/%Y %H:%M:%S') if review.created_at else '' }}
-                            </span>
+                        {{ review.created_at.strftime('%d/%m/%Y %H:%M:%S') if review.created_at else '' }}
+                    </span>
                     {% if current_user.is_authenticated and review.customer_id == current_user.id %}
                     <form action="{{ url_for('delete_review', review_id=review.id) }}" method="post"
                           style="display:inline;">
@@ -425,40 +452,38 @@
                     {% endfor %}
                 </div>
             </div>
+            {% endfor %}
+            {% else %}
+            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+            {% endif %}
         </div>
-        {% endfor %}
+
+        <!-- Review Form -->
+        {% if current_user.is_authenticated %}
+        {% set reviewed = reviews|selectattr('customer_id', 'equalto', current_user.id)|list %}
+        {% if not reviewed %}
+        <div class="review-form mt-4">
+            <form action="{{ url_for('add_review', product_id=product.id) }}" method="post">
+                {{ review_form.hidden_tag() }}
+                <div class="form-group">
+                    <label for="rating">Đánh giá (1-5 sao):</label>
+                    {{ review_form.rating(class="form-control", min=1, max=5) }}
+                </div>
+                <div class="form-group">
+                    <label for="comment">Bình luận:</label>
+                    {{ review_form.comment(class="form-control", rows=3) }}
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+            </form>
+        </div>
         {% else %}
-        <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+        <div class="alert alert-info mt-4">Bạn đã đánh giá sản phẩm này.</div>
+        {% endif %}
+        {% else %}
+        <div class="alert alert-warning mt-4">Hãy <a href="{{ url_for('login') }}">đăng nhập</a> để đánh giá sản phẩm.
+        </div>
         {% endif %}
     </div>
-
-    <!-- Review Form -->
-    {% if current_user.is_authenticated %}
-    {% set reviewed = reviews|selectattr('customer_id', 'equalto', current_user.id)|list %}
-    {% if not reviewed %}
-    <div class="review-form mt-4">
-        <form action="{{ url_for('add_review', product_id=product.id) }}" method="post">
-            {{ review_form.hidden_tag() }}
-            <div class="form-group">
-                <label for="rating">Đánh giá (1-5 sao):</label>
-                {{ review_form.rating(class="form-control", min=1, max=5) }}
-            </div>
-            <div class="form-group">
-                <label for="comment">Bình luận:</label>
-                {{ review_form.comment(class="form-control", rows=3) }}
-            </div>
-            <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-        </form>
-    </div>
-    {% else %}
-    <div class="alert alert-info mt-4">Bạn đã đánh giá sản phẩm này.</div>
-    {% endif %}
-    {% else %}
-    <div class="alert alert-warning mt-4">Hãy <a href="{{ url_for('login') }}">đăng nhập</a> để đánh giá sản phẩm.
-    </div>
-    {% endif %}
-</div>
-<!-- End Review Section -->
 </div>
 
 <!-- FontAwesome for star icons -->
@@ -500,6 +525,7 @@
             quantityInput.value = value - 1;
         }
     });
+
     // Toggle reply form
     document.querySelectorAll('.reply-toggle-btn').forEach(btn => {
         btn.addEventListener('click', function () {

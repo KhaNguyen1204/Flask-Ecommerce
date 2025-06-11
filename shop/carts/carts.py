@@ -23,9 +23,10 @@ def AddCart():
         if product_id and quantity and colors and request.method == 'POST':
             # Convert quantity to integer
             quantity = int(quantity)
+            cart_key = f"{product_id}_{colors}"
 
             DictItem = {
-                product_id: {
+                cart_key: {
                     'id': product.id,
                     'name': product.name,
                     'price': product.price,
@@ -38,9 +39,9 @@ def AddCart():
             }
 
             if 'ShopCart' in session:
-                if str(product_id) in session['ShopCart']:
+                if cart_key in session['ShopCart']:
                     session.modified = True
-                    session['ShopCart'][str(product_id)]['quantity'] += quantity
+                    session['ShopCart'][cart_key]['quantity'] += quantity
                 else:
                     # Add a new product to the cart
                     session['ShopCart'] = MergeDict(session['ShopCart'], DictItem)
@@ -49,6 +50,7 @@ def AddCart():
                 session['ShopCart'] = DictItem
 
             flash("Sản phẩm đã được thêm vào giỏ hàng!", 'success')
+            print(session['ShopCart'])
             return redirect(request.referrer)
     except Exception as e:
         print(e)
@@ -70,7 +72,7 @@ def getCart():
         grandtotal = float("%.2f" % (1.06 * subtotal))
     return render_template('products/carts.html', tax=tax, grandtotal=grandtotal, brands=brands(), categories=categories())
 
-@app.route('/updatecart/<int:code>', methods=['POST'])
+@app.route('/updatecart/<code>', methods=['POST'])
 def updateCart(code):
     if 'ShopCart' not in session or len(session['ShopCart']) <= 0:
         return redirect(url_for('home'))
@@ -79,27 +81,38 @@ def updateCart(code):
         color = request.form.get('colors')
         try:
             session.modified = True
-            for key, item in session['ShopCart'].items():
-                if int(key) == code:
-                    item['quantity'] = int(quantity)
-                    item['colors'] = color
-                    flash('Giỏ hàng đã được cập nhật!', 'success')
-                    return redirect(url_for('getCart'))
+            product = session['ShopCart'][code]
+            product_id = product['id']
+            new_key = f"{product_id}_{color}"
+            if new_key != code:
+                if new_key in session['ShopCart']:
+                    session['ShopCart'][new_key]['quantity'] += int(quantity)
+                    session['ShopCart'].pop(code, None)
+                else:
+                    session['ShopCart'][new_key] = product
+                    session['ShopCart'][new_key]['quantity'] = int(quantity)
+                    session['ShopCart'][code]['colors'] = color
+                    session['ShopCart'].pop(code, None)
+            else:
+                session['ShopCart'][code]['quantity'] = int(quantity)
+                session['ShopCart'][code]['colors'] = color
+
+            flash('Giỏ hàng đã được cập nhật!', 'success')
+            return redirect(url_for('getCart'))
         except Exception as e:
             print(e)
             return redirect(url_for('getCart'))
 
-@app.route('/deleteitem/<int:code>')
+@app.route('/deleteitem/<code>')
 def deleteItem(code):
     if 'ShopCart' not in session or len(session['ShopCart']) <= 0:
         return redirect(url_for('home'))
     try:
         session.modified = True
-        for key, item in session['ShopCart'].items():
-            if int(key) == code:
-                session['ShopCart'].pop(key, None)
-                flash('Sản phẩm đã được xóa khỏi giỏ hàng!', 'success')
-                return redirect(url_for('getCart'))
+        if code in session['ShopCart']:
+            session['ShopCart'].pop(code, None)
+            flash('Sản phẩm đã được xóa khỏi giỏ hàng!', 'success')
+            return redirect(url_for('getCart'))
     except Exception as e:
         print(e)
         return redirect(url_for('getCart'))

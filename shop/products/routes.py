@@ -107,7 +107,7 @@ def addbrand():
         db.session.add(brand)
         db.session.commit()
         flash(f'Thương hiệu {getbrand} được thêm thành công!', 'success')
-        return redirect(url_for('addbrand'))
+        return redirect(url_for('brands'))
 
     return render_template('products/addbrand.html', brands='brands')
 
@@ -153,7 +153,7 @@ def addcategory():
         db.session.add(category)
         db.session.commit()
         flash(f'Danh mục {get_category} được thêm thành công!', 'success')
-        return redirect(url_for('addcategory'))
+        return redirect(url_for('categories'))
 
     return render_template('products/addbrand.html', title='Add Category')
 
@@ -186,7 +186,6 @@ def deletecat(id):
         db.session.commit()
     flash(f'Danh mục {category.name} được xóa thành công!', 'success')
     return redirect(url_for('categories'))
-
 
 @app.route('/addproduct', methods=['GET', 'POST'])
 @role_required(['admin', 'sale'])
@@ -267,7 +266,7 @@ def updateproduct(id):
         db.session.add(product)
         flash(f'Sản phẩm {product.name} được cập nhật thành công!', 'success')
         db.session.commit()
-        return redirect(url_for('admin'))
+        return redirect(request.referrer)
 
     form.name.data = product.name
     form.price.data = product.price

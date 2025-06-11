@@ -2,6 +2,7 @@ from flask import redirect, render_template, url_for, flash, request, session, c
 from shop import app, db, photos, search, bcrypt
 from .forms import CustomerRegisterForm, ReviewForm
 from .model import Customer, Order, OrderDetail, Review
+from shop.products.routes import brands, categories
 from shop.models import Role, User
 import os
 import secrets
@@ -133,7 +134,7 @@ def get_order():
 
             # Xóa giỏ hàng sau khi đã đặt hàng thành công
             session.pop('ShopCart')
-            flash(f'Đơn hàng {order.invoice} của bạn đã được gửi yêu cầu thành !', 'success')
+            flash(f'Đơn hàng {order.invoice} của bạn đã được gửi yêu cầu thành công!', 'success')
             return redirect(url_for('orders', invoice=invoice))
         except Exception as e:
             logging.error(f"Gặp lỗi trong quá trình gửi đơn hàng: {e}", exc_info=True)
@@ -160,7 +161,9 @@ def orders(invoice):
                                    order_details=order.order_details,
                                    grand_total=order.grand_total,
                                    tax=order.tax,
-                                   invoice=invoice)
+                                   invoice=invoice,
+                                   brands=brands(),
+                                   categories=categories())
         else:
             flash('Không tìm thấy đơn hàng', 'danger')
             return redirect(url_for('home'))

@@ -33,9 +33,18 @@
                       <td>{{ order.date_created.strftime('%d-%m-%Y') }}</td>
                       <td>{{ order.order_details|length }}</td>
                       <td>{{ "{:,.0f}".format(order.grand_total) }} VND</td>
+                    {% if order.status == 'pending' %}
                       <td>
-                        <span class="badge bg-success">{{ order.status }}</span>
+                        <span class="badge bg-warning">Chờ duyệt</span>
                       </td>
+                    {% elif order.status == 'completed' %}
+                        <td>
+                        <span class="badge bg-success">Hoàn thành</span>
+                      </td>
+                    {% elif order.status == 'cancelled' %}
+                        <td>
+                        <span class="badge bg-danger">Đã hủy</span>
+                    {% endif %}
                       <td class="text-center">
                         <a href="{{ url_for('orders', invoice=order.invoice) }}" class="btn btn-sm btn-info me-2">
                           <i class="bi bi-eye"></i> Chi tiết

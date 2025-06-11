@@ -8,16 +8,21 @@
 {% block content %}
 {% include '_messages.html' %}
 
-<div class="container">
-    {% include '_navbar_admin.html' %}
-</div>
-
+{% if current_user.role_id == 1 %}
+    <div class="container">
+        {% include '_navbar_admin.html' %}
+    </div>
+{% else %}
+    <div class="container">
+        {% include '_navbar_sale.html' %}
+    </div>
+{% endif %}
 <!-- Main Header -->
  <!-- Main Header -->
 <div class="container mt-4 mb-4">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h2 class="text-primary fw-bold mb-1">Quản Lý Đơn Hàng</h2>
+            <h2 class="text-primary fw-bold mb-1">💻Quản Lý Đơn Hàng</h2>
             <p class="text-muted mb-0">Danh sách và quản lý tất cả đơn hàng trong hệ thống</p>
         </div>
         <div class="d-flex align-items-center gap-3">
@@ -27,13 +32,13 @@
                     <span class="input-group-text bg-white border-end-0">
                         <i class="fas fa-search text-muted"></i>
                     </span>
-                    <input type="text" 
-                           class="form-control border-start-0 ps-0" 
-                           id="searchInput" 
+                    <input type="text"
+                           class="form-control border-start-0 ps-0"
+                           id="searchInput"
                            placeholder="Mã hóa đơn, khách hàng..."
                            style="border-radius: 0 6px 6px 0 !important;">
-                    <button class="btn btn-outline-secondary" 
-                            type="button" 
+                    <button class="btn btn-outline-secondary"
+                            type="button"
                             id="clearSearch"
                             style="border-radius: 0 6px 6px 0; display: none;">
                         <i class="fas fa-times"></i>
@@ -70,11 +75,10 @@
                     <div class="col-2">Khách Hàng</div>
                     <div class="col-2">Ngày Tạo</div>
                     <div class="col-2 text-center">Trạng Thái</div>
-                    <div class="col-2 text-center">Chi tiết</div>
-                    <div class="col-1">Thao Tác</div>
+                    <div class="col-3 text-center">Thao Tác</div>
                 </div>
             </div>
-            
+
             <!-- Table Body -->
             <div class="table-responsive">
                 {% if orders %}
@@ -107,19 +111,18 @@
                         </div>
                         <div class="col-2 text-center">
                             {% if order.status == 'pending' %}
-                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
                             {% elif order.status == 'accepted' %}
                                 <span class="badge bg-info">Đã duyệt</span>
                             {% else %}
                                 <span class="badge bg-success">Hoàn thành</span>
                             {% endif %}
                         </div>
-                        <div class="col-2 text-center">
+                        <div class="col-3 text-center">
                             <a href="{{ url_for('order_detail', id=order.id) }}" class="btn btn-info btn-sm me-2" title="Xem chi tiết">
                                 <i class="fas fa-eye me-1"></i>Chi tiết
                             </a>
-                        </div>
-                        <div class="col-1">
+
                             {% if order.status == 'pending' %}
                                 <button type="button" class="btn btn-success btn-sm" title="Duyệt đơn hàng" data-bs-toggle="modal" data-bs-target="#acceptModal-{{order.id}}">
                                     <i class="fas fa-check me-1"></i>Duyệt
@@ -128,10 +131,6 @@
                                 <button type="button" class="btn btn-primary btn-sm" title="Hoàn thành đơn hàng" data-bs-toggle="modal" data-bs-target="#completeModal-{{order.id}}">
                                     <i class="fas fa-check-circle me-1"></i>Hoàn thành
                                 </button>
-                            {% else %}
-                                <span class="badge bg-light text-muted">
-                                    <i class="fas fa-check-double me-1"></i>Hoàn thành
-                                </span>
                             {% endif %}
                         </div>
                     </div>

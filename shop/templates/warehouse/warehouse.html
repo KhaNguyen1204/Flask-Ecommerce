@@ -4,7 +4,9 @@
 {% block content %}
 {% include '_messages.html' %}
 <div class="container">
+{% if current_user.role_id == 1 %}
     {% include '_navbar_admin.html' %}
+{% endif %}
     {% include '_navbar_warehouse.html' %}
 
     <!-- Page Title -->
@@ -42,12 +44,15 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3 position-relative">
                             <label class="form-label fw-semibold">Tìm kiếm</label>
-                            <input class="form-control" type="search" placeholder="Tên sản phẩm, mã SP..." 
+                            <input class="form-control pe-4" type="search" placeholder="Tên sản phẩm, mã SP..."
                                    aria-label="Search" id="search-input">
+                            <button id="clear-search" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2 d-none">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <div class="col-md-2 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label fw-semibold">Danh mục</label>
                             <select class="form-select" id="category-filter">
                                 <option value="">Tất cả</option>
@@ -56,7 +61,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-2 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label fw-semibold">Thương hiệu</label>
                             <select class="form-select" id="brand-filter">
                                 <option value="">Tất cả</option>
@@ -66,20 +71,8 @@
                             </select>
                         </div>
                         <div class="col-md-2 mb-3">
-                            <label class="form-label fw-semibold">Trạng thái</label>
-                            <select class="form-select" id="stock-filter">
-                                <option value="">Tất cả</option>
-                                <option value="low">Sắp hết hàng</option>
-                                <option value="out">Hết hàng</option>
-                                <option value="in">Còn hàng</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mb-3">
                             <label class="form-label fw-semibold">&nbsp;</label>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary flex-fill">
-                                    <i class="fas fa-search me-1"></i>Tìm
-                                </button>
                                 <button id="reset-filter" class="btn btn-outline-secondary">
                                     <i class="fas fa-redo me-1"></i>Reset
                                 </button>
@@ -100,7 +93,7 @@
                         <h5 class="card-title mb-0 text-dark">
                             <i class="fas fa-boxes me-2"></i>Danh Sách Sản Phẩm Trong Kho
                         </h5>
-                        <small class="text-muted">Tổng cộng: {{ products|length }} sản phẩm</small>
+                        <small class="text-muted">Tổng cộng: <span id="product-count">{{ products|length }}</span> sản phẩm</small>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -120,12 +113,14 @@
                                     <th class="text-center" style="width: 200px;">Thao Tác</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="products-table-body">
                                 {% if products %}
                                 {% for product in products %}
                                 <tr class="align-middle product-row"
                                     data-category="{{ product.category_id }}"
                                     data-brand="{{ product.brand_id }}"
+                                    data-category-name="{{ product.category.name|lower }}"
+                                    data-brand-name="{{ product.brand.name|lower }}"
                                     data-stock="{% if product.stock <= 0 %}out{% elif product.stock <= 3 %}low{% else %}in{% endif %}">
                                     <td class="text-center">
                                         <span class="badge bg-secondary">{{ loop.index }}</span>
@@ -133,30 +128,30 @@
                                     <td class="text-center">
                                         <div class="position-relative d-inline-block">
                                             {% if product.image_1 %}
-                                            <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
-                                                 alt="{{ product.name }}" 
+                                            <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                                                 alt="{{ product.name }}"
                                                  class="rounded shadow-sm product-thumbnail"
                                                  style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
-                                                 data-bs-toggle="modal" 
+                                                 data-bs-toggle="modal"
                                                  data-bs-target="#imageModal-{{ product.id }}">
                                             {% else %}
-                                            <div class="bg-light text-center rounded d-flex align-items-center justify-content-center" 
+                                            <div class="bg-light text-center rounded d-flex align-items-center justify-content-center"
                                                  style="width:50px;height:50px;">
                                                 <i class="fas fa-image text-muted"></i>
                                             </div>
                                             {% endif %}
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="product-name">
                                         <div class="text-dark fw-medium">{{ product.name }}</div>
                                     </td>
-                                    <td>
+                                    <td class="product-code">
                                         <span class="text-muted">{{ product.id or 'N/A' }}</span>
                                     </td>
-                                    <td>
+                                    <td class="product-category">
                                         <span class="badge bg-info text-dark">{{ product.category.name }}</span>
                                     </td>
-                                    <td>
+                                    <td class="product-brand">
                                         <span class="badge bg-primary">{{ product.brand.name }}</span>
                                     </td>
                                     <td class="text-center">
@@ -191,29 +186,9 @@
                                         </div>
                                     </td>
                                 </tr>
-
-                                <!-- Image Preview Modal -->
-                                <div class="modal fade" id="imageModal-{{ product.id }}" tabindex="-1"
-                                     aria-labelledby="imageModalLabel-{{ product.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="imageModalLabel-{{ product.id }}">
-                                                    {{ product.name }}
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body text-center">
-                                                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
-                                                     alt="{{ product.name }}" 
-                                                     class="img-fluid rounded shadow">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 {% endfor %}
                                 {% else %}
-                                <tr>
+                                <tr class="no-products">
                                     <td colspan="10" class="text-center py-5">
                                         <i class="fas fa-box-open text-muted" style="font-size: 3rem;"></i>
                                         <h5 class="text-muted mt-3">Chưa có sản phẩm nào trong kho</h5>
@@ -230,9 +205,273 @@
     </div>
 </div>
 
-<!-- Modals cho chi tiết sản phẩm -->
+<!-- Custom CSS -->
+<style>
+.highlight {
+    background-color: #ffc107;
+    padding: 0 2px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.product-thumbnail {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-thumbnail:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-group .btn {
+    border-radius: 0.375rem !important;
+    margin: 0 2px;
+    font-size: 0.875rem;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.display-5 {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.table th {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.table td {
+    font-size: 0.875rem;
+}
+
+.nav-link.active {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+#clear-search {
+    text-decoration: none;
+    color: #6c757d;
+}
+
+#clear-search:hover {
+    color: #495057;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Khởi tạo các biến cần thiết
+    const searchInput = document.getElementById('search-input');
+    const clearSearchBtn = document.getElementById('clear-search');
+    const resetFilterBtn = document.getElementById('reset-filter');
+    const categoryFilter = document.getElementById('category-filter');
+    const brandFilter = document.getElementById('brand-filter');
+    const productsTableBody = document.getElementById('products-table-body');
+    const productCountEl = document.getElementById('product-count');
+
+    // Tạo thông báo khi không có kết quả
+    const noResultsRow = document.createElement('tr');
+    noResultsRow.className = 'no-results';
+    noResultsRow.innerHTML = `
+        <td colspan="10" class="text-center py-5">
+            <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+            <h5 class="text-muted mt-3">Không có kết quả phù hợp</h5>
+            <p class="text-muted">Hãy thử từ khóa tìm kiếm khác hoặc điều chỉnh bộ lọc</p>
+        </td>
+    `;
+
+    // Xử lý sự kiện tìm kiếm với debounce để tối ưu hiệu suất
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearSearchBtn.classList.toggle('d-none', this.value === '');
+
+        // Clear timeout cũ và tạo timeout mới
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterProducts();
+        }, 300); // Delay 300ms để tránh tìm kiếm quá nhiều lần
+    });
+
+    // Xử lý nút xóa tìm kiếm
+    clearSearchBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        clearSearchBtn.classList.add('d-none');
+        filterProducts();
+    });
+
+    // Xử lý các bộ lọc
+    categoryFilter.addEventListener('change', filterProducts);
+    brandFilter.addEventListener('change', filterProducts);
+
+    // Xử lý nút reset
+    resetFilterBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        brandFilter.value = '';
+        clearSearchBtn.classList.add('d-none');
+        filterProducts();
+    });
+
+    // Hàm chính để lọc sản phẩm
+    function filterProducts() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const categoryValue = categoryFilter.value;
+        const brandValue = brandFilter.value;
+
+        let visibleCount = 0;
+        let hasResults = false;
+
+        // Xóa highlight cũ
+        clearHighlights();
+
+        // Lặp qua từng sản phẩm
+        document.querySelectorAll('.product-row').forEach((row, index) => {
+            const productName = row.querySelector('.product-name').textContent.toLowerCase();
+            const productCode = row.querySelector('.product-code').textContent.toLowerCase();
+            const categoryName = row.dataset.categoryName || '';
+            const brandName = row.dataset.brandName || '';
+
+            // Kiểm tra các điều kiện lọc
+            const categoryMatch = !categoryValue || row.dataset.category === categoryValue;
+            const brandMatch = !brandValue || row.dataset.brand === brandValue;
+            const searchMatch = !searchTerm ||
+                               productName.includes(searchTerm) ||
+                               productCode.includes(searchTerm) ||
+                               categoryName.includes(searchTerm) ||
+                               brandName.includes(searchTerm);
+
+            // Kiểm tra xem sản phẩm có phù hợp với tất cả điều kiện không
+            const shouldShow = categoryMatch && brandMatch && searchMatch;
+
+            if (shouldShow) {
+                row.style.display = '';
+                visibleCount++;
+                hasResults = true;
+
+                // Cập nhật số thứ tự
+                const sttBadge = row.querySelector('.badge.bg-secondary');
+                if (sttBadge) {
+                    sttBadge.textContent = visibleCount;
+                }
+
+                // Highlight kết quả tìm kiếm
+                if (searchTerm) {
+                    highlightSearchResults(row, searchTerm);
+                }
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Cập nhật số lượng sản phẩm hiển thị
+        productCountEl.textContent = visibleCount;
+
+        // Xử lý khi không có kết quả
+        handleNoResults(hasResults);
+    }
+
+    // Hàm xóa highlight
+    function clearHighlights() {
+        document.querySelectorAll('.highlight').forEach(el => {
+            const parent = el.parentNode;
+            parent.replaceChild(document.createTextNode(el.textContent), el);
+            parent.normalize(); // Gộp các text node liền kề
+        });
+    }
+
+    // Hàm highlight kết quả tìm kiếm
+    function highlightSearchResults(row, searchTerm) {
+        const elementsToHighlight = [
+            row.querySelector('.product-name'),
+            row.querySelector('.product-code'),
+            row.querySelector('.product-category'),
+            row.querySelector('.product-brand')
+        ];
+
+        elementsToHighlight.forEach(element => {
+            if (element && element.textContent.toLowerCase().includes(searchTerm)) {
+                highlightText(element, searchTerm);
+            }
+        });
+    }
+
+    // Hàm highlight văn bản
+    function highlightText(element, searchTerm) {
+        const text = element.textContent;
+        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+        const newHTML = text.replace(regex, '<span class="highlight">$1</span>');
+        element.innerHTML = newHTML;
+    }
+
+    // Hàm escape regex để tránh lỗi với các ký tự đặc biệt
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Hàm xử lý khi không có kết quả
+    function handleNoResults(hasResults) {
+        const noResultsElement = document.querySelector('.no-results');
+        const noProductsElement = document.querySelector('.no-products');
+
+        if (!hasResults && !noProductsElement) {
+            if (!noResultsElement) {
+                productsTableBody.appendChild(noResultsRow);
+            }
+        } else {
+            if (noResultsElement) {
+                noResultsElement.remove();
+            }
+        }
+    }
+
+    // Khởi tạo tooltip Bootstrap
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(tooltipTriggerEl => {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+
+<!-- Các modal (giữ nguyên từ code gốc) -->
 {% if products %}
 {% for product in products %}
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imageModal-{{ product.id }}" tabindex="-1"
+     aria-labelledby="imageModalLabel-{{ product.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel-{{ product.id }}">
+                    {{ product.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                     alt="{{ product.name }}"
+                     class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Detail Modal -->
 <div class="modal fade" id="productModal-{{ product.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -246,7 +485,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         {% if product.image_1 %}
-                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}" 
+                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
                              class="img-fluid rounded shadow" alt="{{ product.name }}">
                         {% else %}
                         <div class="bg-light text-center p-5 rounded">
@@ -304,7 +543,7 @@
     </div>
 </div>
 
-<!-- Modal điều chỉnh số lượng -->
+<!-- Stock Adjustment Modal -->
 <div class="modal fade" id="stockAdjustModal-{{ product.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -331,13 +570,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="adjustment_quantity" class="form-label fw-semibold">Số lượng</label>
-                        <input type="number" name="adjustment_quantity" id="adjustment_quantity" 
+                        <input type="number" name="adjustment_quantity" id="adjustment_quantity"
                                class="form-control" min="1" required placeholder="Nhập số lượng">
                     </div>
                     <div class="mb-3">
                         <label for="adjustment_reason" class="form-label fw-semibold">Lý do điều chỉnh</label>
-                        <textarea name="adjustment_reason" id="adjustment_reason" 
-                                  class="form-control" rows="3" required 
+                        <textarea name="adjustment_reason" id="adjustment_reason"
+                                  class="form-control" rows="3" required
                                   placeholder="Nhập lý do điều chỉnh số lượng..."></textarea>
                     </div>
                     <div class="d-grid">
@@ -352,122 +591,5 @@
 </div>
 {% endfor %}
 {% endif %}
-
-<!-- Custom CSS -->
-<style>
-.product-thumbnail {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.product-thumbnail:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(13, 110, 253, 0.05);
-}
-
-.btn-group .btn {
-    border-radius: 0.375rem !important;
-    margin: 0 2px;
-    font-size: 0.875rem;
-}
-
-.card {
-    border-radius: 15px;
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-
-.display-5 {
-    background: linear-gradient(45deg, #007bff, #0056b3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.table th {
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.table td {
-    font-size: 0.875rem;
-}
-
-.nav-link.active {
-    background-color: rgba(13, 110, 253, 0.1);
-    border-radius: 0.375rem;
-    font-weight: 500;
-}
-</style>
-
-<!-- JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Lọc sản phẩm theo danh mục
-    document.getElementById('category-filter').addEventListener('change', filterProducts);
-
-    // Lọc sản phẩm theo thương hiệu
-    document.getElementById('brand-filter').addEventListener('change', filterProducts);
-
-    // Lọc sản phẩm theo trạng thái tồn kho
-    document.getElementById('stock-filter').addEventListener('change', filterProducts);
-
-    // Reset bộ lọc
-    document.getElementById('reset-filter').addEventListener('click', function() {
-        document.getElementById('category-filter').value = '';
-        document.getElementById('brand-filter').value = '';
-        document.getElementById('stock-filter').value = '';
-        document.getElementById('search-input').value = '';
-        filterProducts();
-    });
-
-    // Tìm kiếm sản phẩm
-    document.getElementById('search-input').addEventListener('keyup', filterProducts);
-
-    function filterProducts() {
-        const categoryFilter = document.getElementById('category-filter').value;
-        const brandFilter = document.getElementById('brand-filter').value;
-        const stockFilter = document.getElementById('stock-filter').value;
-        const searchTerm = document.getElementById('search-input').value.toLowerCase();
-
-        document.querySelectorAll('.product-row').forEach(function(row) {
-            let showRow = true;
-
-            if (categoryFilter && row.dataset.category !== categoryFilter) {
-                showRow = false;
-            }
-
-            if (brandFilter && row.dataset.brand !== brandFilter) {
-                showRow = false;
-            }
-
-            if (stockFilter && row.dataset.stock !== stockFilter) {
-                showRow = false;
-            }
-
-            if (searchTerm) {
-                const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                const productCode = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-                if (!productName.includes(searchTerm) && !productCode.includes(searchTerm)) {
-                    showRow = false;
-                }
-            }
-
-            row.style.display = showRow ? '' : 'none';
-        });
-    }
-});
-</script>
 
 {% endblock content %}

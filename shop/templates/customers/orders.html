@@ -3,37 +3,46 @@
 {% include 'navbar.html' %}
 {% include '_messages.html' %}
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <!-- Khung thông tin đơn hàng -->
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-body bg-light">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p class="mb-1"><strong>Mã đơn hàng:</strong> {{order.invoice}}</p>
-                            <p class="mb-1"><strong>Trạng thái:</strong> 
-                                <span class="badge bg-{% if order.status == 'Completed' %}success{% else %}warning{% endif %}">
-                                    {{order.status}}
-                                </span>
-                            </p>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="mb-1"><strong>Khách hàng:</strong> {{customer.username}}</p>
-                            <p class="mb-1"><strong>Email:</strong> {{customer.email}}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="mb-1"><strong>Điện thoại:</strong> {{customer.phone}}</p>
-                            <p class="mb-1"><strong>Ngày đặt:</strong> {{order.date_created}}</p>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Khung thông tin đơn hàng -->
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-body bg-light">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Mã đơn hàng:</strong> {{ order.invoice }}</p>
+                                <p class="mb-1"><strong>Trạng thái:</strong>
+                                    {% if order.status == 'pending' %}
+                                        <td>
+                                            <span class="badge bg-warning">Chờ duyệt</span>
+                                        </td>
+                                    {% elif order.status == 'completed' %}
+                                        <td>
+                                            <span class="badge bg-success">Hoàn thành</span>
+                                        </td>
+                                    {% elif order.status == 'cancelled' %}
+                                        <td>
+                                        <span class="badge bg-danger">Đã hủy</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Khách hàng:</strong> {{ customer.username }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ customer.email }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1"><strong>Điện thoại:</strong> {{ customer.phone }}</p>
+                                <p class="mb-1"><strong>Ngày đặt:</strong> {{ order.date_created }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Bảng sản phẩm -->
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="table-primary">
+                <!-- Bảng sản phẩm -->
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-primary">
                         <tr>
                             <th class="text-center">STT</th>
                             <th>Tên sản phẩm</th>
@@ -42,38 +51,38 @@
                             <th class="text-end">Giảm giá</th>
                             <th class="text-end">Thành tiền</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         {% for item in order_details %}
-                        {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
-                        <tr>
-                            <td class="text-center">{{loop.index}}</td>
-                            <td>{{item.product_name}}</td>
-                            <td class="text-end">{{"%.0f"|format(item.price)}}₫</td>
-                            <td class="text-center">{{item.quantity}}</td>
-                            <td class="text-end">
-                                {% if item.discount > 0 %}
-                                {{item.discount}}% ({{discount}}₫)
-                                {% else %}
-                                0₫
-                                {% endif %}
-                            </td>
-                            <td class="text-end">{{"%0.2f"|format(item.subtotal)}}₫</td>
-                        </tr>
+                            {% set discount = "%0.2f"|format((item.discount/100) * item.price|float * item.quantity|int) %}
+                            <tr>
+                                <td class="text-center">{{ loop.index }}</td>
+                                <td>{{ item.product_name }}</td>
+                                <td class="text-end">{{ "%.0f"|format(item.price) }}₫</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">
+                                    {% if item.discount > 0 %}
+                                        {{ item.discount }}% ({{ discount }}₫)
+                                    {% else %}
+                                        0₫
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">{{ "%0.2f"|format(item.subtotal) }}₫</td>
+                            </tr>
                         {% endfor %}
-                    </tbody>
-                    <tfoot class="table-group-divider">
+                        </tbody>
+                        <tfoot class="table-group-divider">
                         <tr>
                             <td colspan="5" class="text-end fw-bold">Thuế (VAT):</td>
-                            <td class="text-end">{{"%.2f"|format(tax)}}₫</td>
+                            <td class="text-end">{{ "%.2f"|format(tax) }}₫</td>
                         </tr>
                         <tr>
                             <td colspan="5" class="text-end fw-bold">Tổng cộng:</td>
-                            <td class="text-end fw-bold text-primary">{{"%.2f"|format(grand_total)}}₫</td>
+                            <td class="text-end fw-bold text-primary">{{ "%.2f"|format(grand_total) }}₫</td>
                         </tr>
                         <tr>
                             <td colspan="6" class="text-end border-0 pt-3">
-                                <form action="{{url_for('get_pdf', invoice=invoice)}}" method="post" class="d-inline">
+                                <form action="{{ url_for('get_pdf', invoice=invoice) }}" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-sm btn-outline-primary me-2">
                                         <i class="fas fa-file-pdf"></i> Xuất PDF
                                     </button>
@@ -83,20 +92,21 @@
                                 </a>
                             </td>
                         </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-    .table th {
-        white-space: nowrap;
-    }
-    .badge {
-        font-size: 0.85em;
-        padding: 3px 8px;
-    }
-</style>
+    <style>
+        .table th {
+            white-space: nowrap;
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 3px 8px;
+        }
+    </style>
 {% endblock content %}

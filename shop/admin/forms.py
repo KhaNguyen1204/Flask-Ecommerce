@@ -10,7 +10,7 @@ class StaffRegistrationForm(FlaskForm):
     phone = StringField('Số điện thoại', [validators.DataRequired(), validators.Length(min=5, max=15)])
     password = PasswordField('Mật khẩu', [
         validators.DataRequired(), validators.Length(min=6, max=30),
-        validators.EqualTo('comfirm', message='Mật khẩu phải trùng khớp')])
+        validators.EqualTo('confirm', message='Mật khẩu phải trùng khớp')])
     position = StringField('Ví trí', [validators.DataRequired()])
     role_id = SelectField('Vai trò trong trang web', coerce=int)
     confirm = PasswordField('Xác nhân mật khẩu')

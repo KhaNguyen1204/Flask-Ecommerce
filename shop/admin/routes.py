@@ -49,7 +49,7 @@ def admin_register():
     if admin_exists:
         # Nếu đã có admin mà chưa đăng nhập thì yêu cầu đăng nhập
         if not current_user.is_authenticated or current_user.role.name != 'admin':
-            flash('Bạn không có quyền truy cập vào trang này.', 'danger')
+            flash('Admin đã tồn tại, vui lòng đăng nhập!.', 'danger')
             return redirect(url_for('login'))
 
     form = StaffRegistrationForm(request.form)
@@ -381,7 +381,6 @@ def add_customer():
             country=form.country.data,
             city=form.city.data,
             address=form.address.data,
-            zipcode=form.zipcode.data,
             role_id=customer_role.id
         )
 
@@ -395,7 +394,7 @@ def add_customer():
         flash(f'Khách hàng {form.username.data} được thêm thành công!', 'success')
         return redirect(url_for('customers_manager'))
 
-    return render_template('customers/register.html', form=form, title='Add Customer Page')
+    return render_template('customers/register.html', form=form, title='Thêm khách hàng')
 
 @app.route('/delete_customer/<int:id>', methods=['POST'])
 @role_required(['admin'])
@@ -406,6 +405,6 @@ def delete_customer(id):
     if user:
         db.session.delete(user)
     db.session.commit()
-    flash('Xóa nhân viên thành công', 'success')
+    flash('Xóa khách hàng thành công', 'success')
     return redirect(url_for('customers_manager'))
 

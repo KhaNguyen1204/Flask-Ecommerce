@@ -2,89 +2,463 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    {% include '_navbar_admin.html' %}
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center mt-4 mb-4">Staff Management</h1>
-            <div class="mb-3">
-                <a href="{{url_for('add_staff')}}" class="btn btn-primary">Add New Staff</a>
+    <div class="container py-0">
+        {% include '_navbar_admin.html' %}
+
+        <!-- Main Header with Search -->
+        <div class="container mt-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <!-- Left: Title -->
+                <div class="mt-2 mb-4">
+                    <h2 class="text-primary fw-bold mb-1">🧑‍💼Quản lý nhân viên</h2>
+                    <p class="text-muted">Danh sách và quản lý tất cả nhân viên trong hệ thống</p>
+                </div>
+
+
+                <!-- Right: Search Bar and Add Button -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="position-relative">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm..."
+                               style="padding-left: 35px; min-width: 250px;">
+                        <i class="bi bi-search position-absolute" style="left: 12px; top: 10px; color: #6c757d;"></i>
+                    </div>
+                    <a href="{{ url_for('add_staff') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Thêm nhân viên
+                    </a>
+                </div>
             </div>
+
             {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show mb-4">
+                            <i class="bi bi-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             {% endwith %}
 
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Position</th>
-                    <th>Status</th>
-                    <th>Hire Date</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if staffs %}
-                {% for staff in staffs %}
-                <tr>
-                    <td>{{loop.index}}</td>
-                    <td>{{staff.username}}</td>
-                    <td>{{staff.email}}</td>
-                    <td>{{staff.phone}}</td>
-                    <td>{{staff.position}}</td>
-                    <td>{{staff.status}}</td>
-                    <td>{{staff.hire_date.strftime('%Y-%m-%d')}}</td>
-                    <td><a href="{{url_for('update_staff', id=staff.id)}}" class="btn btn-sm btn-info">Chỉnh sửa</a></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#staffModal-{{staff.id}}">
-                            Xóa
-                        </button>
-                    </td>
-                </tr>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="customerTable">
+                            <thead class="table-dark">
+                            <tr>
+                                <th class="text-center" style="width: 5%">#</th>
+                                <th style="width: 15%">Tên nhân viên</th>
+                                <th style="width: 18%">Email</th>
+                                <th style="width: 12%">Số điện thoại</th>
+                                <th style="width: 10%">Vị trí</th>
+                                <th class="text-center" style="width: 10%">Trạng thái</th>
+                                <th style="width: 12%">Ngày vào làm</th>
+                                <th class="text-center" style="width: 18%">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if staffs %}
+                                {% for staff in staffs %}
+                                    <tr>
+                                        <td class="text-center">{{ loop.index }}</td>
+                                        <td class="searchable">{{ staff.username }}</td>
+                                        <td class="searchable">{{ staff.email }}</td>
+                                        <td class="searchable">{{ staff.phone }}</td>
+                                        <td class="searchable">{{ staff.position }}</td>
+                                        <td class="text-center">
+                                            {% if staff.status == 'active' %}
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Ngừng hoạt động</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ staff.hire_date.strftime('%d/%m/%Y') }}</td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <button type="button"
+                                                        class="btn btn-info btn-action"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#detailModal-{{ staff.id }}"
+                                                        title="Chi tiết">
+                                                    Chi tiết
+                                                </button>
 
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="staffModal-{{staff.id}}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Xóa nhân viên</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <span class="text-danger">Bạn có chắc chắn muốn xóa nhân viên "{{staff.username}}"?</span>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                <form action="{{url_for('delete_staff', id=staff.id)}}" method="POST">
-                                    <button type="submit" class="btn btn-danger">Xóa</button>
-                                </form>
-                            </div>
-                        </div>
+                                                <a href="{{ url_for('update_staff', id=staff.id) }}"
+                                                   class="btn btn-primary btn-action"
+                                                   title="Chỉnh sửa">
+                                                    Sửa
+                                                </a>
+
+                                                <button type="button"
+                                                        class="btn btn-danger btn-action"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteModal-{{ staff.id }}"
+                                                        title="Xóa">
+                                                    Xóa
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Detail Modal -->
+                                    <div class="modal fade" id="detailModal-{{ staff.id }}" tabindex="-1"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-info text-white border-0">
+                                                    <h5 class="modal-title">
+                                                        <i class="bi bi-person-circle me-2"></i>Chi tiết nhân viên
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4">
+                                                    <div class="row g-4">
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 bg-light h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-hash me-2"></i>Mã số
+                                                                    </h6>
+                                                                    <p class="card-text h5 text-dark">{{ loop.index }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 bg-light h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-person me-2"></i>Tên nhân viên
+                                                                    </h6>
+                                                                    <p class="card-text h5 text-dark">{{ staff.username }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 bg-light h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-envelope me-2"></i>Email
+                                                                    </h6>
+                                                                    <p class="card-text h6 text-dark">{{ staff.email }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 bg-light h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-telephone me-2"></i>Số điện
+                                                                        thoại
+                                                                    </h6>
+                                                                    <p class="card-text h6 text-dark">{{ staff.phone }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 bg-light h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-briefcase me-2"></i>Vị trí
+                                                                    </h6>
+                                                                    <p class="card-text h6 text-dark">{{ staff.position }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 bg-light h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-check-circle me-2"></i>Trạng
+                                                                        thái
+                                                                    </h6>
+                                                                    <span class="badge bg-{{ 'success' if staff.status == 'Active' else 'secondary' }} fs-6 px-3 py-2">
+                                                                {{ staff.status }}
+                                                            </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-12">
+                                                            <div class="card border-0 bg-light">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title text-primary mb-3">
+                                                                        <i class="bi bi-calendar-check me-2"></i>Ngày
+                                                                        vào làm
+                                                                    </h6>
+                                                                    <p class="card-text h6 text-dark">{{ staff.hire_date.strftime('%d/%m/%Y') }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-0 bg-light">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                        <i class="bi bi-x-circle me-1"></i>Đóng
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delete Confirmation Modal -->
+                                    <div class="modal fade" id="deleteModal-{{ staff.id }}" tabindex="-1"
+                                         aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header border-0">
+                                                    <h5 class="modal-title text-danger">
+                                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4">
+                                                    Bạn có chắc chắn muốn xóa nhân viên
+                                                    <strong>{{ staff.username }}</strong>?
+                                                </div>
+                                                <div class="modal-footer border-0">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Hủy
+                                                    </button>
+                                                    <form action="{{ url_for('delete_staff', id=staff.id) }}"
+                                                          method="POST" style="display: inline;">
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="bi bi-trash me-1"></i> Xóa
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        <i class="bi bi-people display-6 d-block mb-2"></i>
+                                        Không có nhân viên nào
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="8" class="text-center">No staff members found.</td>
-                </tr>
-                {% endif %}
-                </tbody>
-            </table>
+            </div>
         </div>
-    </div>
-</div>
+
+        <style>
+            /* Đồng bộ style với trang báo cáo */
+            body {
+                background: #f8fafc;
+            }
+
+            .card {
+                border-radius: 16px;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+                border: none;
+            }
+
+            .table thead {
+                background: #e9ecef;
+            }
+
+            .table tbody tr:hover {
+                background: #f1f3f6;
+            }
+
+            .btn-primary, .btn-success, .btn-info {
+                border-radius: 8px;
+            }
+
+            .badge {
+                padding: 0.35em 0.65em;
+                font-size: 0.75em;
+                font-weight: 500;
+            }
+
+            /* Navbar style */
+            .navbar {
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+            }
+
+            .nav-link {
+                transition: all 0.2s ease;
+            }
+
+            .nav-link:hover {
+                background-color: rgba(13, 110, 253, 0.1);
+                color: #0d6efd !important;
+            }
+
+            .nav-link.active-nav {
+                background-color: rgba(13, 110, 253, 0.15);
+                color: #0d6efd !important;
+                font-weight: 500 !important;
+            }
+
+            /* Highlight style for search results */
+            .highlight {
+                background-color: #fff3cd;
+                font-weight: bold;
+                padding: 0 2px;
+                border-radius: 3px;
+            }
+
+            /* Hide rows that don't match search */
+            tr[data-visible="false"] {
+                display: none;
+            }
+
+            /* Detail modal styles */
+            .modal-content {
+                border-radius: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            }
+
+            .modal-header.bg-info {
+                border-radius: 12px 12px 0 0;
+            }
+
+            .modal-body .card {
+                border-radius: 8px;
+                transition: transform 0.2s ease;
+            }
+
+            .modal-body .card:hover {
+                transform: translateY(-2px);
+            }
+
+            .modal-footer.bg-light {
+                border-radius: 0 0 12px 12px;
+            }
+
+            /* Custom action button styles */
+            .btn-action {
+                font-size: 12px;
+                font-weight: 500;
+                padding: 6px 12px;
+                border-radius: 6px;
+                border: none;
+                color: white;
+                min-width: 60px;
+                text-align: center;
+                transition: all 0.2s ease;
+            }
+
+            .btn-action:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                color: white;
+            }
+
+            .btn-info.btn-action {
+                background-color: #17a2b8;
+                border-color: #17a2b8;
+            }
+
+            .btn-info.btn-action:hover {
+                background-color: #138496;
+                border-color: #117a8b;
+            }
+
+            .btn-primary.btn-action {
+                background-color: #007bff;
+                border-color: #007bff;
+            }
+
+            .btn-primary.btn-action:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+            }
+
+            .btn-danger.btn-action {
+                background-color: #dc3545;
+                border-color: #dc3545;
+            }
+
+            .btn-danger.btn-action:hover {
+                background-color: #c82333;
+                border-color: #bd2130;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Active nav item
+                const currentPath = window.location.pathname;
+                if (currentPath.startsWith('/manager_staffs')) {
+                    document.getElementById('nav-staff').classList.add('active-nav');
+                }
+
+                // Search functionality
+                const searchInput = document.getElementById('searchInput');
+                const customerTable = document.getElementById('customerTable');
+                const rows = customerTable.querySelectorAll('tbody tr');
+
+                searchInput.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase().trim();
+
+                    rows.forEach(row => {
+                        // Skip if this is the "no results" row
+                        if (row.querySelector('td[colspan]')) return;
+
+                        const searchableCells = row.querySelectorAll('.searchable');
+                        let rowMatches = false;
+
+                        // Remove previous highlights
+                        searchableCells.forEach(cell => {
+                            cell.innerHTML = cell.textContent;
+                        });
+
+                        // Check each searchable cell for matches
+                        searchableCells.forEach(cell => {
+                            const cellText = cell.textContent.toLowerCase();
+
+                            if (searchTerm && cellText.includes(searchTerm)) {
+                                rowMatches = true;
+
+                                // Highlight matching text
+                                const regex = new RegExp(searchTerm, 'gi');
+                                const highlightedText = cell.textContent.replace(regex, match =>
+                                    `<span class="highlight">${match}</span>`
+                                );
+                                cell.innerHTML = highlightedText;
+                            }
+                        });
+
+                        // Show/hide row based on match
+                        if (searchTerm === '' || rowMatches) {
+                            row.setAttribute('data-visible', 'true');
+                            row.style.display = '';
+                        } else {
+                            row.setAttribute('data-visible', 'false');
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Check if any rows are visible
+                    const visibleRows = Array.from(rows).filter(row =>
+                        row.getAttribute('data-visible') === 'true' || row.querySelector('td[colspan]')
+                    );
+
+                    // Show "no results" message if no matches
+                    const noResultsRow = customerTable.querySelector('td[colspan]')?.closest('tr');
+                    if (noResultsRow) {
+                        if (searchTerm && visibleRows.length === 0) {
+                            noResultsRow.style.display = '';
+                        } else {
+                            noResultsRow.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        </script>
 {% endblock %}
