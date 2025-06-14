@@ -21,7 +21,7 @@
 <div class="container mt-1">
     <div>
         <h2 class="text-primary fw-bold mt-3 mb-1">
-            {% if brands %}Quản Lý Thương Hiệu{% else %}Quản Lý Danh Mục{% endif %}
+            {% if brands or is_brands %}Quản Lý Thương Hiệu{% else %}Quản Lý Danh Mục{% endif %}
         </h2>
         <p class="text-muted mb-0">
             {% if brands %}
@@ -32,7 +32,7 @@
         </p>
     </div>
 <div class="container mt-4">
-    {% if brands %}
+    {% if brands or is_brands %}
         <a href="{{ url_for('addbrand') }}" class="btn btn-primary  mb-3">Thêm thương hiệu</a>
     {% else %}
         <a href="{{ url_for('addcategory') }}" class="btn btn-primary  mb-3">Thêm danh mục</a>
@@ -49,7 +49,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-3">
                             <h5 class="card-title mb-0 text-dark">
-                                <i class="fas fa-list me-2"></i>Tìm kiếm {% if brands %}thương hiệu{% else %}danh mục{% endif %}
+                                <i class="fas fa-list me-2"></i>Tìm kiếm {% if brands or is_brands %}thương hiệu{% else %}danh mục{% endif %}
                             </h5>
                             <div class="search-container">
                                 <div class="input-group has-search" style="max-width: 350px;">
@@ -71,7 +71,7 @@
                             </div>
                         </div>
                         <small class="text-muted">
-                            <span id="totalItems">Tổng cộng: {{ (brands or categories)|length }} {% if brands %}thương hiệu{% else %}danh mục{% endif %}</span>
+                            <span id="totalItems">Tổng cộng: {{ (brands or categories)|length }} {% if brands or is_brands %}thương hiệu{% else %}danh mục{% endif %}</span>
                             <span id="searchResults" class="text-primary" style="display: none;"></span>
                         </small>
                     </div>
@@ -82,9 +82,9 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th class="text-center" style="width: 60px;">STT</th>
-                                    <th style="width: 200px;">Tên {% if brands %}Thương Hiệu{% else %}Danh Mục{% endif %}</th>
-                                    <th class="text-center" style="width: 100px;">Hình Ảnh</th>
-                                    <th class="text-center" style="width: 180px;">Thao Tác</th>
+                                    <th style="width: 200px;">Tên {% if brands or is_brands %}Thương Hiệu{% else %}Danh Mục{% endif %}</th>
+                                    <th class="text-center" style="width: 180px;">Cập nhật</th>
+                                    <th class="text-center" style="width: 180px;">Xóa</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,24 +98,6 @@
                                         <div class="text-dark item-name">{{ brand.name }}</div>
                                     </td>
                                     <td class="text-center">
-                                        {% if brand.image %}
-                                        <div class="position-relative d-inline-block">
-                                            <img src="{{ url_for('static', filename='images/brands/' + brand.image) }}" 
-                                                 alt="{{ brand.name }}" 
-                                                 class="rounded shadow-sm item-thumbnail"
-                                                 style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
-                                                 data-bs-toggle="modal" 
-                                                 data-bs-target="#imageModal-{{ brand.id }}">
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
-                                                  style="font-size: 0.6rem;">
-                                                <i class="fas fa-search-plus"></i>
-                                            </span>
-                                        </div>
-                                        {% else %}
-                                        <span class="text-muted">Không có</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center">
                                         <div class="btn-group" role="group">
                                             <a href="{{ url_for('updatebrand', id=brand.id) }}" 
                                                class="btn btn-primary btn-sm px-3" 
@@ -123,6 +105,10 @@
                                                title="Chỉnh sửa thương hiệu">
                                                 <i class="fas fa-edit me-1"></i>Sửa
                                             </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
                                             <button type="button" 
                                                     class="btn btn-danger btn-sm px-3" 
                                                     data-bs-toggle="modal"
@@ -133,28 +119,6 @@
                                         </div>
                                     </td>
                                 </tr>
-
-                                <!-- Image Preview Modal -->
-                                {% if brand.image %}
-                                <div class="modal fade" id="imageModal-{{ brand.id }}" tabindex="-1"
-                                     aria-labelledby="imageModalLabel-{{ brand.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="imageModalLabel-{{ brand.id }}">
-                                                    {{ brand.name }}
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body text-center">
-                                                <img src="{{ url_for('static', filename='images/brands/' + brand.image) }}" 
-                                                     alt="{{ brand.name }}" 
-                                                     class="img-fluid rounded shadow">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
 
                                 <!-- Delete Confirmation Modal -->
                                 <div class="modal fade" id="deleteModal-{{ brand.id }}" tabindex="-1"
@@ -202,24 +166,6 @@
                                         <div class="text-dark item-name">{{ category.name }}</div>
                                     </td>
                                     <td class="text-center">
-                                        {% if category.image %}
-                                        <div class="position-relative d-inline-block">
-                                            <img src="{{ url_for('static', filename='images/categories/' + category.image) }}" 
-                                                 alt="{{ category.name }}" 
-                                                 class="rounded shadow-sm item-thumbnail"
-                                                 style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
-                                                 data-bs-toggle="modal" 
-                                                 data-bs-target="#imageModal-{{ category.id }}">
-                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
-                                                  style="font-size: 0.6rem;">
-                                                <i class="fas fa-search-plus"></i>
-                                            </span>
-                                        </div>
-                                        {% else %}
-                                        <span class="text-muted">Không có</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center">
                                         <div class="btn-group" role="group">
                                             <a href="{{ url_for('updatecat', id=category.id) }}" 
                                                class="btn btn-primary btn-sm px-3" 
@@ -227,6 +173,10 @@
                                                title="Chỉnh sửa danh mục">
                                                 <i class="fas fa-edit me-1"></i>Sửa
                                             </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
                                             <button type="button" 
                                                     class="btn btn-danger btn-sm px-3" 
                                                     data-bs-toggle="modal"
@@ -303,7 +253,7 @@
                     <!-- No results message -->
                     <div id="noResultsMessage" class="text-center py-5" style="display: none;">
                         <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
-                        <h5 class="text-muted mt-3">Không tìm thấy {% if brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
+                        <h5 class="text-muted mt-3">Không tìm thấy {% if brands or is_brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
                         <p class="text-muted">Hãy thử từ khóa khác hoặc xóa bộ lọc</p>
                     </div>
                 </div>
@@ -320,10 +270,10 @@
                 {% elif categories is defined and categories|length == 0 %}
                 <div class="card-body text-center py-5">
                     <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
-                    <h5 class="text-muted mt-3">Chưa có danh mục nào</h5>
-                    <p class="text-muted">Hãy thêm danh mục đầu tiên của bạn!</p>
-                    <a href="{{ url_for('addcategory') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Thêm Danh Mục
+                    <h5 class="text-muted mt-3">Chưa có {% if brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
+                    <p class="text-muted">Hãy thêm {% if brands %}thương hiệu{% else %}danh mục{% endif %} đầu tiên của bạn!</p>
+                    <a href="{{ url_for('addbrand' if brands else 'addcategory') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm {% if brands %}Thương Hiệu{% else %}Danh Mục{% endif %}
                     </a>
                 </div>
                 {% endif %}

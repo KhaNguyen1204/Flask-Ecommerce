@@ -2,475 +2,549 @@
 {% extends "base.html" %}
 
 {% block title %}
-{% if title %} {{ title }} {% else %} Order Management {% endif %}
+    {% if title %} {{ title }} {% else %} Order Management {% endif %}
 {% endblock title %}
 
 {% block content %}
-{% include '_messages.html' %}
+    {% include '_messages.html' %}
 
-{% if current_user.role_id == 1 %}
-    <div class="container">
-        {% include '_navbar_admin.html' %}
-    </div>
-{% else %}
-    <div class="container">
-        {% include '_navbar_sale.html' %}
-    </div>
-{% endif %}
-<!-- Main Header -->
- <!-- Main Header -->
-<div class="container mt-4 mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="text-primary fw-bold mb-1">💻Quản Lý Đơn Hàng</h2>
-            <p class="text-muted mb-0">Danh sách và quản lý tất cả đơn hàng trong hệ thống</p>
+    {% if current_user.role_id == 1 %}
+        <div class="container">
+            {% include '_navbar_admin.html' %}
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="text-muted">Tìm kiếm:</span>
-            <div class="search-container">
-                <div class="input-group has-search" style="width: 250px;">
+    {% else %}
+        <div class="container">
+            {% include '_navbar_sale.html' %}
+        </div>
+    {% endif %}
+    <!-- Main Header -->
+    <!-- Main Header -->
+    <div class="container mt-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-primary fw-bold mb-1">💻Quản Lý Đơn Hàng</h2>
+                <p class="text-muted mb-0">Danh sách và quản lý tất cả đơn hàng trong hệ thống</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-muted">Tìm kiếm:</span>
+                <div class="search-container">
+                    <div class="input-group has-search" style="width: 250px;">
                     <span class="input-group-text bg-white border-end-0">
                         <i class="fas fa-search text-muted"></i>
                     </span>
-                    <input type="text"
-                           class="form-control border-start-0 ps-0"
-                           id="searchInput"
-                           placeholder="Mã hóa đơn, khách hàng..."
-                           style="border-radius: 0 6px 6px 0 !important;">
-                    <button class="btn btn-outline-secondary"
-                            type="button"
-                            id="clearSearch"
-                            style="border-radius: 0 6px 6px 0; display: none;">
-                        <i class="fas fa-times"></i>
-                    </button>
+                        <input type="text"
+                               class="form-control border-start-0 ps-0"
+                               id="searchInput"
+                               placeholder="Mã hóa đơn, khách hàng..."
+                               style="border-radius: 0 6px 6px 0 !important;">
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                id="clearSearch"
+                                style="border-radius: 0 6px 6px 0; display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Flash Messages -->
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-</div>
-
-<!-- Data Table -->
-<div class="container">
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <!-- Table Header -->
-            <div class="bg-dark text-white p-3">
-                <div class="row align-items-center fw-bold">
-                    <div class="col-1 text-center">STT</div>
-                    <div class="col-2">Mã Hóa Đơn</div>
-                    <div class="col-2">Khách Hàng</div>
-                    <div class="col-2">Ngày Tạo</div>
-                    <div class="col-2 text-center">Trạng Thái</div>
-                    <div class="col-3 text-center">Thao Tác</div>
-                </div>
-            </div>
-
-            <!-- Table Body -->
-            <div class="table-responsive">
-                {% if orders %}
-                    {% for order in orders %}
-                    <div class="row align-items-center border-bottom py-3 {% if loop.index % 2 == 0 %}bg-light{% endif %} hover-row">
-                        <div class="col-1 text-center">
-                            <span class="badge bg-secondary rounded-circle px-2 py-1">{{loop.index}}</span>
-                        </div>
-                        <div class="col-2">
-                            <div class="d-flex align-items-center">
-                                <div class="invoice-circle me-2">
-                                    <i class="fas fa-file-invoice"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 fw-semibold">{{ order.invoice }}</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>
-                                {{ order.customer.username if order.customer else 'N/A' }}
-                            </small>
-                        </div>
-                        <div class="col-2">
-                            <small class="text-muted">
-                                <i class="fas fa-calendar me-1"></i>
-                                {{ order.date_created.strftime('%d/%m/%Y %H:%M') if order.date_created else 'N/A' }}
-                            </small>
-                        </div>
-                        <div class="col-2 text-center">
-                            {% if order.status == 'pending' %}
-                                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
-                            {% elif order.status == 'accepted' %}
-                                <span class="badge bg-info">Đã duyệt</span>
-                            {% else %}
-                                <span class="badge bg-success">Hoàn thành</span>
-                            {% endif %}
-                        </div>
-                        <div class="col-3 text-center">
-                            <a href="{{ url_for('order_detail', id=order.id) }}" class="btn btn-info btn-sm me-2" title="Xem chi tiết">
-                                <i class="fas fa-eye me-1"></i>Chi tiết
-                            </a>
-
-                            {% if order.status == 'pending' %}
-                                <button type="button" class="btn btn-success btn-sm" title="Duyệt đơn hàng" data-bs-toggle="modal" data-bs-target="#acceptModal-{{order.id}}">
-                                    <i class="fas fa-check me-1"></i>Duyệt
-                                </button>
-                            {% elif order.status == 'accepted' %}
-                                <button type="button" class="btn btn-primary btn-sm" title="Hoàn thành đơn hàng" data-bs-toggle="modal" data-bs-target="#completeModal-{{order.id}}">
-                                    <i class="fas fa-check-circle me-1"></i>Hoàn thành
-                                </button>
-                            {% endif %}
-                        </div>
+    <!-- Flash Messages -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                    
-                    <!-- Accept Order Modal -->
-                    {% if order.status == 'pending' %}
-                    <div class="modal fade" id="acceptModal-{{order.id}}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-success text-white">
-                                    <h5 class="modal-title">
-                                        <i class="fas fa-check me-2"></i>Xác nhận duyệt đơn hàng
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Data Table -->
+    <div class="container">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <!-- Table Header -->
+                <div class="bg-dark text-white p-3">
+                    <div class="row align-items-center fw-bold">
+                        <div class="col-1 text-center">STT</div>
+                        <div class="col-2">Mã Hóa Đơn</div>
+                        <div class="col-2 text-center">Khách Hàng</div>
+                        <div class="col-2 text-center">Ngày Tạo</div>
+                        <div class="col-2 text-center">Trạng Thái</div>
+                        <div class="col-3 text-center">Thao Tác</div>
+                    </div>
+                </div>
+
+                <!-- Table Body -->
+                <div class="table-responsive">
+                    {% if orders %}
+                        {% for order in orders %}
+                            <div class="row align-items-center border-bottom py-3 {% if loop.index % 2 == 0 %}bg-light{% endif %} hover-row">
+                                <div class="col-1 text-center">
+                                    <span class="badge bg-secondary rounded-circle px-2 py-1">{{ loop.index }}</span>
                                 </div>
-                                <div class="modal-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-question-circle text-success" style="font-size: 3rem;"></i>
+                                <div class="col-2 text-center">
+                                    <div class="d-flex align-items-center ">
+                                        <div class="invoice-circle me-2">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-semibold">{{ order.invoice }}</h6>
+                                        </div>
                                     </div>
-                                    <h6 class="mb-2">Bạn có chắc chắn muốn duyệt đơn hàng này?</h6>
-                                    <p class="text-muted mb-0">
-                                        Mã hóa đơn: <strong class="text-success">{{order.invoice}}</strong>
-                                    </p>
-                                    <p class="text-muted mb-0">
-                                        Khách hàng: <strong>{{order.customer.username if order.customer else 'N/A'}}</strong>
-                                    </p>
                                 </div>
-                                <div class="modal-footer justify-content-center">
-                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i>Hủy
-                                    </button>
-                                    <form action="{{ url_for('accept_order', id=order.id) }}" method="POST" class="d-inline">
-                                        <button type="submit" class="btn btn-success">
+                                <div class="col-2 text-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ order.customer.username if order.customer else 'N/A' }}
+                                    </small>
+                                </div>
+                                <div class="col-2 text-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ order.date_created.strftime('%d/%m/%Y %H:%M') if order.date_created else 'N/A' }}
+                                    </small>
+                                </div>
+                                <div class="col-2 text-center">
+                                    {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
+                                    {% elif order.status == 'accepted' %}
+                                        <span class="badge bg-info">Đã duyệt</span>
+                                    {% elif order.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Đã hủy</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Hoàn thành</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-3 text-center">
+                                    <a href="{{ url_for('order_detail', id=order.id) }}"
+                                       class="btn btn-info btn-sm me-2" title="Xem chi tiết">
+                                        <i class="fas fa-eye me-1"></i>Chi tiết
+                                    </a>
+
+                                    {% if order.status == 'pending' %}
+                                        <button type="button" class="btn btn-success btn-sm" title="Duyệt đơn hàng"
+                                                data-bs-toggle="modal" data-bs-target="#acceptModal-{{ order.id }}">
                                             <i class="fas fa-check me-1"></i>Duyệt
                                         </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Complete Order Modal -->
-                    {% if order.status == 'accepted' %}
-                    <div class="modal fade" id="completeModal-{{order.id}}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-primary text-white">
-                                    <h5 class="modal-title">
-                                        <i class="fas fa-check-circle me-2"></i>Xác nhận hoàn thành đơn hàng
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-question-circle text-primary" style="font-size: 3rem;"></i>
-                                    </div>
-                                    <h6 class="mb-2">Bạn có chắc chắn đơn hàng này đã hoàn thành?</h6>
-                                    <p class="text-muted mb-0">
-                                        Mã hóa đơn: <strong class="text-primary">{{order.invoice}}</strong>
-                                    </p>
-                                    <p class="text-muted mb-0">
-                                        Khách hàng: <strong>{{order.customer.username if order.customer else 'N/A'}}</strong>
-                                    </p>
-                                </div>
-                                <div class="modal-footer justify-content-center">
-                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i>Hủy
-                                    </button>
-                                    <form action="{{ url_for('complete_order', id=order.id) }}" method="POST" class="d-inline">
-                                        <button type="submit" class="btn btn-primary">
+                                    {% elif order.status == 'accepted' %}
+                                        <button type="button" class="btn btn-primary btn-sm" title="Hoàn thành đơn hàng"
+                                                data-bs-toggle="modal" data-bs-target="#completeModal-{{ order.id }}">
                                             <i class="fas fa-check-circle me-1"></i>Hoàn thành
                                         </button>
-                                    </form>
+                                    {% endif %}
+                                    {% if order.status not in ['completed', 'cancelled'] %}
+                                        <button type="button" class="btn btn-danger btn-sm" title="Huỷ đơn hàng"
+                                                data-bs-toggle="modal" data-bs-target="#cancelModal-{{ order.id }}">
+                                            <i class="fas fa-times me-1"></i>Huỷ
+                                        </button>
+                                    {% endif %}
                                 </div>
                             </div>
+
+                            <!-- Accept Order Modal -->
+                            {% if order.status == 'pending' %}
+                                <div class="modal fade" id="acceptModal-{{ order.id }}" tabindex="-1"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-check me-2"></i>Xác nhận duyệt đơn hàng
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-question-circle text-success"
+                                                       style="font-size: 3rem;"></i>
+                                                </div>
+                                                <h6 class="mb-2">Bạn có chắc chắn muốn duyệt đơn hàng này?</h6>
+                                                <p class="text-muted mb-0">
+                                                    Mã hóa đơn: <strong
+                                                        class="text-success">{{ order.invoice }}</strong>
+                                                </p>
+                                                <p class="text-muted mb-0">
+                                                    Khách hàng:
+                                                    <strong>{{ order.customer.username if order.customer else 'N/A' }}</strong>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer justify-content-center">
+                                                <button type="button" class="btn btn-secondary me-2"
+                                                        data-bs-dismiss="modal">
+                                                    <i class="fas fa-times me-1"></i>Hủy
+                                                </button>
+                                                <form action="{{ url_for('accept_order', id=order.id) }}" method="POST"
+                                                      class="d-inline">
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check me-1"></i>Duyệt
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Complete Order Modal -->
+                            {% if order.status == 'accepted' %}
+                                <div class="modal fade" id="completeModal-{{ order.id }}" tabindex="-1"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-check-circle me-2"></i>Xác nhận hoàn thành đơn hàng
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-question-circle text-primary"
+                                                       style="font-size: 3rem;"></i>
+                                                </div>
+                                                <h6 class="mb-2">Bạn có chắc chắn đơn hàng này đã hoàn thành?</h6>
+                                                <p class="text-muted mb-0">
+                                                    Mã hóa đơn: <strong
+                                                        class="text-primary">{{ order.invoice }}</strong>
+                                                </p>
+                                                <p class="text-muted mb-0">
+                                                    Khách hàng:
+                                                    <strong>{{ order.customer.username if order.customer else 'N/A' }}</strong>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer justify-content-center">
+                                                <button type="button" class="btn btn-secondary me-2"
+                                                        data-bs-dismiss="modal">
+                                                    <i class="fas fa-times me-1"></i>Hủy
+                                                </button>
+                                                <form action="{{ url_for('complete_order', id=order.id) }}"
+                                                      method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-check-circle me-1"></i>Hoàn thành
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if order.status in ['accepted', 'pending'] %}
+                                <div class="modal fade" id="cancelModal-{{ order.id }}" tabindex="-1"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-times me-2"></i>Xác nhận huỷ đơn hàng
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-exclamation-triangle text-danger"
+                                                       style="font-size: 3rem;"></i>
+                                                </div>
+                                                <h6 class="mb-2">Bạn có chắc chắn muốn huỷ đơn hàng này?</h6>
+                                                <p class="text-muted mb-0">
+                                                    Mã hóa đơn: <strong class="text-danger">{{ order.invoice }}</strong>
+                                                </p>
+                                                <p class="text-muted mb-0">
+                                                    Khách hàng:
+                                                    <strong>{{ order.customer.username if order.customer else 'N/A' }}</strong>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer justify-content-center">
+                                                <button type="button" class="btn btn-secondary me-2"
+                                                        data-bs-dismiss="modal">
+                                                    <i class="fas fa-times me-1"></i>Hủy
+                                                </button>
+                                                <form action="{{ url_for('cancel_order', id=order.id) }}" method="POST"
+                                                      class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-times me-1"></i>Huỷ đơn
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted">Chưa có đơn hàng nào</h5>
+                            <p class="text-muted">Đơn hàng sẽ xuất hiện ở đây khi có khách hàng đặt hàng</p>
                         </div>
-                    </div>
                     {% endif %}
-                    
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-shopping-cart text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h5 class="text-muted">Chưa có đơn hàng nào</h5>
-                        <p class="text-muted">Đơn hàng sẽ xuất hiện ở đây khi có khách hàng đặt hàng</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <!-- Order Statistics -->
-    {% if orders %}
-    <div class="mt-3">
-        <div class="row">
-            <div class="col-md-6">
-                <span class="text-muted">Tổng cộng: <strong>{{ orders|length }} đơn hàng</strong></span>
-            </div>
-            <div class="col-md-6">
-                <div class="text-muted small text-end">
-                    {% set pending_count = orders | selectattr('status', 'equalto', 'pending') | list | length %}
-                    {% set accepted_count = orders | selectattr('status', 'equalto', 'accepted') | list | length %}
-                    {% set completed_count = orders | selectattr('status', 'equalto', 'completed') | list | length %}
-                    <span class="me-3"><i class="fas fa-circle text-warning me-1"></i>Chờ duyệt: {{ pending_count }}</span>
-                    <span class="me-3"><i class="fas fa-circle text-info me-1"></i>Đã duyệt: {{ accepted_count }}</span>
-                    <span><i class="fas fa-circle text-success me-1"></i>Hoàn thành: {{ completed_count }}</span>
                 </div>
             </div>
         </div>
+
+        <!-- Order Statistics -->
+        {% if orders %}
+            <div class="mt-3">
+                <div class="row">
+                    <div class="col-md-6">
+                        <span class="text-muted">Tổng cộng: <strong>{{ orders|length }} đơn hàng</strong></span>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small text-end">
+                            {% set pending_count = orders | selectattr('status', 'equalto', 'pending') | list | length %}
+                            {% set accepted_count = orders | selectattr('status', 'equalto', 'accepted') | list | length %}
+                            {% set completed_count = orders | selectattr('status', 'equalto', 'completed') | list | length %}
+                            {% set cancel_count = orders | selectattr('status', 'equalto', 'cancelled') | list | length %}
+                            <span class="me-3"><i
+                                    class="fas fa-circle text-warning me-1"></i>Chờ duyệt: {{ pending_count }}</span>
+                            <span class="me-3"><i
+                                    class="fas fa-circle text-info me-1"></i>Đã duyệt: {{ accepted_count }}</span>
+                            <span><i
+                                    class="fas fa-circle text-success me-1"></i>Hoàn thành: {{ completed_count }}</span>
+                            <span><i
+                                    class="fas fa-circle text-danger me-1"></i>Đã hủy: {{ cancel_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    {% endif %}
-</div>
 
-<!-- Custom CSS -->
-<style>
-.search-container .input-group.has-search {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
-    transition: all 0.3s ease;
-}
-
-.search-container .input-group.has-search:focus-within {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-}
-
-.search-container .input-group-text {
-    border-radius: 6px 0 0 6px !important;
-    padding: 0.375rem 0.75rem;
-}
-
-.search-container .form-control {
-    border-left: none;
-    padding-left: 0;
-    height: 38px;
-}
-
-.search-container .form-control:focus {
-    box-shadow: none;
-    border-color: #ced4da;
-}
-
-.search-container .btn-outline-secondary {
-    border-color: #ced4da;
-    color: #6c757d;
-    padding: 0 12px;
-}
-
-.search-container .btn-outline-secondary:hover {
-    background-color: transparent;
-    color: #495057;
-}
-.hover-row {
-    transition: all 0.2s ease;
-}
-
-.hover-row:hover {
-    background-color: #f8f9fa !important;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.card {
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-
-.btn {
-    border-radius: 6px;
-    font-weight: 500;
-}
-
-.modal-content {
-    border-radius: 10px;
-    border: none;
-}
-
-.modal-header {
-    border-bottom: none;
-}
-
-.modal-footer {
-    border-top: none;
-    padding-top: 0;
-}
-
-.invoice-circle {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, #28a745, #20c997);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-.table-responsive .row {
-    margin: 0;
-}
-
-.table-responsive .col-1,
-.table-responsive .col-2,
-.table-responsive .col-3 {
-    padding: 0.5rem;
-}
-
-/* Status badge colors */
-.badge.bg-warning {
-    color: #000 !important;
-}
-.highlight {
-    background-color: #fff3cd;
-    padding: 1px 3px;
-    border-radius: 3px;
-    color: #000;
-    font-weight: 500;
-}
-
-
-
-@media (max-width: 768px) {
-    .container {
-        padding: 0 10px;
-    }
-    
-    .d-flex.justify-content-between {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .table-responsive .row {
-        flex-direction: column;
-        padding: 1rem;
-    }
-    
-    .table-responsive .col-1,
-    .table-responsive .col-2,
-    .table-responsive .col-3 {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-    
-    .col-3 .btn {
-        margin-bottom: 0.5rem;
-        display: block;
-        width: 100%;
-    }
-}
-
-</style>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const clearSearchBtn = document.getElementById('clearSearch');
-    const orderRows = document.querySelectorAll('.hover-row');
-    
-    function highlightText(element, searchTerm) {
-    if (!element || !searchTerm) return;
-
-    if (!element.dataset.original) {
-        element.dataset.original = element.innerHTML;
-    }
-
-    const text = element.textContent;
-    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
-    const highlightedText = text.replace(regex, '<span class="highlight">$1</span>');
-    element.innerHTML = highlightedText;
-}
-    
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-    
-    function removeHighlights() {
-    document.querySelectorAll('[data-original]').forEach(el => {
-        el.innerHTML = el.dataset.original;
-        delete el.dataset.original;
-    });
-}
-    
-    function performSearch() {
-        const searchTerm = searchInput.value.trim();
-        removeHighlights();
-        
-        if (!searchTerm) {
-            orderRows.forEach(row => row.style.display = '');
-            return;
+    <!-- Custom CSS -->
+    <style>
+        .search-container .input-group.has-search {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            transition: all 0.3s ease;
         }
-        
-        const lowerSearchTerm = searchTerm.toLowerCase();
-        let hasResults = false;
-        
-        orderRows.forEach(row => {
-            const invoiceElement = row.querySelector('h6');
-            const customerElement = row.querySelector('.col-2:nth-child(3) small');
-            
-            const invoice = invoiceElement?.textContent.toLowerCase() || '';
-            const customer = customerElement?.textContent.toLowerCase() || '';
-            
-            if (invoice.includes(lowerSearchTerm) || customer.includes(lowerSearchTerm)) {
-                row.style.display = '';
-                hasResults = true;
-                
-                // Highlight matching text
-                if (invoice.includes(lowerSearchTerm)) {
-                    highlightText(invoiceElement, searchTerm);
-                }
-                if (customer.includes(lowerSearchTerm)) {
-                    highlightText(customerElement, searchTerm);
-                }
-            } else {
-                row.style.display = 'none';
+
+        .search-container .input-group.has-search:focus-within {
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-container .input-group-text {
+            border-radius: 6px 0 0 6px !important;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .search-container .form-control {
+            border-left: none;
+            padding-left: 0;
+            height: 38px;
+        }
+
+        .search-container .form-control:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+
+        .search-container .btn-outline-secondary {
+            border-color: #ced4da;
+            color: #6c757d;
+            padding: 0 12px;
+        }
+
+        .search-container .btn-outline-secondary:hover {
+            background-color: transparent;
+            color: #495057;
+        }
+
+        .hover-row {
+            transition: all 0.2s ease;
+        }
+
+        .hover-row:hover {
+            background-color: #f8f9fa !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+        }
+
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom: none;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .invoice-circle {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .table-responsive .row {
+            margin: 0;
+        }
+
+        .table-responsive .col-1,
+        .table-responsive .col-2,
+        .table-responsive .col-3 {
+            padding: 0.5rem;
+        }
+
+        /* Status badge colors */
+        .badge.bg-warning {
+            color: #000 !important;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: #000;
+            font-weight: 500;
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
             }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .table-responsive .row {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .table-responsive .col-1,
+            .table-responsive .col-2,
+            .table-responsive .col-3 {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .col-3 .btn {
+                margin-bottom: 0.5rem;
+                display: block;
+                width: 100%;
+            }
+        }
+
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            const orderRows = document.querySelectorAll('.hover-row');
+
+            function highlightText(element, searchTerm) {
+                if (!element || !searchTerm) return;
+
+                if (!element.dataset.original) {
+                    element.dataset.original = element.innerHTML;
+                }
+
+                const text = element.textContent;
+                const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+                const highlightedText = text.replace(regex, '<span class="highlight">$1</span>');
+                element.innerHTML = highlightedText;
+            }
+
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            function removeHighlights() {
+                document.querySelectorAll('[data-original]').forEach(el => {
+                    el.innerHTML = el.dataset.original;
+                    delete el.dataset.original;
+                });
+            }
+
+            function performSearch() {
+                const searchTerm = searchInput.value.trim();
+                removeHighlights();
+
+                if (!searchTerm) {
+                    orderRows.forEach(row => row.style.display = '');
+                    return;
+                }
+
+                const lowerSearchTerm = searchTerm.toLowerCase();
+                let hasResults = false;
+
+                orderRows.forEach(row => {
+                    const invoiceElement = row.querySelector('h6');
+                    const customerElement = row.querySelector('.col-2:nth-child(3) small');
+
+                    const invoice = invoiceElement?.textContent.toLowerCase() || '';
+                    const customer = customerElement?.textContent.toLowerCase() || '';
+
+                    if (invoice.includes(lowerSearchTerm) || customer.includes(lowerSearchTerm)) {
+                        row.style.display = '';
+                        hasResults = true;
+
+                        // Highlight matching text
+                        if (invoice.includes(lowerSearchTerm)) {
+                            highlightText(invoiceElement, searchTerm);
+                        }
+                        if (customer.includes(lowerSearchTerm)) {
+                            highlightText(customerElement, searchTerm);
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            // Event listeners
+            searchInput.addEventListener('input', function () {
+                performSearch();
+                clearSearchBtn.style.display = this.value ? 'block' : 'none';
+            });
+
+            clearSearchBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                performSearch();
+                clearSearchBtn.style.display = 'none';
+                searchInput.focus();
+            });
         });
-    }
-    
-    // Event listeners
-    searchInput.addEventListener('input', function() {
-        performSearch();
-        clearSearchBtn.style.display = this.value ? 'block' : 'none';
-    });
-    
-    clearSearchBtn.addEventListener('click', function() {
-        searchInput.value = '';
-        performSearch();
-        clearSearchBtn.style.display = 'none';
-        searchInput.focus();
-    });
-});
-</script>
+    </script>
 
 {% endblock content %}

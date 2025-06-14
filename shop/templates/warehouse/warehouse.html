@@ -4,7 +4,7 @@
 {% block content %}
 {% include '_messages.html' %}
 <div class="container">
-{% if current_user.role_id == 1 %}
+{% if current_user.role.name == "admin" %}
     {% include '_navbar_admin.html' %}
 {% endif %}
     {% include '_navbar_warehouse.html' %}
@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col-md-4 mb-3 position-relative">
                             <label class="form-label fw-semibold">Tìm kiếm</label>
-                            <input class="form-control pe-4" type="search" placeholder="Tên sản phẩm, mã SP..."
+                            <input class="form-control pe-4" type="search" placeholder="Tên sản phẩm..."
                                    aria-label="Search" id="search-input">
                             <button id="clear-search" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2 d-none">
                                 <i class="fas fa-times"></i>
@@ -74,7 +74,7 @@
                             <label class="form-label fw-semibold">&nbsp;</label>
                             <div class="d-flex gap-2">
                                 <button id="reset-filter" class="btn btn-outline-secondary">
-                                    <i class="fas fa-redo me-1"></i>Reset
+                                    <i class="fas fa-redo me-1"></i>Đặt lại
                                 </button>
                             </div>
                         </div>
@@ -104,11 +104,10 @@
                                     <th class="text-center" style="width: 60px;">STT</th>
                                     <th class="text-center" style="width: 80px;">Hình Ảnh</th>
                                     <th style="width: 200px;">Tên Sản Phẩm</th>
-                                    <th style="width: 100px;">Mã SP</th>
-                                    <th style="width: 120px;">Danh Mục</th>
-                                    <th style="width: 120px;">Thương Hiệu</th>
+                                    <th class="text-center" style="width: 120px;">Danh Mục</th>
+                                    <th class="text-center" style="width: 120px;">Thương Hiệu</th>
                                     <th class="text-center" style="width: 100px;">Số Lượng</th>
-                                    <th class="text-end" style="width: 120px;">Giá Bán</th>
+                                    <th class="text-center" style="width: 120px;">Giá Bán</th>
                                     <th class="text-center" style="width: 100px;">Trạng Thái</th>
                                     <th class="text-center" style="width: 200px;">Thao Tác</th>
                                 </tr>
@@ -145,19 +144,16 @@
                                     <td class="product-name">
                                         <div class="text-dark fw-medium">{{ product.name }}</div>
                                     </td>
-                                    <td class="product-code">
-                                        <span class="text-muted">{{ product.id or 'N/A' }}</span>
-                                    </td>
-                                    <td class="product-category">
+                                    <td class="product-category text-center">
                                         <span class="badge bg-info text-dark">{{ product.category.name }}</span>
                                     </td>
-                                    <td class="product-brand">
+                                    <td class="product-brand text-center">
                                         <span class="badge bg-primary">{{ product.brand.name }}</span>
                                     </td>
                                     <td class="text-center">
                                         <span class="fw-bold fs-6">{{ product.stock }}</span>
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-center">
                                         <span class="text-success fw-semibold">
                                             {{ "{:,.0f}".format(product.price) }} đ
                                         </span>
@@ -276,7 +272,6 @@
 <!-- JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Khởi tạo các biến cần thiết
     const searchInput = document.getElementById('search-input');
     const clearSearchBtn = document.getElementById('clear-search');
     const resetFilterBtn = document.getElementById('reset-filter');
@@ -285,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const productsTableBody = document.getElementById('products-table-body');
     const productCountEl = document.getElementById('product-count');
 
-    // Tạo thông báo khi không có kết quả
     const noResultsRow = document.createElement('tr');
     noResultsRow.className = 'no-results';
     noResultsRow.innerHTML = `
@@ -296,30 +290,24 @@ document.addEventListener('DOMContentLoaded', function() {
         </td>
     `;
 
-    // Xử lý sự kiện tìm kiếm với debounce để tối ưu hiệu suất
     let searchTimeout;
     searchInput.addEventListener('input', function() {
         clearSearchBtn.classList.toggle('d-none', this.value === '');
-
-        // Clear timeout cũ và tạo timeout mới
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             filterProducts();
-        }, 300); // Delay 300ms để tránh tìm kiếm quá nhiều lần
+        }, 300);
     });
 
-    // Xử lý nút xóa tìm kiếm
     clearSearchBtn.addEventListener('click', function() {
         searchInput.value = '';
         clearSearchBtn.classList.add('d-none');
         filterProducts();
     });
 
-    // Xử lý các bộ lọc
     categoryFilter.addEventListener('change', filterProducts);
     brandFilter.addEventListener('change', filterProducts);
 
-    // Xử lý nút reset
     resetFilterBtn.addEventListener('click', function() {
         searchInput.value = '';
         categoryFilter.value = '';
@@ -328,7 +316,6 @@ document.addEventListener('DOMContentLoaded', function() {
         filterProducts();
     });
 
-    // Hàm chính để lọc sản phẩm
     function filterProducts() {
         const searchTerm = searchInput.value.trim().toLowerCase();
         const categoryValue = categoryFilter.value;
@@ -337,26 +324,20 @@ document.addEventListener('DOMContentLoaded', function() {
         let visibleCount = 0;
         let hasResults = false;
 
-        // Xóa highlight cũ
         clearHighlights();
 
-        // Lặp qua từng sản phẩm
         document.querySelectorAll('.product-row').forEach((row, index) => {
             const productName = row.querySelector('.product-name').textContent.toLowerCase();
-            const productCode = row.querySelector('.product-code').textContent.toLowerCase();
             const categoryName = row.dataset.categoryName || '';
             const brandName = row.dataset.brandName || '';
 
-            // Kiểm tra các điều kiện lọc
             const categoryMatch = !categoryValue || row.dataset.category === categoryValue;
             const brandMatch = !brandValue || row.dataset.brand === brandValue;
             const searchMatch = !searchTerm ||
                                productName.includes(searchTerm) ||
-                               productCode.includes(searchTerm) ||
                                categoryName.includes(searchTerm) ||
                                brandName.includes(searchTerm);
 
-            // Kiểm tra xem sản phẩm có phù hợp với tất cả điều kiện không
             const shouldShow = categoryMatch && brandMatch && searchMatch;
 
             if (shouldShow) {
@@ -364,13 +345,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 visibleCount++;
                 hasResults = true;
 
-                // Cập nhật số thứ tự
                 const sttBadge = row.querySelector('.badge.bg-secondary');
                 if (sttBadge) {
                     sttBadge.textContent = visibleCount;
                 }
 
-                // Highlight kết quả tìm kiếm
                 if (searchTerm) {
                     highlightSearchResults(row, searchTerm);
                 }
@@ -379,27 +358,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Cập nhật số lượng sản phẩm hiển thị
         productCountEl.textContent = visibleCount;
-
-        // Xử lý khi không có kết quả
         handleNoResults(hasResults);
     }
 
-    // Hàm xóa highlight
     function clearHighlights() {
         document.querySelectorAll('.highlight').forEach(el => {
             const parent = el.parentNode;
             parent.replaceChild(document.createTextNode(el.textContent), el);
-            parent.normalize(); // Gộp các text node liền kề
+            parent.normalize();
         });
     }
 
-    // Hàm highlight kết quả tìm kiếm
     function highlightSearchResults(row, searchTerm) {
         const elementsToHighlight = [
             row.querySelector('.product-name'),
-            row.querySelector('.product-code'),
             row.querySelector('.product-category'),
             row.querySelector('.product-brand')
         ];
@@ -411,7 +384,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Hàm highlight văn bản
     function highlightText(element, searchTerm) {
         const text = element.textContent;
         const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
@@ -419,12 +391,10 @@ document.addEventListener('DOMContentLoaded', function() {
         element.innerHTML = newHTML;
     }
 
-    // Hàm escape regex để tránh lỗi với các ký tự đặc biệt
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // Hàm xử lý khi không có kết quả
     function handleNoResults(hasResults) {
         const noResultsElement = document.querySelector('.no-results');
         const noProductsElement = document.querySelector('.no-products');
@@ -440,7 +410,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Khởi tạo tooltip Bootstrap
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     const tooltipList = tooltipTriggerList.map(tooltipTriggerEl => {
         return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -448,7 +417,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Các modal (giữ nguyên từ code gốc) -->
 {% if products %}
 {% for product in products %}
 <!-- Image Preview Modal -->
@@ -499,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <p><strong>Mã sản phẩm:</strong><br>
-                                   <span class="text-muted">{{ product.code or 'N/A' }}</span></p>
+                                   <span class="text-muted">{{ product.id or 'N/A' }}</span></p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Danh mục:</strong><br>

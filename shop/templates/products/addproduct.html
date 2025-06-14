@@ -15,7 +15,7 @@
         position: relative;
         overflow-x: hidden;
     }
-    
+
     /* Hiệu ứng nền */
     .floating-elements {
         position: absolute;
@@ -27,19 +27,19 @@
         z-index: -1;
         overflow: hidden;
     }
-    
+
     .floating-element {
         position: absolute;
         background: rgba(23, 162, 184, 0.08);
         border-radius: 50%;
         animation: floatAround 20s infinite linear;
     }
-    
+
     @keyframes floatAround {
         0% { transform: translate(0, 0) rotate(0deg); }
         100% { transform: translate(100px, 50px) rotate(360deg); }
     }
-    
+
     /* Container chính */
     .form-container {
         margin: 60px auto; /* Giảm margin để bố cục gọn hơn */
@@ -217,7 +217,7 @@
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
             <div class="mb-4">
-                <a href="{{ url_for('admin') }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('admin') if current_user.role.name == 'admin' else url_for('sales') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i> Quay lại
                 </a>
             </div>

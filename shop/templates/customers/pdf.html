@@ -117,7 +117,7 @@
         <div class="row invoice-header">
             <div class="col-md-6">
                 <p><strong>Ngày xuất:</strong> {{ order.date_created.strftime('%d/%m/%Y %H:%M') }}</p>
-                <p><strong>Nhân viên bán hàng:</strong> {{ order.staff.username }}</p>
+                <p><strong>Nhân viên:</strong> {{ order.staff.username }}</p>
             </div>
             <div class="col-md-6 text-right">
                 <p><strong>Mã hóa đơn:</strong> {{ order.invoice }}</p>

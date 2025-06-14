@@ -476,10 +476,11 @@
             <!-- Header -->
             <div class="page-header">
                 <h1 class="page-title">Chi tiết đơn hàng</h1>
-                <a href="javascript:window.print()" class="print-btn no-print">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>Xuất hóa đơn</span>
-                </a>
+                <form action="{{ url_for('get_pdf', invoice=order.invoice) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Tải hóa đơn">
+                        <i class="bi bi-download"></i> Hóa đơn
+                    </button>
+                </form>
             </div>
 
             <!-- Order information -->
@@ -516,7 +517,11 @@
                     </span>
                         {% elif order.status == 'cancelled' %}
                             <span class="info-value">
-                                <span class="status-badge btn-warning">Đã hủy</span>
+                                <span class="status-badge  status-pending">Đã hủy</span>
+                            </span>
+                        {% else %}
+                            <span class="info-value">
+                                <span class="status-badge  status-completed">Đã duyệt</span>
                             </span>
                         {% endif %}
                     </div>
