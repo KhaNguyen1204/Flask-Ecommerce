@@ -155,7 +155,7 @@ def addcategory():
         flash(f'Danh mục {get_category} được thêm thành công!', 'success')
         return redirect(url_for('categories'))
 
-    return render_template('products/addbrand.html', title='Add Category')
+    return render_template('products/addbrand.html', title='Add Category',)
 
 
 @app.route('/updatecat/<int:id>', methods=['GET', 'POST'])

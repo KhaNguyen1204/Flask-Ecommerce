@@ -307,13 +307,23 @@
                         <p class="text-muted">Hãy thử từ khóa khác hoặc xóa bộ lọc</p>
                     </div>
                 </div>
-                {% if (brands or categories)|length == 0 %}
+                <!-- Kiểm tra điều kiện hiển thị khi không có dữ liệu -->
+                {% if brands is defined and brands|length == 0 %}
                 <div class="card-body text-center py-5">
                     <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
-                    <h5 class="text-muted mt-3">Chưa có {% if brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
-                    <p class="text-muted">Hãy thêm {% if brands %}thương hiệu{% else %}danh mục{% endif %} đầu tiên của bạn!</p>
-                    <a href="{{ url_for('addbrand' if brands else 'addcategory') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Thêm {% if brands %}Thương Hiệu{% else %}Danh Mục{% endif %}
+                    <h5 class="text-muted mt-3">Chưa có thương hiệu nào</h5>
+                    <p class="text-muted">Hãy thêm thương hiệu đầu tiên của bạn!</p>
+                    <a href="{{ url_for('addbrand') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm Thương Hiệu
+                    </a>
+                </div>
+                {% elif categories is defined and categories|length == 0 %}
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="text-muted mt-3">Chưa có danh mục nào</h5>
+                    <p class="text-muted">Hãy thêm danh mục đầu tiên của bạn!</p>
+                    <a href="{{ url_for('addcategory') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm Danh Mục
                     </a>
                 </div>
                 {% endif %}

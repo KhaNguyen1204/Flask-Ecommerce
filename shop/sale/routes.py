@@ -66,7 +66,7 @@ def complete_order(id):
         flash('Đơn hàng của bạn đã hoàn thành!', 'success')
         return redirect(url_for('manager_order'))
     else:
-        flash('Bạn cần đăng nhập để xác nhậnn hoàn thành đơn hành', 'danger')
+        flash('Bạn cần đăng nhập để xác nhậnn hoàn thành đơn hàng', 'danger')
         return redirect(url_for('login'))
 @app.route('/manage_comments')
 @role_required(['admin', 'sale'])
