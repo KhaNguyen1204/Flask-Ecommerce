@@ -1,83 +1,94 @@
 {% extends 'base.html' %}
 {% set show_footer = false %}
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card mt-4 mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="text-center">{{ title }}</h3>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <!-- Back Button -->
+                <div class="mt-4 mb-2">
+                    <a href="{{ url_for('staff') }}" class="btn btn-outline-secondary mb-3">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
                 </div>
-                <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="card shadow mt-2 mb-4">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3 class="mb-0">{{ title }}</h3>
                     </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
 
-                    <form method="post">
-                        {{ form.csrf_token }}
-                        <div class="mb-3">
-                            {{ form.username.label(class="form-label") }}
-                            {{ form.username(class="form-control") }}
-                            {% for error in form.username.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.email.label(class="form-label") }}
-                            {{ form.email(class="form-control") }}
-                            {% for error in form.email.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.phone.label(class="form-label") }}
-                            {{ form.phone(class="form-control") }}
-                            {% for error in form.phone.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.position.label(class="form-label") }}
-                            {{ form.position(class="form-control") }}
-                            {% for error in form.position.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.role_id.label(class="form-label") }}
-                            {{ form.role_id(class="form-control") }}
-                            {% for error in form.role_id.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control") }}
-                            {% for error in form.password.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.confirm.label(class="form-label") }}
-                            {{ form.confirm(class="form-control") }}
-                            {% for error in form.confirm.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="d-grid gap-2">
-                            {{ form.submit(class="btn btn-primary") }}
-                        </div>
-                    </form>
+                        <form method="post" autocomplete="off">
+                            {{ form.csrf_token }}
+                            <div class="mb-3">
+                                {{ form.username.label(class="form-label fw-semibold") }}
+                                {{ form.username(class="form-control", placeholder="Tên nhân viên") }}
+                                {% for error in form.username.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.email.label(class="form-label fw-semibold") }}
+                                {{ form.email(class="form-control", placeholder="Email") }}
+                                {% for error in form.email.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.phone.label(class="form-label fw-semibold") }}
+                                {{ form.phone(class="form-control", placeholder="Số điện thoại") }}
+                                {% for error in form.phone.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.position.label(class="form-label fw-semibold") }}
+                                {{ form.position(class="form-control", placeholder="Vị trí") }}
+                                {% for error in form.position.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.role_id.label(class="form-label fw-semibold") }}
+                                {{ form.role_id(class="form-select") }}
+                                {% for error in form.role_id.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% if "Chỉnh sửa" not in title and "Cập nhật" not in title %}
+                                <div class="mb-3">
+                                    {{ form.password.label(class="form-label fw-semibold") }}
+                                    {{ form.password(class="form-control", placeholder="Mật khẩu") }}
+                                    {% for error in form.password.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if "Chỉnh sửa" not in title and "Cập nhật" not in title %}
+                                <div class="mb-3">
+                                    {{ form.confirm.label(class="form-label fw-semibold") }}
+                                    {{ form.confirm(class="form-control", placeholder="Xác nhận mật khẩu") }}
+                                    {% for error in form.confirm.errors %}
+                                        <div class="text-danger small">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="d-grid gap-2 mt-4">
+                                {{ form.submit(class="btn btn-primary btn-lg") }}
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

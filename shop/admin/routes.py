@@ -21,7 +21,8 @@ def admin():
 @role_required(['admin', 'sale', 'storekeeper'])
 def brands():
     brands = Brand.query.order_by(Brand.id.desc()).all()
-    return render_template('admin/brand.html', title='Brands Page', brands=brands)
+    is_brands = True
+    return render_template('admin/brand.html', title='Brands Page', brands=brands, is_brands=is_brands)
 
 @app.route('/categories')
 @role_required(['admin', 'sale', 'storekeeper'])
@@ -299,6 +300,10 @@ def update_staff(id):
         form.position.data = staff.position
         form.role_id.data = staff.role_id
 
+    if request.method == 'POST':
+        form.password.validators = []
+        form.confirm.validators = []
+    # If the form is submitted
     if request.method == 'POST' and form.validate():
         # Check if email already exists with another staff
         existing_staff = Staff.query.filter_by(email=form.email.data).first()
@@ -318,11 +323,6 @@ def update_staff(id):
         staff.phone = form.phone.data
         staff.position = form.position.data
         staff.role_id = form.role_id.data
-
-        # Update password only if provided
-        if form.password.data:
-            hashed_password = bcrypt.generate_password_hash(form.password.data)
-            staff.password = hashed_password
 
         db.session.commit()
         flash('Thông tin nhân viên đã được cập nhật thành công', 'success')
@@ -345,7 +345,8 @@ def delete_staff(id):
 @app.route('/manager_customers', methods=['GET', 'POST'])
 @role_required(['admin'])
 def customers_manager():
-    customers = User.query.filter_by(role_id=Role.query.filter_by(name='customer').first().id).all()
+    # customers = User.query.filter_by(role_id=Role.query.filter_by(name='customer').first().id).all()
+    customers = Customer.query.order_by(Customer.id.desc()).all()
     return render_template('admin/customers.html', title='Quản lý khách hàng', customers=customers)
 
 @app.route('/add_customer', methods=['GET', 'POST'])

@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-
+{% if 'Thêm' in title %}
+    {% set show_footer = false %}
+{% else %}
+    {% set show_footer = true %}
+{% endif %}
 {% block head %}
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -43,7 +47,12 @@
     {% include '_messages.html' %}
 
     <div class="container py-5">
-        <a href="{{ url_for('customers_manager') }}" class="btn btn-outline-secondary mb-3">
+        <a href="{% if current_user.is_authenticated and current_user.role.name in ['admin', 'sale'] %}
+             {{ url_for('customers_manager') }}
+         {% else %}
+             {{ url_for('home') }}
+         {% endif %}"
+           class="btn btn-outline-secondary mb-3">
             <i class="bi bi-arrow-left me-1"></i> Quay lại
         </a>
         <div class="row justify-content-center">

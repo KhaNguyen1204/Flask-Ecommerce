@@ -84,11 +84,9 @@
                 <div class="col-md-2">
                     <label class="form-label fw-semibold d-block">&nbsp;</label>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-outline-primary w-100" id="search-btn">
-                            <i class="fas fa-search me-1"></i>Tìm
-                        </button>
+                        <button class="btn btn-primary fw-semibold" id="filter-button">Tìm</button>
                         <button id="reset-filter" class="btn btn-outline-secondary" title="Xóa tất cả bộ lọc">
-                            <i class="fas fa-redo me-1"></i>Reset
+                            <i class="fas fa-redo me-1"></i>Đặt lại
                         </button>
                     </div>
                 </div>
@@ -132,9 +130,9 @@
                                     <th class="text-center" style="width: 60px;">STT</th>
                                     <th style="width: 120px;">Số Phiếu</th>
                                     <th class="text-center" style="width: 120px;">Ngày Nhập</th>
-                                    <th style="width: 150px;">Kho</th>
-                                    <th class="text-end" style="width: 150px;">Tổng Tiền</th>
-                                    <th style="width: 150px;">Người Tạo</th>
+                                    <th style="width: 150px;" class="text-center">Kho</th>
+                                    <th class="text-center" style="width: 150px;">Tổng Tiền</th>
+                                    <th style="width: 150px;" class="text-center">Người Tạo</th>
                                     <th class="text-center" style="width: 120px;">Trạng Thái</th>
                                     <th class="text-center" style="width: 200px;">Thao Tác</th>
                                 </tr>
@@ -158,13 +156,13 @@
                                     <td class="text-center">
                                         <span class="text-muted">{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</span>
                                     </td>
-                                    <td class="searchable-content" data-field="warehouse_name">
+                                    <td class="searchable-content text-center" data-field="warehouse_name">
                                         <span class="badge bg-info text-dark">{{ receipt.warehouse.name }}</span>
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-center">
                                         <span class="text-success fw-semibold">{{ "{:,.0f}".format(receipt.total_amount) }} đ</span>
                                     </td>
-                                    <td class="searchable-content" data-field="creator_name">
+                                    <td class="searchable-content text-center" data-field="creator_name">
                                         <span class="badge bg-primary">{{ receipt.creator.username }}</span>
                                     </td>
                                     <td class="text-center">

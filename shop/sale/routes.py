@@ -68,6 +68,36 @@ def complete_order(id):
     else:
         flash('Bạn cần đăng nhập để xác nhậnn hoàn thành đơn hành', 'danger')
         return redirect(url_for('login'))
+
+# Trong file `shop/sale/routes.py`
+@app.route('/cancel_order/<int:id>', methods=['POST'])
+@role_required(['admin', 'sale', 'customer'])
+@login_required
+def cancel_order(id):
+    order = Order.query.get_or_404(id)
+    # Nếu là khách hàng
+    if current_user.role.name == 'customer':
+        if order.customer_id != current_user.id:
+            flash('Bạn không thể hủy đơn hàng không thuộc về bạn!', 'danger')
+            return redirect(url_for('history_orders'))
+        if order.status == 'completed':
+            flash('Đơn hàng đã hoàn thành, không thể hủy!', 'danger')
+            return redirect(url_for('history_orders'))
+        order.status = 'cancelled'
+        db.session.commit()
+        flash('Đơn hàng của bạn đã được hủy!', 'success')
+        return redirect(url_for('history_orders'))
+    # Nếu là nhân viên hoặc admin
+    else:
+        if order.status == 'completed':
+            flash('Đơn hàng đã hoàn thành, không thể hủy!', 'danger')
+            return redirect(url_for('manager_order'))
+        order.staff_id = current_user.id
+        order.status = 'cancelled'
+        db.session.commit()
+        flash('Đơn hàng đã bị hủy thành công!', 'success')
+        return redirect(url_for('manager_order'))
+
 @app.route('/manage_comments')
 @role_required(['admin', 'sale'])
 @login_required

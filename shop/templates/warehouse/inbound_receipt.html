@@ -112,10 +112,10 @@
                                     <th class="text-center" style="width: 60px;">STT</th>
                                     <th style="width: 120px;">Số Phiếu</th>
                                     <th class="text-center" style="width: 120px;">Ngày Nhập</th>
-                                    <th style="width: 200px;">Nhà Cung Cấp</th>
-                                    <th style="width: 150px;">Kho</th>
-                                    <th class="text-end" style="width: 150px;">Tổng Tiền</th>
-                                    <th style="width: 150px;">Người Tạo</th>
+                                    <th style="width: 200px;" class="text-center">Nhà Cung Cấp</th>
+                                    <th style="width: 150px;" class="text-center">Kho</th>
+                                    <th class="text-center" style="width: 150px;">Tổng Tiền</th>
+                                    <th style="width: 150px;" class="text-center">Người Tạo</th>
                                     <th class="text-center" style="width: 120px;">Trạng Thái</th>
                                     <th class="text-center" style="width: 200px;">Thao Tác</th>
                                 </tr>
@@ -139,16 +139,16 @@
                                     <td class="text-center">
                                         <span class="text-muted">{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</span>
                                     </td>
-                                    <td class="searchable-supplier">
+                                    <td class="searchable-supplier text-center">
                                         {{ receipt.supplier }}
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <span class="badge bg-info text-dark">{{ receipt.warehouse.name }}</span>
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-center">
                                         <span class="text-success fw-semibold">{{ "{:,.0f}".format(receipt.total_amount) }} đ</span>
                                     </td>
-                                    <td class="searchable-creator">
+                                    <td class="searchable-creator text-center">
                                         <span class="badge bg-primary">{{ receipt.creator.username }}</span>
                                     </td>
                                     <td class="text-center">

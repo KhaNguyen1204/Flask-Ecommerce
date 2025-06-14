@@ -9,169 +9,305 @@
 </div>
 
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h2 class="text-primary mb-1 fw-bold">QUẢN LÝ SẢN PHẨM</h2>
-            <p class="text-muted">Quản lý tất cả các sản phẩm có trong cửa hàng</p>
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-5 fw-bold text-primary mb-2">
+                        <i class="fas fa-boxes me-3"></i>Quản Lý Sản Phẩm
+                    </h1>
+                    <p class="text-muted mb-0">Danh sách và quản lý tất cả sản phẩm trong cửa hàng</p>
+                </div>
+                <a href="{{ url_for('addproduct') }}" class="btn btn-success btn-lg shadow-sm">
+                    <i class="fas fa-plus me-2"></i>Thêm Sản Phẩm
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <div class="mb-3 d-flex justify-content-start">
-            <div class="search-box w-50">
-                <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
-                </div>
-            </div>
-        </div>
-
-        <table class="table table-hover align-middle" id="productTable">
-            <thead class="table-dark">
-                <tr>
-                    <th style="width: 5%">STT</th>
-                    <th style="width: 20%">Sản phẩm</th>
-                    <th style="width: 12%">Giá (VND)</th>
-                    <th style="width: 10%">Giảm giá(%)</th>
-                    <th style="width: 15%">Thương hiệu</th>
-                    <th style="width: 15%">Ảnh</th>
-                    <th style="width: 10%">Sửa</th>
-                    <th style="width: 10%">Xóa</th>
-                </tr>
-            </thead>
-            <tbody id="productTableBody">
-                {% for product in products %}
-                <tr class="product-row" data-name="{{product.name|lower}}" data-brand="{{product.brand.name|lower}}">
-                    <td>{{loop.index}}</td>
-                    <td class="fw-semibold product-name">{{product.name}}</td>
-                    <td>{{"{:,.0f}".format(product.price)}}</td>
-                    <td>
-                        {% if product.discount > 0 %}
-                        <span class="badge bg-danger">{{product.discount}}%</span>
-                        {% else %}
-                        <span class="badge bg-secondary">0%</span>
-                        {% endif %}
-                    </td>
-                    <td class="product-brand">{{product.brand.name}}</td>
-                    <td>
-                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
-                             class="img-thumbnail"
-                             alt="{{product.name}}"
-                             style="width: 80px; height: auto;">
-                    </td>
-                    <td>
-                        <a href="{{url_for('updateproduct', id=product.id)}}"
-                           class="btn btn-outline-primary btn-sm">
-                           <i class="fas fa-edit"></i> Sửa
-                        </a>
-                    </td>
-                    <td>
-                        <button type="button"
-                                class="btn btn-outline-danger btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal-{{product.id}}">
-                            <i class="fas fa-trash-alt"></i> Xóa
-                        </button>
-                    </td>
-                </tr>
-
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="deleteModal-{{product.id}}" tabindex="-1" aria-labelledby="deleteModalLabel-{{product.id}}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title text-danger" id="deleteModalLabel-{{product.id}}">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa sản phẩm
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="text-center mb-3">
-                                    <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
-                                         class="img-thumbnail mb-3"
-                                         alt="{{product.name}}"
-                                         style="width: 100px; height: auto;">
-                                </div>
-                                <p class="text-center">
-                                    Bạn có chắc chắn muốn xóa sản phẩm <strong>"{{product.name}}"</strong>?
-                                </p>
-                                <div class="alert alert-warning" role="alert">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    Hành động này không thể hoàn tác!
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-1"></i>Hủy
-                                </button>
-                                <form action="{{ url_for('deleteproduct', id=product.id) }}" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-trash-alt me-1"></i>Xóa sản phẩm
-                                    </button>
-                                </form>
-                            </div>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light border-0 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <h5 class="card-title mb-0 text-dark">
+                        <i class="fas fa-list me-2"></i>Tìm kiếm sản phẩm
+                    </h5>
+                    <div class="search-container">
+                        <div class="input-group has-search" style="max-width: 350px;">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="searchInput"
+                                   placeholder="Tìm kiếm..." style="border-radius: 0 6px 6px 0 !important;">
+                            <button class="btn btn-outline-secondary" type="button" id="clearSearch"
+                                    style="border-radius: 0 6px 6px 0; display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div id="noResults" class="text-center py-4 d-none">
-            <h5 class="text-muted">Không có kết quả phù hợp</h5>
+                <small class="text-muted">
+                    <span id="totalProducts">Tổng cộng: {{ products|length }} sản phẩm</span>
+                    <span id="searchResults" class="text-primary" style="display: none;"></span>
+                </small>
+            </div>
         </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="productTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" style="width: 60px;">STT</th>
+                            <th style="width: 200px;">Tên Sản Phẩm</th>
+                            <th class="text-center" style="width: 120px;">Giá</th>
+                            <th class="text-center" style="width: 100px;">Giảm Giá</th>
+                            <th class="text-center" style="width: 100px;">Thương Hiệu</th>
+                            <th class="text-center" style="width: 100px;">Hình Ảnh</th>
+                            <th class="text-center" style="width: 180px;">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        {% for product in products %}
+                        <tr class="align-middle product-row" data-name="{{product.name|lower}}" data-brand="{{product.brand.name|lower}}">
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{loop.index}}</span>
+                            </td>
+                            <td>
+                                <div class="text-dark product-name">{{product.name}}</div>
+                            </td>
+                            <td class="text-center">
+                                <span class="text-success">{{"{:,.0f}".format(product.price)}} VND</span>
+                            </td>
+                            <td class="text-center">
+                                {% if product.discount > 0 %}
+                                <span class="badge bg-danger">{{product.discount}}%</span>
+                                {% else %}
+                                <span class="badge bg-secondary">0%</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-info text-dark product-brand">{{product.brand.name}}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="position-relative d-inline-block">
+                                    <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                                         alt="{{product.name}}"
+                                         class="rounded shadow-sm product-thumbnail"
+                                         style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#imageModal-{{ product.id }}">
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
+                                          style="font-size: 0.6rem;">
+                                        <i class="fas fa-search-plus"></i>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a href="{{url_for('updateproduct', id=product.id)}}"
+                                       class="btn btn-primary btn-sm px-3"
+                                       data-bs-toggle="tooltip"
+                                       title="Chỉnh sửa sản phẩm">
+                                        <i class="fas fa-edit me-1"></i>Sửa
+                                    </a>
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm px-3"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal-{{product.id}}"
+                                            title="Xóa sản phẩm">
+                                        <i class="fas fa-trash me-1"></i>Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Image Preview Modal -->
+                        <div class="modal fade" id="imageModal-{{ product.id }}" tabindex="-1"
+                             aria-labelledby="imageModalLabel-{{ product.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="imageModalLabel-{{ product.id }}">
+                                            {{ product.name }}
+                                        </h5>
+                                        <button type="button" class="btn-close"
+                                                data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                                             alt="{{ product.name }}"
+                                             class="img-fluid rounded shadow">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal-{{product.id}}" tabindex="-1" aria-labelledby="deleteModalLabel-{{product.id}}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title" id="deleteModalLabel-{{product.id}}">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa sản phẩm
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="text-center mb-3">
+                                            <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                                                 class="img-thumbnail mb-3"
+                                                 alt="{{product.name}}"
+                                                 style="width: 100px; height: auto;">
+                                        </div>
+                                        <p class="text-center">
+                                            Bạn có chắc chắn muốn xóa sản phẩm <strong>"{{product.name}}"</strong>?
+                                        </p>
+                                        <div class="alert alert-warning" role="alert">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Hành động này không thể hoàn tác!
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-1"></i>Hủy
+                                        </button>
+                                        <form action="{{ url_for('deleteproduct', id=product.id) }}" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-trash-alt me-1"></i>Xóa sản phẩm
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- No results message -->
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mt-3">Không tìm thấy sản phẩm nào</h5>
+                <p class="text-muted">Hãy thử từ khóa khác hoặc xóa bộ lọc</p>
+            </div>
+        </div>
+        {% if products|length == 0 %}
+            <div class="card-body text-center py-5">
+                <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
+                <h5 class="text-muted mt-3">Chưa có sản phẩm nào</h5>
+                <p class="text-muted">Hãy thêm sản phẩm đầu tiên của bạn!</p>
+                <a href="{{ url_for('addproduct') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Thêm Sản Phẩm
+                </a>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <style>
+    .product-thumbnail {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .product-thumbnail:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .btn-group .btn {
+        border-radius: 0.375rem !important;
+        margin: 0 2px;
+        font-size: 0.875rem;
+    }
+    .card {
+        border-radius: 15px;
+    }
+    .badge {
+        font-size: 0.75rem;
+    }
+    .display-5 {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .table th {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .table td {
+        font-size: 0.875rem;
+    }
+    .search-container .input-group.has-search {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    .search-container .input-group.has-search:focus-within {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+    .search-container .input-group-text {
+        border-radius: 6px 0 0 6px !important;
+        padding: 0.375rem 0.75rem;
+    }
+    .search-container .form-control {
+        border-left: none;
+        padding-left: 0;
+        height: 38px;
+    }
+    .search-container .form-control:focus {
+        box-shadow: none;
+        border-color: #ced4da;
+    }
+    .product-name {
+        font-weight: 600;
+    }
+    .search-container .btn-outline-secondary {
+        border-color: #ced4da;
+        color: #6c757d;
+        padding: 0 12px;
+    }
+    .search-container .btn-outline-secondary:hover {
+        background-color: transparent;
+        color: #495057;
+    }
     .highlight {
         background-color: #fff3cd;
-        padding: 0 2px;
+        padding: 1px 3px;
         border-radius: 3px;
-        font-weight: bold;
     }
-
-    .modal-content {
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #dee2e6;
-        border-radius: 12px 12px 0 0;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #dee2e6;
-        border-radius: 0 0 12px 12px;
-    }
-
-    .btn-danger:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-    }
-
-    .btn-secondary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    .product-row.filtered {
+        display: none;
     }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Search functionality
     const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearch');
     const productRows = document.querySelectorAll('.product-row');
-    const productTableBody = document.getElementById('productTableBody');
+    const totalProducts = document.getElementById('totalProducts');
+    const searchResults = document.getElementById('searchResults');
     const noResults = document.getElementById('noResults');
+    const productTableBody = document.getElementById('productTableBody');
+    const totalCount = {{ products|length }};
 
-    function highlightText(text, searchTerm) {
-        if (!searchTerm) return text;
-        const regex = new RegExp(`(${searchTerm})`, 'gi');
-        return text.replace(regex, '<span class="highlight">$1</span>');
-    }
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
 
-    function filterProducts() {
-        const searchTerm = searchInput.value.trim().toLowerCase();
-        let hasResults = false;
+        // Clear previous highlights
+        document.querySelectorAll('.highlight').forEach(el => {
+            el.outerHTML = el.innerHTML;
+        });
 
         productRows.forEach(row => {
             const productName = row.getAttribute('data-name');
@@ -182,42 +318,73 @@ document.addEventListener('DOMContentLoaded', function() {
             if (searchTerm === '' ||
                 productName.includes(searchTerm) ||
                 brandName.includes(searchTerm)) {
-                row.classList.remove('d-none');
-                hasResults = true;
+
+                row.style.display = '';
+                visibleCount++;
 
                 // Highlight matching text
-                if (searchTerm) {
-                    nameCell.innerHTML = highlightText(nameCell.textContent, searchTerm);
-                    brandCell.innerHTML = highlightText(brandCell.textContent, searchTerm);
+                if (searchTerm !== '') {
+                    highlightText(nameCell, searchTerm);
+                    highlightText(brandCell, searchTerm);
                 } else {
                     nameCell.innerHTML = nameCell.textContent;
                     brandCell.innerHTML = brandCell.textContent;
                 }
             } else {
-                row.classList.add('d-none');
+                row.style.display = 'none';
             }
         });
 
-        // Show/hide no results message
-        if (!hasResults && searchTerm) {
-            noResults.classList.remove('d-none');
-            productTableBody.classList.add('d-none');
+        // Update result counter
+        if (searchTerm === '') {
+            totalProducts.style.display = '';
+            searchResults.style.display = 'none';
+            noResults.style.display = 'none';
+            productTableBody.style.display = '';
         } else {
-            noResults.classList.add('d-none');
-            productTableBody.classList.remove('d-none');
+            totalProducts.style.display = 'none';
+            searchResults.style.display = '';
+            searchResults.textContent = `Tìm thấy: ${visibleCount} sản phẩm`;
+
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+                productTableBody.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                productTableBody.style.display = '';
+            }
         }
     }
 
-    // Search input event
-    searchInput.addEventListener('input', filterProducts);
+    function highlightText(element, searchTerm) {
+        if (!element) return;
+        const text = element.textContent;
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        const highlightedText = text.replace(regex, '<span class="highlight">$1</span>');
+        element.innerHTML = highlightedText;
+    }
 
-    // Press ESC to clear search
-    searchInput.addEventListener('keyup', function(e) {
-        if (e.key === 'Escape') {
-            searchInput.value = '';
-            filterProducts();
+    // Event listeners
+    searchInput.addEventListener('input', performSearch);
+    searchInput.addEventListener('keyup', function (e) {
+        if (e.key === 'Enter') {
+            performSearch();
         }
     });
+
+    clearSearchBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        performSearch();
+        searchInput.focus();
+    });
+
+    // Show/hide clear button based on input
+    searchInput.addEventListener('input', function () {
+        clearSearchBtn.style.display = this.value ? 'block' : 'none';
+    });
+
+    // Initialize clear button visibility
+    clearSearchBtn.style.display = 'none';
 
     // Confirm delete with double-click prevention
     document.querySelectorAll('form[action*="deleteproduct"]').forEach(form => {
