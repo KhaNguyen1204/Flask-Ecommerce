@@ -2,71 +2,75 @@
 
 {% extends 'base.html' %}
 {% block content %}
-{% include 'navbar.html' %}
+    {% include 'navbar.html' %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
 
-{% include '_messages.html' %}
-<div class="floating-elements">
-    <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
-    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
-    <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
-</div>
+    {% include '_messages.html' %}
+    <div class="floating-elements">
+        <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+        <div class="floating-element"
+             style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+        <div class="floating-element"
+             style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
+    </div>
 
-<div class="container products-container">
-    <div class="row">
-        {% for product in products %}
-        <div class="col-md-3 mb-4">
-            <div class="card product-card h-100">
-                <div class="product-img-container">
-                    <img src="{{url_for('static', filename='images/products/' + product.image_1)}}"
-                         class="product-img" 
-                         alt="{{product.name}}">
-                    
-                    {% if product.discount > 0 %}
-                    <span class="discount-badge">
-                        -{{product.discount}}%
+    <div class="container products-container">
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-3 mb-4">
+                    <div class="card product-card h-100">
+                        <div class="product-img-container">
+                            <img src="{{ url_for('static', filename='images/products/' + product.image_1) }}"
+                                 class="product-img"
+                                 alt="{{ product.name }}">
+
+                            {% if product.discount > 0 %}
+                                <span class="discount-badge">
+                        -{{ product.discount }}%
                     </span>
-                    {% endif %}
-                </div>
-                
-                <div class="card-body">
-                    <h5 class="product-name">{{product.name}}</h5>
-                    <p class="product-price">
-                        {{product.price}}$
-                        {% if product.discount > 0 %}
-                            <span class="original-price">{{ "%0.2f"|format(product.price|float + (product.price|float * product.discount|float / 100)) }}$</span>
-                        {% endif %}
-                    </p>
-                    
-                    <div class="card-actions">
-                        <a href="{{url_for('single_page', id=product.id)}}" 
-                           class="btn-details">
-                            <i class="bi bi-eye-fill me-1"></i> Chi tiết
-                        </a>
-                        
-                        <form action="{{url_for('AddCart')}}" method="post" class="m-0 h-100">
-                            <input type="hidden" name="product_id" value="{{product.id}}">
-                            <input type="hidden" name="quantity" value="1" min="1" max="{{product.stock}}">
-                            {% set colors = product.colors.split(',') %}
-                            <select name="colors" id="colors" class="d-none">
-                                {% for color in colors %}
-                                    {% set col = color.split(':') %}
-                                    <option value="{{col[0]}}">{{col[0]|capitalize}}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn-add-to-cart h-100">
-                                <i class="bi bi-cart-plus-fill me-1"></i> Thêm
-                            </button>
-                        </form>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="product-name">{{ product.name }}</h5>
+                            <p class="product-price">
+                                {% if product.discount > 0 %}
+                                    <span>{{ "{:,.0f}".format(product.price|float - (product.price|float * product.discount|float / 100)) }}đ</span>
+                                    <span class="original-price">{{ "{:,.0f}".format(product.price|float) }}đ</span>
+                                {% else %}
+                                    {{ "{:,.0f}".format(product.price|float) }}đ
+                                {% endif %}
+                            </p>
+
+                            <div class="card-actions">
+                                <a href="{{ url_for('single_page', id=product.id) }}"
+                                   class="btn-details">
+                                    <i class="bi bi-eye-fill me-1"></i> Chi tiết
+                                </a>
+
+                                <form action="{{ url_for('AddCart') }}" method="post" class="m-0 h-100">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                                    {% set colors = product.colors.split(',') %}
+                                    <select name="colors" id="colors" class="d-none">
+                                        {% for color in colors %}
+                                            {% set col = color.split(':') %}
+                                            <option value="{{ col[0] }}">{{ col[0]|capitalize }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn-add-to-cart h-100">
+                                        <i class="bi bi-cart-plus-fill me-1"></i> Thêm
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
 
-<script="{{ url_for('static', filename='js/result.js') }}"></script>
+    <script="{{ url_for('static', filename='js/result.js') }}"></script>
 
 {% endblock content %}

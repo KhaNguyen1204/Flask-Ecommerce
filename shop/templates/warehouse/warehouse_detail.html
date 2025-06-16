@@ -9,7 +9,6 @@
 {% endif %}
     {% include '_navbar_warehouse.html' %}
 
-
     <!-- Page Title -->
     <div class="container mt-4">
         <div class="row">
@@ -41,13 +40,17 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
+                    <div class="row align-items-end g-3 flex-wrap">
+                        <div class="col">
                             <label class="form-label fw-semibold">Tìm kiếm</label>
-                            <input class="form-control" type="search" placeholder="Tên kho, địa điểm..." 
-                                   aria-label="Search" id="search-input">
+                            <div class="position-relative">
+                                <input class="form-control" type="search" placeholder="Tên kho, địa điểm..." aria-label="Search" id="search-input">
+                                <div class="search-clear position-absolute top-50 end-0 translate-middle-y me-3" style="display: none; cursor: pointer;">
+                                    <i class="fas fa-times-circle text-muted"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col">
                             <label class="form-label fw-semibold">Trạng thái</label>
                             <select class="form-select" id="status-filter">
                                 <option value="">Tất cả</option>
@@ -55,7 +58,7 @@
                                 <option value="inactive">Không hoạt động</option>
                             </select>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col">
                             <label class="form-label fw-semibold">Sắp xếp</label>
                             <select class="form-select" id="sort-filter">
                                 <option value="">Mặc định</option>
@@ -65,16 +68,13 @@
                                 <option value="capacity_low">Sức chứa (thấp-cao)</option>
                             </select>
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <label class="form-label fw-semibold">&nbsp;</label>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn ru-primary flex-fill">
-                                    <i class="fas fa-search me-1"></i>Tìm
-                                </button>
-                                <button id="reset-filter" class="btn btn-outline-secondary">
-                                    <i class="fas fa-redo me-1"></i>Đặt lại
-                                </button>
-                            </div>
+                        <div class="col d-flex gap-2 align-items-end">
+                            <button class="btn btn-primary fw-semibold" id="search-btn">
+                                <i class="fas fa-search me-1"></i>Tìm
+                            </button>
+                            <button id="reset-filter" class="btn btn-outline-secondary" title="Xóa tất cả bộ lọc">
+                                <i class="fas fa-redo me-1"></i>Đặt lại
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                         <h5 class="card-title mb-0 text-dark">
                             <i class="fas fa-warehouse me-2"></i>Danh Sách Kho Hàng
                         </h5>
-                        <small class="text-muted">Tổng cộng: {{ warehouses|length }} kho</small>
+                        <small class="text-muted" id="warehouse-count">Tổng cộng: {{ warehouses|length }} kho</small>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -109,18 +109,20 @@
                                     <th class="text-center" style="width: 180px;">Thao Tác</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="warehouses-tbody">
                                 {% if warehouses %}
                                 {% for warehouse in warehouses %}
                                 <tr class="align-middle warehouse-row"
-                                    data-status="{{ warehouse.status }}">
+                                    data-status="{{ warehouse.status }}"
+                                    data-name="{{ warehouse.name|lower }}"
+                                    data-location="{{ warehouse.location|lower }}">
                                     <td class="text-center">
                                         <span class="badge bg-secondary">{{ loop.index }}</span>
                                     </td>
-                                    <td>
-                                        <div class="text-dark fw-medium">{{ warehouse.name }}</div>
+                                    <td class="searchable-content">
+                                        <span class="fw-medium">{{ warehouse.name }}</span>
                                     </td>
-                                    <td>
+                                    <td class="searchable-content">
                                         <span class="text-muted">{{ warehouse.location }}</span>
                                     </td>
                                     <td class="text-center">
@@ -145,14 +147,14 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ url_for('warehouse_edit', id=warehouse.id) }}" 
+                                            <a href="{{ url_for('warehouse_edit', id=warehouse.id) }}"
                                                class="btn btn-primary btn-sm px-3"
                                                title="Chỉnh sửa kho">
                                                 <i class="fas fa-edit me-1"></i>Sửa
                                             </a>
-                                            <button type="button" 
-                                                    class="btn btn-danger btn-sm px-3" 
-                                                    data-bs-toggle="modal" 
+                                            <button type="button"
+                                                    class="btn btn-danger btn-sm px-3"
+                                                    data-bs-toggle="modal"
                                                     data-bs-target="#deleteModal-{{ warehouse.id }}"
                                                     title="Xóa kho">
                                                 <i class="fas fa-trash me-1"></i>Xóa
@@ -170,6 +172,14 @@
                                     </td>
                                 </tr>
                                 {% endif %}
+                                <!-- No search results row -->
+                                <tr id="no-results-row" style="display: none;">
+                                    <td colspan="8" class="text-center py-5">
+                                        <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+                                        <h5 class="text-muted mt-3">Không tìm thấy kết quả</h5>
+                                        <p class="text-muted">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

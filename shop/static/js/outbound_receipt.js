@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     let searchTimeout;
     let currentSearchTerm = '';
-    const originalRowCount = {{ receipts|length }};
+    const originalRowCount = window.originalRowCount || 0;
 
     // DOM elements
     const searchInput = document.getElementById('search-input');
@@ -295,3 +295,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+

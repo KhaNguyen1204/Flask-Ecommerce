@@ -9,119 +9,126 @@
 {% endblock title %}
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/home_index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_index.css') }}">
 
-<div class="floating-elements">
-    <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
-    <div class="floating-element" style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
-    <div class="floating-element" style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
-</div>
+    <div class="floating-elements">
+        <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%;"></div>
+        <div class="floating-element"
+             style="width: 150px; height: 150px; top: 70%; left: 80%; animation-delay: -5s;"></div>
+        <div class="floating-element"
+             style="width: 60px; height: 60px; top: 40%; left: 90%; animation-delay: -10s;"></div>
+    </div>
 
-<div class="container products-container">
-    <div class="row">
-        {% set products_list = brand or get_cat_prod or products.items %}
-        {% for p in products_list %}
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-                <div class="card h-100 product-card">
-                    <div class="product-img-container">
-                        <img src="{{ url_for('static', filename='images/products/' + p.image_1) }}"
-                             class="card-img-top product-img"
-                             alt="{{ p.name }}"
-                             loading="lazy"
-                             width="750"
-                             height="500"
-                             onload="this.classList.add('loaded')"
-                             onerror="this.classList.add('error'); this.alt='Không có ảnh';">
+    <div class="container products-container">
+        <div class="row">
+            {% set products_list = brand or get_cat_prod or products.items %}
+            {% for p in products_list %}
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 product-card">
+                        <div class="product-img-container">
+                            <img src="{{ url_for('static', filename='images/products/' + p.image_1) }}"
+                                 class="card-img-top product-img"
+                                 alt="{{ p.name }}"
+                                 loading="lazy"
+                                 width="750"
+                                 height="500"
+                                 onload="this.classList.add('loaded')"
+                                 onerror="this.classList.add('error'); this.alt='Không có ảnh';">
 
-                        {% if p.discount > 0 %}
-                            <div class="badge-discount">
-                                -{{ p.discount }}%
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="card-body">
-                        <h5 class="card-title" title="{{ p.name }}">{{ p.name }}</h5>
-                        <p class="price">
-                            {{ "{:,.0f}".format(p.price|float) }}đ
                             {% if p.discount > 0 %}
-                                <span class="original-price">{{ "{:,.0f}".format(p.price|float + (p.price|float * p.discount|float / 100)) }}đ</span>
+                                <div class="badge-discount">
+                                    -{{ p.discount }}%
+                                </div>
                             {% endif %}
-                        </p>
-                    </div>
+                        </div>
 
-                    <div class="card-footer">
-                        <a href="{{ url_for('single_page', id=p.id) }}"
-                           class="btn btn-details">
-                            <i class="bi bi-eye-fill me-1"></i> <span>Chi tiết</span>
-                        </a>
-                        <form action="{{ url_for('AddCart') }}" method="post" class="m-0 p-0">
-                            <input type="hidden" name="product_id" value="{{ p.id }}">
-                            <input type="hidden" name="quantity" value="1">
-                            {% set colors = p.colors.split(',') %}
-                            <select name="colors" style="display: none;">
-                                {% for color in colors %}
-                                    {% set col = color.split(':') %}
-                                    <option value="{{ col[0] }}">{{ col[0]|capitalize }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn btn-add-to-cart">
-                                <i class="bi bi-cart-plus-fill me-1"></i> <span>Thêm</span>
-                            </button>
-                        </form>
+                        <div class="card-body">
+                            <h5 class="card-title" title="{{ p.name }}">{{ p.name }}</h5>
+                            <p class="price">
+                                {% if p.discount > 0 %}
+                                    <span>{{ "{:,.0f}".format(p.price|float - (p.price|float * p.discount|float / 100)) }}đ</span>
+                                    <span class="original-price">{{ "{:,.0f}".format(p.price|float) }}đ</span>
+                                {% else %}
+                                {{ "{:,.0f}".format(p.price|float) }}đ
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="card-footer">
+                            <a href="{{ url_for('single_page', id=p.id) }}"
+                               class="btn btn-details">
+                                <i class="bi bi-eye-fill me-1"></i> <span>Chi tiết</span>
+                            </a>
+                            <form action="{{ url_for('AddCart') }}" method="post" class="m-0 p-0">
+                                <input type="hidden" name="product_id" value="{{ p.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                {% set colors = p.colors.split(',') %}
+                                <select name="colors" style="display: none;">
+                                    {% for color in colors %}
+                                        {% set col = color.split(':') %}
+                                        <option value="{{ col[0] }}">{{ col[0]|capitalize }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-add-to-cart">
+                                    <i class="bi bi-cart-plus-fill me-1"></i> <span>Thêm</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+        </div>
+
+        <!-- Phân trang -->
+        {% if products_list %}
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% set pagination = brand or get_cat_prod or products %}
+                        {% if pagination.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="
+                                           {{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.prev_num) }}"
+                                   aria-label="Trang trước">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for page in pagination.iter_pages(left_edge=1, right_edge=2, left_current=1, right_current=2) %}
+                            {% if page %}
+                                <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                                    <a class="page-link"
+                                       href="
+                                               {{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=page) }}"
+                                       aria-label="Trang {{ page }}">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if pagination.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="
+                                           {{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.next_num) }}"
+                                   aria-label="Trang sau">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             </div>
-        {% endfor %}
+        {% endif %}
     </div>
 
-    <!-- Phân trang -->
-    {% if products_list %}
-    <div class="pagination-container">
-        <nav aria-label="Page navigation">
-            <ul class="pagination">
-                {% set pagination = brand or get_cat_prod or products %}
-                {% if pagination.has_prev %}
-                    <li class="page-item">
-                        <a class="page-link"
-                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.prev_num) }}"
-                           aria-label="Trang trước">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                {% endif %}
-
-                {% for page in pagination.iter_pages(left_edge=1, right_edge=2, left_current=1, right_current=2) %}
-                    {% if page %}
-                        <li class="page-item {% if page == pagination.page %}active{% endif %}">
-                            <a class="page-link"
-                               href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=page) }}"
-                               aria-label="Trang {{ page }}">
-                                {{ page }}
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-
-                {% if pagination.has_next %}
-                    <li class="page-item">
-                        <a class="page-link"
-                           href="{{ url_for(request.endpoint, id=get_b.id if brand else get_cat.id if get_cat_prod else None, page=pagination.next_num) }}"
-                           aria-label="Trang sau">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-    {% endif %}
-</div>
-
-<script="{{ url_for('static', filename='js/home_index.js') }}"></script>
+    <script="{{ url_for('static', filename='js/home_index.js') }}"></script>
 
 {% endblock content %}

@@ -12,12 +12,12 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="/">
-                            <i class="bi bi-grid"></i>Tất cả sản phẩm 
+                            <i class="bi bi-grid"></i>Tất cả sản phẩm
                         </a>
                     </li>
                         <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-folder"></i>Thương hiệu 
+                            <i class="bi bi-folder"></i>Thương hiệu
                         </a>
                         <div class="dropdown-menu">
                             {% for brand in brands %}
@@ -30,7 +30,7 @@
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-folder"></i>Danh mục 
+                            <i class="bi bi-folder"></i>Danh mục
                         </a>
                         <div class="dropdown-menu">
                             {% for category in categories %}
@@ -41,7 +41,7 @@
                         </div>
                     </li>
                 </ul>
-                
+
                 <div class="d-flex align-items-center ms-auto">
                     <form class="search-form d-flex me-3" role="search" action="{{url_for('result')}}">
                         <input class="form-control search-input" type="search" placeholder="Sản phẩm cần tìm..." aria-label="Search" name="q">
@@ -49,14 +49,14 @@
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
-                    
+
                     <div class="nav-item me-3">
                         <a class="nav-link cart-link" href="{{url_for('getCart')}}">
                             <i class="bi bi-cart3"></i>
                             <span class="cart-counter">{{session['ShopCart']|length}}</span>
                         </a>
                     </div>
-                    
+
                     {% if current_user.is_authenticated %}
                     <div class="nav-item me-2">
                         <a class="nav-link auth-link username" href="/customer/profile">
@@ -65,7 +65,7 @@
                     </div>
                     <div class="nav-item">
                         <a class="nav-link auth-link logout" href="{{url_for('customer_logout')}}">
-                            <i class="bi bi-box-arrow-right"></i>Đăng xuất 
+                            <i class="bi bi-box-arrow-right"></i>Đăng xuất
                         </a>
                     </div>
                     {% else %}
