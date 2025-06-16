@@ -1,0 +1,4 @@
+
+function printReceipt() {
+    window.print();
+}

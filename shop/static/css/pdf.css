@@ -1,0 +1,89 @@
+
+        body {
+            font-size: 14px;
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+        }
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .invoice-title {
+            color: red;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 26px;
+        }
+        .store-info {
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .store-name {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .invoice-header {
+            margin-bottom: 20px;
+        }
+        .invoice-info {
+            margin-bottom: 25px;
+        }
+        .info-box {
+            border: 1px solid #000;
+            padding: 10px;
+            height: 100%;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-align: center;
+            background-color: #f0f0f0;
+            padding: 5px;
+        }
+        table th, table td {
+            vertical-align: middle !important;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            font-weight: bold;
+            text-align: center;
+        }
+        .table-bordered td, .table-bordered th {
+            border: 1px solid #dee2e6 !important;
+        }
+        .notes-section {
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .thank-you {
+            text-align: center;
+            margin: 30px 0;
+            font-style: italic;
+            font-size: 14px;
+        }
+        .signatures {
+            margin: 40px 0;
+        }
+        .signature-box {
+            display: inline-block;
+            width: 48%;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 40px;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+        }

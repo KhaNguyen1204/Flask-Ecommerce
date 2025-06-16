@@ -1,0 +1,76 @@
+
+    .product-thumbnail {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .product-thumbnail:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .btn-group .btn {
+        border-radius: 0.375rem !important;
+        margin: 0 2px;
+        font-size: 0.875rem;
+    }
+    .card {
+        border-radius: 15px;
+    }
+    .badge {
+        font-size: 0.75rem;
+    }
+    .display-5 {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .table th {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .table td {
+        font-size: 0.875rem;
+    }
+    .search-container .input-group.has-search {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    .search-container .input-group.has-search:focus-within {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    }
+    .search-container .input-group-text {
+        border-radius: 6px 0 0 6px !important;
+        padding: 0.375rem 0.75rem;
+    }
+    .search-container .form-control {
+        border-left: none;
+        padding-left: 0;
+        height: 38px;
+    }
+    .search-container .form-control:focus {
+        box-shadow: none;
+        border-color: #ced4da;
+    }
+    .product-name {
+        font-weight: 600;
+    }
+    .search-container .btn-outline-secondary {
+        border-color: #ced4da;
+        color: #6c757d;
+        padding: 0 12px;
+    }
+    .search-container .btn-outline-secondary:hover {
+        background-color: transparent;
+        color: #495057;
+    }
+    .highlight {
+        background-color: #fff3cd;
+        padding: 1px 3px;
+        border-radius: 3px;
+    }
+    .product-row.filtered {
+        display: none;
+    }

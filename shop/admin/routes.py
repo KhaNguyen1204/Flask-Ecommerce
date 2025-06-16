@@ -173,7 +173,7 @@ def roles():
 @role_required(['admin'])
 def add_role():
     form = RoleForm(request.form)
-    form.submit.label.text = 'Add Role'
+    form.submit.label.text = 'Thêm vai trò'
     if request.method == 'POST' and form.validate():
         # Check if role already exists
         role = Role.query.filter_by(name=form.name.data).first()

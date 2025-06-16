@@ -261,6 +261,7 @@
                 {% if brands is defined and brands|length == 0 %}
                 <div class="card-body text-center py-5">
                     <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
+<<<<<<< HEAD
                     <h5 class="text-muted mt-3">Chưa có thương hiệu nào</h5>
                     <p class="text-muted">Hãy thêm thương hiệu đầu tiên của bạn!</p>
                     <a href="{{ url_for('addbrand') }}" class="btn btn-primary">
@@ -270,10 +271,16 @@
                 {% elif categories is defined and categories|length == 0 %}
                 <div class="card-body text-center py-5">
                     <i class="fas fa-box-open text-muted" style="font-size: 4rem;"></i>
-                    <h5 class="text-muted mt-3">Chưa có {% if brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
-                    <p class="text-muted">Hãy thêm {% if brands %}thương hiệu{% else %}danh mục{% endif %} đầu tiên của bạn!</p>
-                    <a href="{{ url_for('addbrand' if brands else 'addcategory') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Thêm {% if brands %}Thương Hiệu{% else %}Danh Mục{% endif %}
+                    <h5 class="text-muted mt-3">Chưa có danh mục nào</h5>
+                    <p class="text-muted">Hãy thêm danh mục đầu tiên của bạn!</p>
+                    <a href="{{ url_for('addcategory') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm Danh Mục
+=======
+                    <h5 class="text-muted mt-3">Chưa có {% if brands or is_brands %}thương hiệu{% else %}danh mục{% endif %} nào</h5>
+                    <p class="text-muted">Hãy thêm {% if brands or is_brands %}thương hiệu{% else %}danh mục{% endif %} đầu tiên của bạn!</p>
+                    <a href="{{ url_for('addbrand' if brands or is_brands else 'addcategory') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Thêm {% if brands or is_brands %}Thương Hiệu{% else %}Danh Mục{% endif %}
+>>>>>>> 9d7dc6c93e44a9c035951f7ad2fc711515c5f470
                     </a>
                 </div>
                 {% endif %}
@@ -281,90 +288,9 @@
         </div>
     </div>
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const clearSearch = document.getElementById('clearSearch');
-    const itemRows = document.querySelectorAll('.item-row');
-    const noResultsMessage = document.getElementById('noResultsMessage');
-    const totalItemsSpan = document.getElementById('totalItems');
-    const searchResultsSpan = document.getElementById('searchResults');
-    
-    // Xử lý tìm kiếm
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.trim().toLowerCase();
-        let matchedItems = 0;
-        
-        // Hiển thị nút xóa khi có nội dung
-        clearSearch.style.display = searchTerm ? 'block' : 'none';
-        
-        itemRows.forEach(row => {
-            const itemName = row.getAttribute('data-item-name');
-            const nameCell = row.querySelector('.item-name');
-            const originalName = nameCell.dataset.original || nameCell.textContent;
-            
-            // Lưu tên gốc nếu chưa có
-            if (!nameCell.dataset.original) {
-                nameCell.dataset.original = originalName;
-            }
-            
-            // Highlight và lọc
-            if (searchTerm === '' || itemName.includes(searchTerm)) {
-                row.style.display = '';
-                matchedItems++;
-                
-                // Highlight từ khóa nếu có
-                if (searchTerm) {
-                    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
-                    nameCell.innerHTML = originalName.replace(regex, '<span class="bg-warning">$1</span>');
-                } else {
-                    nameCell.textContent = originalName;
-                }
-            } else {
-                row.style.display = 'none';
-                nameCell.textContent = originalName;
-            }
-        });
-        
-        // Hiển thị thông báo khi không có kết quả
-        if (searchTerm && matchedItems === 0) {
-            noResultsMessage.style.display = 'block';
-            searchResultsSpan.style.display = 'none';
-        } else {
-            noResultsMessage.style.display = 'none';
-            
-            // Cập nhật số lượng kết quả
-            if (searchTerm) {
-                searchResultsSpan.textContent = `Tìm thấy: ${matchedItems}`;
-                searchResultsSpan.style.display = 'inline';
-                totalItemsSpan.style.display = 'none';
-            } else {
-                searchResultsSpan.style.display = 'none';
-                totalItemsSpan.style.display = 'inline';
-            }
-        }
-    });
-    
-    // Xóa tìm kiếm
-    clearSearch.addEventListener('click', function() {
-        searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input'));
-        searchInput.focus();
-    });
-    
-    // Hàm escape ký tự đặc biệt cho regex
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-});
-</script>
 
-<style>
-.bg-warning {
-    background-color: #ffc107;
-    padding: 0 2px;
-    border-radius: 3px;
-}
-</style>
+
+<script src="{{url_for('static', filename='js/manager_brands.js')}}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manager_brands.css') }}">
 
 {% endblock content %}

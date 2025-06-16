@@ -1,0 +1,116 @@
+<!-- Custom CSS -->
+
+    .hover-row {
+        transition: all 0.2s ease;
+    }
+
+    .hover-row:hover {
+        background-color: #f8f9fa !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .modal-content {
+        border-radius: 10px;
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .avatar-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #17a2b8, #138496);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+    }
+
+    .info-item label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+
+    .table-responsive .row {
+        margin: 0;
+    }
+
+    .table-responsive .col-1,
+    .table-responsive .col-2 {
+        padding: 0.5rem;
+    }
+
+    .highlight {
+        background-color: #FFEB3B;
+        padding: 0 1px;
+        border-radius: 2px;
+        font-weight: bold;
+        color: #000;
+    }
+
+    #clearSearch {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px 12px;
+    }
+
+    #searchInput {
+        padding-right: 35px;
+    }
+
+    .d-flex.flex-nowrap {
+        flex-wrap: nowrap !important;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 10px;
+        }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .table-responsive .row {
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .table-responsive .col-1,
+        .table-responsive .col-2 {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }

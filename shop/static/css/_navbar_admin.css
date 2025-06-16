@@ -1,0 +1,125 @@
+/* Tăng chiều cao tổng thể của navbar */
+.navbar {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    min-height: 60px; /* hoặc giá trị bạn muốn */
+}
+
+/* Tăng padding cho các nav-link */
+.nav-link {
+    padding-top: 0.8rem !important;
+    padding-bottom: 0.8rem !important;
+}
+
+/* Tăng kích thước cho dropdown toggle */
+.btn-outline-dark {
+    padding: 0.5rem 1rem;
+}
+
+/* Đảm bảo logo cũng cân đối */
+.navbar-brand {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 1.25rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .navbar {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .nav-link {
+        padding: 0.5rem 1rem !important;
+    }
+}
+
+/* Orange gradient background cho navbar */
+.bg-gradient-orange {
+    background: #fbe87e;
+}
+
+/* Style cho nav links với hover effect */
+.nav-link-hover {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.nav-link-hover:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #333 !important;
+    transform: translateY(-1px);
+}
+
+/* Style cho active nav item */
+.nav-link.active-nav {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #333 !important;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Style cho navbar toggler */
+.navbar-toggler-orange {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.navbar-toggler-orange:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+}
+
+/* Style cho dropdown button */
+.btn-outline-dark {
+    border-color: rgba(0, 0, 0, 0.5);
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(0, 0, 0, 0.7);
+    color: #333;
+}
+
+/* Style cho dropdown toggle khi active */
+.btn-outline-dark.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #333 !important;
+    border-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Style cho navbar brand */
+.navbar-brand {
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #ee7b07 !important;
+    transform: scale(1.05);
+}
+
+/* Custom yellow icon cho brand */
+.text-warning {
+    color: #ffd700 !important;
+}
+
+/* Shadow enhancement */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.5rem rgba(255, 140, 0, 0.3) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .bg-gradient-orange {
+        background: linear-gradient(180deg, #66ff00 0%, #a56000 50%, #ff6600 100%);
+    }
+    
+    .navbar-nav {
+        padding-top: 1rem;
+    }
+    
+    .nav-link-hover {
+        margin-bottom: 0.25rem;
+    }
+}

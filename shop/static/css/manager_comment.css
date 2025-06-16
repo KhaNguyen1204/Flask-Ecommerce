@@ -1,0 +1,29 @@
+
+.card {
+    border-radius: 1.5rem;
+}
+.card-header {
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+}
+.input-group-text {
+    border-radius: 0.75rem 0 0 0.75rem !important;
+}
+.form-control {
+    border-radius: 0 0.75rem 0.75rem 0 !important;
+}
+.table th, .table td {
+    vertical-align: middle;
+    font-size: 1rem;
+}
+.product-name .highlight {
+    background: #fff3cd;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+.btn-outline-primary {
+    border-radius: 0.5rem;
+}
+.badge {
+    font-size: 1rem;
+    padding: 0.5em 1em;
+}

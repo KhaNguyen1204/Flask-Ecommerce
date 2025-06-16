@@ -1,70 +1,4 @@
-<!-- Warehouse Navigation Bar -->
-<style>
-    .warehouse-navbar {
-        background: linear-gradient(90deg, #e3f2fd 0%, #f8f9fa 100%);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        padding: 0.75rem 1.5rem;
-        border-radius: 0 0 1rem 1rem;
-    }
-    .warehouse-navbar .navbar-brand {
-        font-weight: 700;
-        color: #1565c0;
-        font-size: 1.4rem;
-        letter-spacing: 1px;
-    }
-    .warehouse-navbar .nav-link {
-        color: #34495e;
-        font-weight: 500;
-        padding: 0.6rem 1.2rem;
-        border-radius: 0.5rem;
-        margin: 0 0.2rem;
-        transition: background 0.2s, color 0.2s;
-    }
-    .warehouse-navbar .nav-link:hover,
-    .warehouse-navbar .nav-link.active {
-        color: #1976d2 !important;
-        background: #e3f2fd;
-        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
-    }
-    .warehouse-navbar .dropdown-toggle {
-        display: flex;
-        align-items: center;
-        font-weight: 600;
-        color: #1976d2;
-    }
-    .warehouse-navbar .dropdown-menu {
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 16px rgba(21, 101, 192, 0.08);
-        min-width: 180px;
-    }
-    .warehouse-navbar .dropdown-item {
-        padding: 0.6rem 1.2rem;
-        border-radius: 0.5rem;
-        color: #34495e;
-        font-weight: 500;
-    }
-    .warehouse-navbar .dropdown-item:hover {
-        background: #e3f2fd;
-        color: #1976d2;
-    }
-    .warehouse-navbar .dropdown-divider {
-        margin: 0.4rem 0;
-    }
-    .account-avatar {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #1976d2 60%, #64b5f6 100%);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 10px;
-        font-size: 18px;
-        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
-    }
-</style>
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/_navbar_warehouse.css') }}">
 <nav class="navbar navbar-expand-lg warehouse-navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="/warehouse">
@@ -119,26 +53,4 @@
         </div>
     </div>
 </nav>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.warehouse-navbar .nav-link:not(.dropdown-toggle)');
-    navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
-            link.classList.add('active');
-            link.closest('.nav-item').classList.add('active');
-        }
-    });
-    const dropdownItems = document.querySelectorAll('.warehouse-navbar .dropdown-item');
-    dropdownItems.forEach(item => {
-        if (item.getAttribute('href') === currentPath) {
-            item.classList.add('active');
-            const dropdownToggle = item.closest('.dropdown-menu').previousElementSibling;
-            if (dropdownToggle && dropdownToggle.classList.contains('dropdown-toggle')) {
-                dropdownToggle.classList.add('active');
-            }
-        }
-    });
-});
-</script>
+<script src="{{url_for('static', filename='js/_navbar_warehouse.js')}}"></script>

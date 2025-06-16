@@ -1,0 +1,219 @@
+
+/* Improved overall styling */
+body {
+background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+position: relative;
+overflow-x: hidden;
+font-family: 'Roboto', sans-serif;
+}
+
+/* Enhanced background effects */
+.floating-elements {
+position: absolute;
+width: 100%;
+height: 100%;
+top: 0;
+left: 0;
+pointer-events: none;
+z-index: -1;
+overflow: hidden;
+}
+
+.floating-element {
+position: absolute;
+background: rgba(23, 162, 184, 0.08);
+border-radius: 50%;
+animation: floatAround 20s infinite linear;
+}
+
+@keyframes floatAround {
+0% { transform: translate(0, 0) rotate(0deg); }
+33% { transform: translate(50px, 100px) rotate(120deg); }
+66% { transform: translate(100px, 30px) rotate(240deg); }
+100% { transform: translate(0, 0) rotate(360deg); }
+}
+
+/* Main container with improved animation */
+.add-container {
+margin-top: 80px;
+margin-bottom: 80px;
+opacity: 0;
+transform: translateY(20px);
+animation: fadeInUp 0.8s 0.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes fadeInUp {
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+/* Enhanced card styling */
+.add-card {
+background: rgba(255, 255, 255, 0.95);
+backdrop-filter: blur(10px);
+border-radius: 24px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+border: 1px solid rgba(255,255,255,0.2);
+padding: 40px;
+transition: transform 0.4s ease, box-shadow 0.4s ease;
+position: relative;
+overflow: hidden;
+}
+
+.add-card::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 5px;
+background: linear-gradient(to right, #17a2b8, #138496, #17a2b8);
+background-size: 200% 100%;
+animation: gradientMove 3s infinite linear;
+}
+
+@keyframes gradientMove {
+0% { background-position: 0% 0%; }
+100% { background-position: 200% 0%; }
+}
+
+.add-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+}
+
+/* Improved title styling */
+.add-title {
+font-weight: 700;
+letter-spacing: 1.5px;
+text-align: center;
+margin-bottom: 30px;
+color: #2b2d42;
+position: relative;
+padding-bottom: 15px;
+font-size: 1.8rem;
+}
+
+.add-title::after {
+content: '';
+position: absolute;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%);
+width: 80px;
+height: 4px;
+background: linear-gradient(to right, #17a2b8, #138496);
+border-radius: 2px;
+}
+
+/* Enhanced form elements */
+.form-input {
+background: rgba(255,255,255,0.9);
+border: 2px solid #e9ecef;
+border-radius: 12px;
+padding: 14px 20px;
+font-size: 1rem;
+transition: all 0.3s ease;
+width: 100%;
+margin-bottom: 25px;
+box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+}
+
+.form-input:focus {
+border-color: #17a2b8;
+box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+outline: none;
+transform: translateY(-2px);
+}
+
+.input-container {
+position: relative;
+margin-bottom: 25px;
+}
+
+.input-icon {
+position: absolute;
+left: 15px;
+top: 50%;
+transform: translateY(-50%);
+color: #adb5bd;
+transition: all 0.3s ease;
+}
+
+.form-input-icon {
+padding-left: 45px;
+}
+
+/* Enhanced submit button */
+.btn-submit {
+background: linear-gradient(45deg, #17a2b8, #138496);
+border: none;
+padding: 14px 30px;
+font-weight: 600;
+letter-spacing: 1px;
+border-radius: 50px;
+box-shadow: 0 10px 20px rgba(23, 162, 184, 0.3);
+transition: all 0.3s ease;
+color: white;
+width: 100%;
+position: relative;
+overflow: hidden;
+}
+
+.btn-submit::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+transition: all 0.6s ease;
+}
+
+.btn-submit:hover {
+transform: translateY(-3px);
+box-shadow: 0 15px 30px rgba(23, 162, 184, 0.4);
+background: linear-gradient(45deg, #138496, #17a2b8);
+}
+
+.btn-submit:hover::before {
+left: 100%;
+}
+
+.btn-submit:active {
+transform: translateY(0);
+box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+}
+
+/* Card subtle background pattern */
+.pattern {
+position: absolute;
+top: 0;
+right: 0;
+width: 100%;
+height: 100%;
+background-image: radial-gradient(rgba(23, 162, 184, 0.1) 2px, transparent 2px);
+background-size: 30px 30px;
+opacity: 0.3;
+pointer-events: none;
+}
+
+/* Improved responsive styling */
+@media (max-width: 768px) {
+.add-container {
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.add-card {
+    padding: 30px 25px;
+}
+
+.add-title {
+    font-size: 1.5rem;
+}
+}
+

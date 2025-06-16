@@ -1,0 +1,28 @@
+
+body {
+    background: #f8fafc;
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.card-header {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, .25);
+}
+
+.profile-preview {
+    width: 3cm;                 /* hoặc dùng 80px như bạn đang dùng */
+    height: 3cm;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    margin-bottom: 10px;
+    display: block;             /* Không dùng 'none' để ảnh luôn hiển thị */
+}
