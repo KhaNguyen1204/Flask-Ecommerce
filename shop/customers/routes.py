@@ -206,6 +206,8 @@ def get_pdf(invoice):
             return redirect(url_for('orders', invoice=invoice))
     else:
         flash('Bạn không thể xuất hóa đơn vì đơn hàng chưa hoàn thành.', 'warning')
+        if current_user.role.name == 'admin' or current_user.role.name == 'sale':
+            return redirect(request.referrer)
         return redirect(url_for('orders', invoice=invoice))
 
 @app.route('/customer/profile')

@@ -30,6 +30,7 @@ def AddCart():
                     'id': product.id,
                     'name': product.name,
                     'price': product.price,
+                    'stock': product.stock,
                     'quantity': quantity,
                     'colors': colors,
                     'discount': product.discount,

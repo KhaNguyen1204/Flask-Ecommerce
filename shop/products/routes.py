@@ -28,7 +28,7 @@ def home():
     show_admin_register = not admin_exists
 
     page = request.args.get('page', 1, type=int)
-    products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=4)
+    products = AddProduct.query.filter(AddProduct.stock > 0).paginate(page=page, per_page=8)
     return render_template('products/index.html', products=products, brands=brands(), categories=categories(),
                            show_admin_register=show_admin_register)
 
@@ -74,7 +74,7 @@ def get_brand(id):
 
     page = request.args.get('page', 1, type=int)
     get_b = Brand.query.filter_by(id=id).first_or_404()
-    brand = AddProduct.query.filter_by(brand_id=get_b.id).paginate(page=page, per_page=4)
+    brand = AddProduct.query.filter_by(brand_id=get_b.id).paginate(page=page, per_page=8)
     return render_template('products/index.html', brand=brand, brands=brands(), categories=categories(), get_b=get_b,
                            show_admin_register=show_admin_register)
 
@@ -90,7 +90,7 @@ def get_categories(id):
 
     page = request.args.get('page', 1, type=int)
     get_cat = Category.query.filter_by(id=id).first_or_404()
-    get_cat_prod = AddProduct.query.filter_by(category=get_cat).paginate(page=page, per_page=4)
+    get_cat_prod = AddProduct.query.filter_by(category=get_cat).paginate(page=page, per_page=8)
     return render_template('products/index.html', get_cat_prod=get_cat_prod, brands=brands(), categories=categories(),
                            get_cat=get_cat, show_admin_register=show_admin_register)
 
@@ -215,11 +215,10 @@ def addproduct():
         db.session.add(addpro)
         db.session.commit()
         flash(f'Sản phẩm {name} được thêm thành công!', 'success')
-        return redirect(url_for('admin'))
+        return redirect(url_for('addproduct'))
 
     return render_template('products/addproduct.html', title='Thêm sản phẩm', form=form, brands=brands,
                            categories=categories)
-
 
 @app.route('/updateproduct/<int:id>', methods=['GET', 'POST'])
 @role_required(['admin', 'sale'])

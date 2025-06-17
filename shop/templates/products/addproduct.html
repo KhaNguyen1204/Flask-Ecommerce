@@ -34,21 +34,21 @@
                     <form method="post" enctype="multipart/form-data">
                         <!-- Thông tin cơ bản -->
                         <div class="mb-4">
-                            <label class="form-label">Tên Sản Phẩm</label>
+                            <label class="form-label"></label>
                             {{ render_field(form.name, class_="form-control", placeholder="Nhập tên sản phẩm") }}
                         </div>
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
-                                <label class="form-label">Giá</label>
+                                <label class="form-label"></label>
                                 {{ render_field(form.price, class_="form-control", placeholder="VNĐ") }}
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Giảm Giá (%)</label>
+                                <label class="form-label"></label>
                                 {{ render_field(form.discount, class_="form-control", placeholder="0-100") }}
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Số Lượng</label>
+                                <label class="form-label"></label>
                                 {{ render_field(form.stock, class_="form-control", placeholder="Tồn kho") }}
                             </div>
                         </div>
@@ -77,12 +77,12 @@
 
                         <!-- Chi tiết sản phẩm -->
                         <div class="mb-4">
-                            <label class="form-label">Mô Tả Sản Phẩm</label>
+                            <label class="form-label"></label>
                             {{ render_field(form.description, class_="form-control", placeholder="Mô tả chi tiết sản phẩm...", rows=6) }}
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">Màu Sắc (phân cách bằng dấu phẩy)</label>
+                            <label class="form-label"></label>
                             {{ render_field(form.colors, class_="form-control", placeholder="Ví dụ: Đỏ,Xanh,Vàng") }}
                         </div>
 
@@ -91,15 +91,15 @@
                             <label class="form-label mb-3">Hình Ảnh Sản Phẩm</label>
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label">Ảnh Chính</label>
+                                    <label class="form-label"></label>
                                     {{ render_field(form.image_1, class_="form-control", required=True) }}
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">Ảnh Phụ 1</label>
+                                    <label class="form-label"></label>
                                     {{ render_field(form.image_2, class_="form-control") }}
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">Ảnh Phụ 2</label>
+                                    <label class="form-label"></label>
                                     {{ render_field(form.image_3, class_="form-control") }}
                                 </div>
                             </div>

@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     let searchTimeout;
     let currentSearchTerm = '';
-    const originalRowCount = window.originalRowCount || 0;
 
     // DOM elements
     const searchInput = document.getElementById('search-input');
@@ -11,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateToFilter = document.getElementById('date-to');
     const resetButton = document.getElementById('reset-filter');
     const clearSearchButton = document.getElementById('clear-search');
-    const searchButton = document.getElementById('search-btn');
+    const searchButton = document.getElementById('filter-button');
     const searchSpinner = document.querySelector('.search-spinner');
     const searchClear = document.querySelector('.search-clear');
     const searchResultsInfo = document.getElementById('search-results-info');
@@ -295,4 +294,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-

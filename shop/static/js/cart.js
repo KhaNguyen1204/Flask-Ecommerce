@@ -35,3 +35,14 @@ tableRows.forEach(row => {
         row.style.transform = 'translateX(0)';
     });
 });
+
+document.querySelectorAll('.quantity-input').forEach(function(input) {
+    input.addEventListener('input', function() {
+        let min = parseInt(this.min, 10);
+        let max = parseInt(this.max, 10);
+        let val = parseInt(this.value, 10);
+
+        if (val < min) this.value = min;
+        if (val > max) this.value = max;
+    });
+});

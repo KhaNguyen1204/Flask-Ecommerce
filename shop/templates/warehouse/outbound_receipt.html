@@ -248,9 +248,5 @@
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/outbound_receipt.css') }}">
 <!-- JavaScript -->
-<script>
-window.originalRowCount = {{ receipts|length }};
-</script>
 <script src="{{url_for('static', filename='js/outbound_receipt.js')}}"></script>
-
 {% endblock content %}

@@ -1,308 +1,225 @@
 document.addEventListener('DOMContentLoaded', function() {
-    let searchTimeout;
-    let currentSearchTerm = '';
-    const originalRowCount = window.originalRowCount || 0;
-
-    // DOM elements
     const searchInput = document.getElementById('search-input');
-    const statusFilter = document.getElementById('status-filter');
-    const warehouseFilter = document.getElementById('warehouse-filter');
-    const dateFromFilter = document.getElementById('date-from');
-    const dateToFilter = document.getElementById('date-to');
-    const resetButton = document.getElementById('reset-filter');
-    const clearSearchButton = document.getElementById('clear-search');
-    const searchButton = document.getElementById('search-btn');
-    const searchSpinner = document.querySelector('.search-spinner');
-    const searchClear = document.querySelector('.search-clear');
-    const searchResultsInfo = document.getElementById('search-results-info');
-    const resultsText = document.getElementById('results-text');
+    const clearButton = document.getElementById('clear-search');
+    const filterButton = document.getElementById('filter-button');
+    const resetButton = document.getElementById('reset-button');
+    const searchStats = document.getElementById('search-stats');
+    const visibleCount = document.getElementById('visible-count');
     const totalCount = document.getElementById('total-count');
+    const totalDisplay = document.getElementById('total-display');
     const noResultsRow = document.getElementById('no-results-row');
+
+    let searchTimeout;
+    let originalContent = new Map(); // Store original content for each searchable element
 
     // Initialize
     initializeSearch();
 
     function initializeSearch() {
-        // Debounced search on input
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            const value = this.value.trim();
-
-            if (value !== currentSearchTerm) {
-                showSearchSpinner();
-                searchTimeout = setTimeout(() => {
-                    performSearch();
-                }, 300); // 300ms debounce
-            }
+        // Store original content for highlighting
+        document.querySelectorAll('.searchable-receipt-number, .searchable-supplier, .searchable-creator').forEach(element => {
+            originalContent.set(element, element.textContent.trim());
         });
 
-        // Real-time filter changes
-        [statusFilter, warehouseFilter, dateFromFilter, dateToFilter].forEach(element => {
-            element.addEventListener('change', performSearch);
-        });
+        // Event listeners
+        searchInput.addEventListener('input', handleSearchInput);
+        clearButton.addEventListener('click', clearSearch);
+        document.getElementById('status-filter').addEventListener('change', debounceFilter);
+        document.getElementById('warehouse-filter').addEventListener('change', debounceFilter);
+        document.getElementById('start-date').addEventListener('change', debounceFilter);
+        document.getElementById('end-date').addEventListener('change', debounceFilter);
+        filterButton.addEventListener('click', filterReceipts);
+        resetButton.addEventListener('click', resetFilters);
 
-        // Search button click
-        if (searchButton) searchButton.addEventListener('click', performSearch);
-
-        // Clear search
-        if (searchClear) searchClear.addEventListener('click', clearSearch);
-        if (clearSearchButton) clearSearchButton.addEventListener('click', clearSearch);
-
-        // Reset all filters
-        if (resetButton) resetButton.addEventListener('click', resetAllFilters);
-
-        // Enter key on search input
+        // Enter key support
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                performSearch();
+                filterReceipts();
             }
         });
     }
 
-    function showSearchSpinner() {
-        if (searchSpinner) searchSpinner.style.display = 'block';
-        if (searchClear) searchClear.style.display = 'none';
-        searchInput.classList.add('searching');
-    }
+    function handleSearchInput(e) {
+        const value = e.target.value.trim();
 
-    function hideSearchSpinner() {
-        if (searchSpinner) searchSpinner.style.display = 'none';
-        searchInput.classList.remove('searching');
-        if (searchInput.value.trim() && searchClear) {
-            searchClear.style.display = 'block';
-        }
-    }
+        // Show/hide clear button
+        clearButton.style.display = value ? 'block' : 'none';
 
-    function performSearch() {
-        showSearchSpinner();
+        // Add loading effect
+        searchInput.classList.add('loading-search');
 
-        setTimeout(() => {
-            const searchTerm = searchInput.value.trim().toLowerCase();
-            const status = statusFilter.value;
-            const warehouse = warehouseFilter.value;
-            const dateFrom = dateFromFilter.value;
-            const dateTo = dateToFilter.value;
+        // Clear existing timeout
+        clearTimeout(searchTimeout);
 
-            currentSearchTerm = searchTerm;
-
-            // Clear previous highlights
-            clearHighlights();
-
-            const rows = document.querySelectorAll('.receipt-row');
-            let visibleCount = 0;
-            let hasActiveFilters = searchTerm || status || warehouse || dateFrom || dateTo;
-
-            rows.forEach((row, index) => {
-                const isVisible = checkRowVisibility(row, searchTerm, status, warehouse, dateFrom, dateTo);
-
-                if (isVisible) {
-                    visibleCount++;
-                    showRow(row, index);
-
-                    // Highlight search term
-                    if (searchTerm) {
-                        highlightSearchTerm(row, searchTerm);
-                    }
-                } else {
-                    hideRow(row);
-                }
-            });
-
-            // Update UI
-            updateSearchResults(visibleCount, hasActiveFilters, searchTerm);
-            updateRowNumbers();
-            hideSearchSpinner();
-
-            // Show/hide no results row
-            if (noResultsRow) {
-                if (visibleCount === 0 && rows.length > 0) {
-                    noResultsRow.style.display = '';
-                } else {
-                    noResultsRow.style.display = 'none';
-                }
-            }
-        }, 100); // Small delay for smooth UX
-    }
-
-    function checkRowVisibility(row, searchTerm, status, warehouse, dateFrom, dateTo) {
-        // Status filter
-        if (status && row.getAttribute('data-status') !== status) {
-            return false;
-        }
-
-        // Warehouse filter
-        if (warehouse && row.getAttribute('data-warehouse') !== warehouse) {
-            return false;
-        }
-
-        // Date filters
-        if (dateFrom || dateTo) {
-            const dateText = row.getAttribute('data-receipt-date');
-            const parts = dateText.split('/');
-            const rowDate = new Date(parts[2], parts[1] - 1, parts[0]);
-
-            if (dateFrom) {
-                const from = new Date(dateFrom);
-                if (rowDate < from) return false;
-            }
-
-            if (dateTo) {
-                const to = new Date(dateTo);
-                if (rowDate > to) return false;
-            }
-        }
-
-        // Search term filter
-        if (searchTerm) {
-            const receiptNumber = row.getAttribute('data-receipt-number').toLowerCase();
-            const warehouseName = row.getAttribute('data-warehouse-name').toLowerCase();
-            const creatorName = row.getAttribute('data-creator-name').toLowerCase();
-
-            const searchableText = `${receiptNumber} ${warehouseName} ${creatorName}`;
-
-            // Support multiple search terms
-            const searchTerms = searchTerm.split(' ').filter(term => term.length > 0);
-            return searchTerms.every(term => searchableText.includes(term));
-        }
-
-        return true;
-    }
-
-    function showRow(row, index) {
-        row.style.display = '';
-        row.classList.remove('fade-out');
-        row.classList.add('fade-in');
-
-        // Remove animation class after animation completes
-        setTimeout(() => {
-            row.classList.remove('fade-in');
-        }, 500);
-    }
-
-    function hideRow(row) {
-        row.classList.add('fade-out');
-        setTimeout(() => {
-            row.style.display = 'none';
-            row.classList.remove('fade-out');
+        // Debounce search
+        searchTimeout = setTimeout(() => {
+            searchInput.classList.remove('loading-search');
+            filterReceipts();
         }, 300);
-    }
-
-    function highlightSearchTerm(row, searchTerm) {
-        const searchableElements = row.querySelectorAll('.searchable-content');
-        const searchTerms = searchTerm.split(' ').filter(term => term.length > 0);
-
-        searchableElements.forEach(element => {
-            const textNode = element.querySelector('span') || element;
-            let originalText = textNode.getAttribute('data-original-text') || textNode.textContent;
-
-            // Store original text if not already stored
-            if (!textNode.getAttribute('data-original-text')) {
-                textNode.setAttribute('data-original-text', originalText);
-            }
-
-            let highlightedText = originalText;
-
-            searchTerms.forEach(term => {
-                const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
-                highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
-            });
-
-            textNode.innerHTML = highlightedText;
-        });
-    }
-
-    function clearHighlights() {
-        const highlightedElements = document.querySelectorAll('.searchable-content span[data-original-text]');
-        highlightedElements.forEach(element => {
-            const originalText = element.getAttribute('data-original-text');
-            if (originalText) {
-                element.textContent = originalText;
-                element.removeAttribute('data-original-text');
-            }
-        });
-    }
-
-    function updateSearchResults(visibleCount, hasActiveFilters, searchTerm) {
-        if (hasActiveFilters) {
-            if (searchResultsInfo) searchResultsInfo.style.display = 'block';
-
-            let message = `Hiển thị ${visibleCount} trong tổng số ${originalRowCount} phiếu`;
-            if (searchTerm) {
-                message += ` cho từ khóa "${searchTerm}"`;
-            }
-            if (resultsText) resultsText.textContent = message;
-
-            if (totalCount) totalCount.textContent = `Hiển thị: ${visibleCount}/${originalRowCount} phiếu`;
-        } else {
-            if (searchResultsInfo) searchResultsInfo.style.display = 'none';
-            if (totalCount) totalCount.textContent = `Tổng cộng: ${originalRowCount} phiếu`;
-        }
-    }
-
-    function updateRowNumbers() {
-        const visibleRows = document.querySelectorAll('.receipt-row[style=""], .receipt-row:not([style])');
-        visibleRows.forEach((row, index) => {
-            const numberCell = row.querySelector('.badge.bg-secondary');
-            if (numberCell) {
-                numberCell.textContent = index + 1;
-            }
-        });
     }
 
     function clearSearch() {
         searchInput.value = '';
-        if (searchClear) searchClear.style.display = 'none';
-        currentSearchTerm = '';
-        performSearch();
+        clearButton.style.display = 'none';
         searchInput.focus();
+        clearTimeout(searchTimeout);
+        filterReceipts();
     }
 
-    function resetAllFilters() {
-        // Clear all inputs
+    function debounceFilter() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterReceipts, 150);
+    }
+
+    function resetFilters() {
+        // Clear all filters
+        document.getElementById('status-filter').value = '';
+        document.getElementById('warehouse-filter').value = '';
         searchInput.value = '';
-        statusFilter.value = '';
-        warehouseFilter.value = '';
-        dateFromFilter.value = '';
-        dateToFilter.value = '';
+        document.getElementById('start-date').value = '';
+        document.getElementById('end-date').value = '';
 
-        // Hide search elements
-        if (searchClear) searchClear.style.display = 'none';
-        if (searchResultsInfo) searchResultsInfo.style.display = 'none';
+        // Hide clear button
+        clearButton.style.display = 'none';
 
-        // Clear highlights and reset
-        clearHighlights();
-        currentSearchTerm = '';
-
-        // Show all rows with animation
-        const rows = document.querySelectorAll('.receipt-row');
-        rows.forEach((row, index) => {
-            setTimeout(() => {
-                showRow(row, index);
-            }, index * 50); // Staggered animation
-        });
-
-        // Update UI
-        updateRowNumbers();
-        if (totalCount) totalCount.textContent = `Tổng cộng: ${originalRowCount} phiếu`;
+        // Reset and filter
+        clearTimeout(searchTimeout);
+        filterReceipts();
 
         // Focus search input
         searchInput.focus();
+    }
+
+    function filterReceipts() {
+        const status = document.getElementById('status-filter').value;
+        const warehouse = document.getElementById('warehouse-filter').value;
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        const rows = document.querySelectorAll('.receipt-row');
+        let visibleRows = 0;
+
+        // Clear all highlights first
+        clearHighlights();
+
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            const rowWarehouse = row.getAttribute('data-warehouse');
+            const rowDate = row.getAttribute('data-date');
+            const receiptNumber = row.getAttribute('data-receipt-number').toLowerCase();
+            const supplier = row.getAttribute('data-supplier').toLowerCase();
+            const creator = row.getAttribute('data-creator').toLowerCase();
+
+            let visible = true;
+            let searchMatch = false;
+
+            // Filter by status
+            if (status && rowStatus !== status) {
+                visible = false;
+            }
+
+            // Filter by warehouse
+            if (warehouse && rowWarehouse !== warehouse) {
+                visible = false;
+            }
+
+            // Filter by date range
+            if (startDate && rowDate < startDate) {
+                visible = false;
+            }
+            if (endDate && rowDate > endDate) {
+                visible = false;
+            }
+
+            // Search filter with highlighting
+            if (searchTerm) {
+                searchMatch = receiptNumber.includes(searchTerm) ||
+                             supplier.includes(searchTerm) ||
+                             creator.includes(searchTerm);
+
+                if (!searchMatch) {
+                    visible = false;
+                } else {
+                    // Highlight matching text
+                    highlightText(row.querySelector('.searchable-receipt-number'), searchTerm);
+                    highlightText(row.querySelector('.searchable-supplier'), searchTerm);
+                    highlightText(row.querySelector('.searchable-creator'), searchTerm);
+                }
+            }
+
+            // Show/hide row with animation
+            if (visible) {
+                row.style.display = '';
+                row.classList.remove('fade-out');
+                visibleRows++;
+            } else {
+                row.classList.add('fade-out');
+                setTimeout(() => {
+                    if (row.classList.contains('fade-out')) {
+                        row.style.display = 'none';
+                    }
+                }, 300);
+            }
+        });
+
+        // Update counters and show/hide elements
+        updateSearchStats(visibleRows, rows.length, searchTerm || hasActiveFilters());
+
+        // Show/hide no results message
+        if (visibleRows === 0 && rows.length > 0) {
+            noResultsRow.style.display = '';
+        } else {
+            noResultsRow.style.display = 'none';
+        }
+    }
+
+    function clearHighlights() {
+        document.querySelectorAll('.searchable-receipt-number, .searchable-supplier, .searchable-creator').forEach(element => {
+            const original = originalContent.get(element);
+            if (original) {
+                element.innerHTML = original;
+            }
+        });
+    }
+
+    function highlightText(element, searchTerm) {
+        if (!element || !searchTerm) return;
+
+        const original = originalContent.get(element);
+        if (!original) return;
+
+        const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+        const highlighted = original.replace(regex, '<span class="highlight">$1</span>');
+        element.innerHTML = highlighted;
     }
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // Initialize clear button visibility
-    searchInput.addEventListener('input', function() {
-        if (this.value.trim() && searchClear) {
-            searchClear.style.display = 'block';
-        } else if (searchClear) {
-            searchClear.style.display = 'none';
+    function hasActiveFilters() {
+        return document.getElementById('status-filter').value ||
+               document.getElementById('warehouse-filter').value ||
+               document.getElementById('start-date').value ||
+               document.getElementById('end-date').value;
+    }
+
+    function updateSearchStats(visible, total, showStats) {
+        visibleCount.textContent = visible;
+        totalCount.textContent = total;
+
+        if (showStats) {
+            searchStats.style.display = 'block';
+            totalDisplay.style.display = 'none';
+        } else {
+            searchStats.style.display = 'none';
+            totalDisplay.style.display = 'block';
+            totalDisplay.textContent = `Tổng cộng: ${visible} phiếu`;
         }
-    });
+    }
 
     // Initial filter
-    performSearch();
+    filterReceipts();
 });

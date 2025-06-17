@@ -16,8 +16,10 @@ def warehouse():
     brands = Brand.query.all()
     categories = Category.query.all()
     for product in products:
-        if product.stock <= 3:
+        if 0 < product.stock <= 3:
             flash(f'Sản phẩm {product.name} sắp hết hàng', 'warning')
+        if product.stock <= 0:
+            flash(f'Sản phẩm {product.name} đã hết hàng', 'danger')
     return render_template('warehouse/warehouse.html', title='Warehouse Dashboard', products=products, brands=brands, categories=categories)
 
 

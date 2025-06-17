@@ -1,180 +1,193 @@
 {% set show_footer = False %}
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
+    <div class="container">
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0">Tạo phiếu xuất kho mới</h4>
-                    <a href="{{ request.referrer or url_for('outbound_receipt') }}" class="btn btn-secondary btn-sm">
-                        <i class="fa fa-arrow-left"></i> <-- Quay lại
-                    </a>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h4 class="mb-0">Tạo phiếu xuất kho mới</h4>
+                        <a href="{{ request.referrer or url_for('outbound_receipt') }}"
+                           class="btn btn-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> <-- Quay lại
+                        </a>
 
-                </div>
-                <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-
-                    <form method="post" id="outboundReceiptForm">
-                        {{ form.hidden_tag() }}
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.receipt_number.id }}" class="form-label">{{ form.receipt_number.label }}</label>
-                                    {{ form.receipt_number(class="form-control") }}
-                                    {% if form.receipt_number.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.receipt_number.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
+                    <div class="card-body">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
                                     </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.receipt_date.id }}" class="form-label">{{ form.receipt_date.label }}</label>
-                                    {{ form.receipt_date(class="form-control", type="date") }}
-                                    {% if form.receipt_date.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.receipt_date.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.recipient.id }}" class="form-label">{{ form.recipient.label }}</label>
-                                    {{ form.recipient(class="form-control") }}
-                                    {% if form.recipient.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.recipient.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="{{ form.warehouse_id.id }}" class="form-label">{{ form.warehouse_id.label }}</label>
-                                    {{ form.warehouse_id(class="form-select") }}
-                                    {% if form.warehouse_id.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.warehouse_id.errors %}
-                                        <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="{{ form.notes.id }}" class="form-label">{{ form.notes.label }}</label>
-                            {{ form.notes(class="form-control", rows="3") }}
-                            {% if form.notes.errors %}
-                            <div class="text-danger">
-                                {% for error in form.notes.errors %}
-                                <span>{{ error }}</span>
                                 {% endfor %}
-                            </div>
                             {% endif %}
-                        </div>
+                        {% endwith %}
 
-                        <hr>
-                        <h5>Chi tiết phiếu xuất</h5>
+                        <form method="post" id="outboundReceiptForm">
+                            {{ form.hidden_tag() }}
 
-                        <div id="receipt-details">
-                            <!-- Ban đầu hiển thị một dòng chi tiết -->
-                            <div class="receipt-detail-row row mb-3">
-                                <div class="col-md-4">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Sản phẩm</label>
-                                        <select name="product_id[]" class="form-select product-select" required>
-                                            <option value="">-- Chọn sản phẩm --</option>
-                                            {% for product in products %}
-                                            <option value="{{ product.id }}" data-price="{{ product.price }}" data-stock="{{ product.stock }}">{{ product.name }} (Tồn kho: {{ product.stock }})</option>
-                                            {% endfor %}
-                                        </select>
+                                        <label for="{{ form.receipt_number.id }}"
+                                               class="form-label">{{ form.receipt_number.label }}</label>
+                                        {{ form.receipt_number(class="form-control") }}
+                                        {% if form.receipt_number.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.receipt_number.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Số lượng</label>
-                                        <input type="number" name="quantity[]" class="form-control quantity-input" value="1" min="1" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="mb-3">
-                                        <label class="form-label">Đơn giá</label>
-                                        <input type="number" name="price[]" class="form-control price-input" value="0" min="0" step="0.01" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="mb-3">
-                                        <label class="form-label">Thành tiền</label>
-                                        <input type="text" class="form-control subtotal-display" readonly>
-                                        <input type="hidden" name="subtotal[]" class="subtotal-input" value="0">
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="mb-3">
-                                        <label class="form-label">&nbsp;</label>
-                                        <button type="button" class="btn btn-danger form-control remove-detail">
-                                            <i class="fa fa-trash"></i>Xóa
-                                        </button>
+                                        <label for="{{ form.receipt_date.id }}"
+                                               class="form-label">{{ form.receipt_date.label }}</label>
+                                        {{ form.receipt_date(class="form-control", type="date") }}
+                                        {% if form.receipt_date.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.receipt_date.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <button type="button" id="add-detail" class="btn btn-success">
-                                <i class="fa fa-plus"></i> Thêm sản phẩm
-                            </button>
-                        </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.recipient.id }}"
+                                               class="form-label">{{ form.recipient.label }}</label>
+                                        {{ form.recipient(class="form-control") }}
+                                        {% if form.recipient.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.recipient.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.warehouse_id.id }}"
+                                               class="form-label">{{ form.warehouse_id.label }}</label>
+                                        {{ form.warehouse_id(class="form-select") }}
+                                        {% if form.warehouse_id.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.warehouse_id.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6 offset-md-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between">
-                                            <h5>Tổng tiền:</h5>
-                                            <h5 id="total-amount-display">0 đ</h5>
-                                            <input type="hidden" name="total_amount" id="total-amount-input" value="0">
+                            <div class="mb-3">
+                                <label for="{{ form.notes.id }}" class="form-label">{{ form.notes.label }}</label>
+                                {{ form.notes(class="form-control", rows="3") }}
+                                {% if form.notes.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.notes.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <hr>
+                            <h5>Chi tiết phiếu xuất</h5>
+
+                            <div id="receipt-details">
+                                <!-- Ban đầu hiển thị một dòng chi tiết -->
+                                <div class="receipt-detail-row row mb-3">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Sản phẩm</label>
+                                            <select name="product_id[]" class="form-select product-select" required>
+                                                <option value="">-- Chọn sản phẩm --</option>
+                                                {% for product in products %}
+                                                    <option value="{{ product.id }}" data-price="{{ product.price }}"
+                                                            data-stock="{{ product.stock }}"
+                                                            data-discount="{{ product.discount }}">{{ product.name }}
+                                                        (Tồn kho: {{ product.stock }})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label class="form-label">Số lượng</label>
+                                            <input type="number" name="quantity[]" class="form-control quantity-input"
+                                                   value="1" min="1" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="mb-3">
+                                            <label class="form-label">Đơn giá</label>
+                                            <input type="text" class="form-control price-display" readonly>
+                                            <input type="hidden" name="price[]" class="price-input" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Thành tiền</label>
+                                            <input type="text" class="form-control subtotal-display" readonly>
+                                            <input type="hidden" name="subtotal[]" class="subtotal-input" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="mb-3">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button type="button" class="btn btn-danger form-control remove-detail">
+                                                <i class="fa fa-trash"></i>Xóa
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="submit" class="btn btn-primary">Lưu phiếu xuất</button>
-                            <a href="{{ url_for('outbound_receipt') }}" class="btn btn-secondary">Hủy</a>
-                        </div>
-                    </form>
+                            <div class="mb-3">
+                                <button type="button" id="add-detail" class="btn btn-success">
+                                    <i class="fa fa-plus"></i> Thêm sản phẩm
+                                </button>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6 offset-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <h5>Tổng tiền:</h5>
+                                                <h5 id="total-amount-display">0 đ</h5>
+                                                <input type="hidden" name="total_amount" id="total-amount-input"
+                                                       value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="submit" class="btn btn-primary">Lưu phiếu xuất</button>
+                                <a href="{{ url_for('outbound_receipt') }}" class="btn btn-secondary">Hủy</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="{{url_for('static', filename='js/outbound_receipt_add.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/outbound_receipt_add.js') }}"></script>
 {% endblock %}

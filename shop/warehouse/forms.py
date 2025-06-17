@@ -4,9 +4,9 @@ from wtforms.validators import DataRequired, Length, NumberRange, Optional
 from flask_wtf.file import FileField, FileAllowed
 
 class WarehouseForm(FlaskForm):
-    name = StringField('Tên kho', validators=[DataRequired(), Length(min=2, max=100)])
-    location = StringField('Địa chỉ', validators=[DataRequired(), Length(min=2, max=255)])
-    capacity = IntegerField('Sức chứa', validators=[Optional(), NumberRange(min=0)])
+    name = StringField('Tên kho', validators=[DataRequired(), Length(min=2, max=100, message='Tên kho phải từ 2 đến 100 ký tự')])
+    location = StringField('Địa chỉ', validators=[DataRequired(), Length(min=2, max=255, message='Địa chỉ phải từ 2 đến 255 ký tự')])
+    capacity = IntegerField('Sức chứa', validators=[Optional(), NumberRange(min=0, message='Sức chứa phải lớn hơn hoặc bằng 0')])
     description = TextAreaField('Mô tả', validators=[Optional()])
     manager_id = SelectField('Người quản lý', coerce=int, validators=[Optional()])
     status = SelectField('Trạng thái', choices=[
@@ -15,7 +15,7 @@ class WarehouseForm(FlaskForm):
     ], validators=[DataRequired()])
 
 class InboundReceiptForm(FlaskForm):
-    receipt_number = StringField('Số phiếu nhập', validators=[DataRequired(), Length(min=3, max=50)])
+    receipt_number = StringField('Số phiếu nhập', validators=[DataRequired(), Length(min=3, max=50, message='Số phiếu nhập phải từ 3 đến 50 ký tự')])
     receipt_date = DateField('Ngày nhập', format='%Y-%m-%d', validators=[DataRequired()])
     supplier = StringField('Nhà cung cấp', validators=[Optional(), Length(max=100)])
     warehouse_id = SelectField('Kho', coerce=int, validators=[DataRequired()])
@@ -28,12 +28,12 @@ class InboundReceiptForm(FlaskForm):
 
 class InboundReceiptDetailForm(FlaskForm):
     product_id = SelectField('Sản phẩm', coerce=int, validators=[DataRequired()])
-    quantity = IntegerField('Số lượng', validators=[DataRequired(), NumberRange(min=1)])
-    price = FloatField('Đơn giá', validators=[DataRequired(), NumberRange(min=0)])  # Thay đổi từ unit_price thành price
+    quantity = IntegerField('Số lượng', validators=[DataRequired(), NumberRange(min=1, message='Số lượng phải lớn hơn hoặc bằng 1')])
+    price = FloatField('Đơn giá', validators=[DataRequired(), NumberRange(min=0, message='Đơn giá phải lớn hơn hoặc bằng 0')])  # Thay đổi từ unit_price thành price
     notes = TextAreaField('Ghi chú', validators=[Optional()])
 
 class OutboundReceiptForm(FlaskForm):
-    receipt_number = StringField('Số phiếu xuất', validators=[DataRequired(), Length(min=3, max=50)])
+    receipt_number = StringField('Số phiếu xuất', validators=[DataRequired(), Length(min=3, max=50, message='Số phiếu xuất phải từ 3 đến 50 ký tự')])
     receipt_date = DateField('Ngày xuất', format='%Y-%m-%d', validators=[DataRequired()])
     recipient = StringField('Người nhận', validators=[Optional(), Length(max=100)])
     warehouse_id = SelectField('Kho', coerce=int, validators=[DataRequired()])
@@ -46,8 +46,8 @@ class OutboundReceiptForm(FlaskForm):
 
 class OutboundReceiptDetailForm(FlaskForm):
     product_id = SelectField('Sản phẩm', coerce=int, validators=[DataRequired()])
-    quantity = IntegerField('Số lượng', validators=[DataRequired(), NumberRange(min=1)])
-    price = FloatField('Đơn giá', validators=[DataRequired(), NumberRange(min=0)])  # Thay đổi từ unit_price thành price
+    quantity = IntegerField('Số lượng', validators=[DataRequired(), NumberRange(min=1, message='Số lượng phải lớn hơn hoặc bằng 1')])
+    price = FloatField('Đơn giá', validators=[DataRequired(), NumberRange(min=0, message="Đơn giá phải lớn hơn hoặc bằng 0")])  # Thay đổi từ unit_price thành price
     notes = TextAreaField('Ghi chú', validators=[Optional()])
 
 class SearchForm(FlaskForm):

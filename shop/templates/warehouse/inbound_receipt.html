@@ -8,6 +8,7 @@
 {% endif %}
     {% include '_navbar_warehouse.html' %}
 
+
     <!-- Page Title -->
     <div class="container mt-4">
         <div class="row">
@@ -15,12 +16,12 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h1 class="display-5 fw-bold text-primary mb-2">
-                            <i class="fas fa-file-import me-3"></i>Quản Lý Phiếu Xuất kho
+                            <i class="fas fa-file-import me-3"></i>Quản Lý Phiếu Nhập Kho
                         </h1>
-                        <p class="text-muted mb-0">Theo dõi và quản lý các phiếu xuất kho trong hệ thống</p>
+                        <p class="text-muted mb-0">Theo dõi và quản lý các phiếu nhập kho trong hệ thống</p>
                     </div>
                     <div>
-                        <a href="{{ url_for('outbound_receipt_add') }}" class="btn btn-success btn-lg shadow-sm">
+                        <a href="{{ url_for('inbound_receipt_add') }}" class="btn btn-success btn-lg shadow-sm">
                             <i class="fas fa-plus me-2"></i>Tạo Phiếu Mới
                         </a>
                     </div>
@@ -43,15 +44,11 @@
                         <div class="col">
                             <label class="form-label fw-semibold">Tìm kiếm</label>
                             <div class="position-relative">
-                                <input class="form-control search-input" type="search" placeholder="Số phiếu, tên kho, người tạo..." aria-label="Search" id="search-input">
-                                <div class="search-spinner position-absolute top-50 end-0 translate-middle-y me-3" style="display: none;">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span class="visually-hidden">Đang tìm...</span>
-                                    </div>
-                                </div>
-                                <div class="search-clear position-absolute top-50 end-0 translate-middle-y me-3" style="display: none; cursor: pointer;">
-                                    <i class="fas fa-times-circle text-muted"></i>
-                                </div>
+                                <input class="form-control search-input" type="search" placeholder="Số phiếu..." aria-label="Search" id="search-input">
+                                <i class="fas fa-search position-absolute search-icon"></i>
+                                <button class="btn btn-link position-absolute clear-search" id="clear-search" style="display: none;">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="col">
@@ -67,39 +64,24 @@
                             <label class="form-label fw-semibold">Trạng thái</label>
                             <select class="form-select" id="status-filter">
                                 <option value="">Tất cả</option>
-                                <option value="pending">Chờ xử lý</option>
+                                <option value="pending">Chưa nhập kho</option>
                                 <option value="completed">Hoàn thành</option>
                             </select>
                         </div>
                         <div class="col">
                             <label class="form-label fw-semibold">Từ ngày</label>
-                            <input class="form-control" type="date" id="date-from">
+                            <input class="form-control" type="date" id="start-date">
                         </div>
                         <div class="col">
                             <label class="form-label fw-semibold">Đến ngày</label>
-                            <input class="form-control" type="date" id="date-to">
+                            <input class="form-control" type="date" id="end-date">
                         </div>
                         <div class="col d-flex gap-2 align-items-end">
-                            <button class="btn btn-primary fw-semibold" id="search-btn">Tìm</button>
-                            <button class="btn btn-outline-secondary" id="reset-filter" title="Xóa tất cả bộ lọc">
-                                <i class="fas fa-redo me-1"></i>Đặt lại
-                            </button>
+                            <button class="btn btn-primary fw-semibold" id="filter-button">Tìm</button>
+                            <button class="btn btn-outline-secondary" id="reset-button">Đặt lại</button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Results Info -->
-    <div class="row mb-3" id="search-results-info" style="display: none;">
-        <div class="col-12">
-            <div class="alert alert-info border-0 shadow-sm">
-                <i class="fas fa-info-circle me-2"></i>
-                <span id="results-text"></span>
-                <button type="button" class="btn btn-sm btn-outline-info ms-3" id="clear-search">
-                    <i class="fas fa-times me-1"></i>Xóa tìm kiếm
-                </button>
             </div>
         </div>
     </div>
@@ -111,9 +93,15 @@
                 <div class="card-header bg-light border-0 py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0 text-dark">
-                            <i class="fas fa-list me-2"></i>Danh sách phiếu xuất kho
+                            <i class="fas fa-list me-2"></i>Danh Sách Phiếu Nhập Kho
                         </h5>
-                        <small class="text-muted" id="total-count">Tổng cộng: {{ receipts|length }} phiếu</small>
+                        <div class="d-flex align-items-center gap-3">
+                            <div id="search-stats" class="text-muted small" style="display: none;">
+                                <i class="fas fa-search me-1"></i>
+                                <span id="visible-count">0</span> / <span id="total-count">{{ receipts|length }}</span> kết quả
+                            </div>
+                            <small class="text-muted" id="total-display">Tổng cộng: {{ receipts|length }} phiếu</small>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -123,7 +111,8 @@
                                 <tr>
                                     <th class="text-center" style="width: 60px;">STT</th>
                                     <th style="width: 120px;">Số Phiếu</th>
-                                    <th class="text-center" style="width: 120px;">Ngày Xuất</th>
+                                    <th class="text-center" style="width: 120px;">Ngày Nhập</th>
+                                    <th style="width: 200px;" class="text-center">Nhà Cung Cấp</th>
                                     <th style="width: 150px;" class="text-center">Kho</th>
                                     <th class="text-center" style="width: 150px;">Tổng Tiền</th>
                                     <th style="width: 150px;" class="text-center">Người Tạo</th>
@@ -131,32 +120,35 @@
                                     <th class="text-center" style="width: 200px;">Thao Tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="receipts-tbody">
+                            <tbody>
                                 {% if receipts %}
                                 {% for receipt in receipts %}
                                 <tr class="align-middle receipt-row"
                                     data-status="{{ receipt.status }}"
                                     data-warehouse="{{ receipt.warehouse_id }}"
+                                    data-date="{{ receipt.receipt_date.strftime('%Y-%m-%d') }}"
                                     data-receipt-number="{{ receipt.receipt_number }}"
-                                    data-warehouse-name="{{ receipt.warehouse.name }}"
-                                    data-creator-name="{{ receipt.creator.username }}"
-                                    data-receipt-date="{{ receipt.receipt_date.strftime('%d/%m/%Y') }}">
+                                    data-supplier="{{ receipt.supplier }}"
+                                    data-creator="{{ receipt.creator.username }}">
                                     <td class="text-center">
                                         <span class="badge bg-secondary">{{ loop.index }}</span>
                                     </td>
-                                    <td class="searchable-content" data-field="receipt_number">
+                                    <td class="searchable-receipt-number">
                                         <span class="fw-medium">{{ receipt.receipt_number }}</span>
                                     </td>
                                     <td class="text-center">
                                         <span class="text-muted">{{ receipt.receipt_date.strftime('%d/%m/%Y') }}</span>
                                     </td>
-                                    <td class="searchable-content text-center" data-field="warehouse_name">
+                                    <td class="searchable-supplier text-center">
+                                        {{ receipt.supplier }}
+                                    </td>
+                                    <td class="text-center">
                                         <span class="badge bg-info text-dark">{{ receipt.warehouse.name }}</span>
                                     </td>
                                     <td class="text-center">
                                         <span class="text-success fw-semibold">{{ "{:,.0f}".format(receipt.total_amount) }} đ</span>
                                     </td>
-                                    <td class="searchable-content text-center" data-field="creator_name">
+                                    <td class="searchable-creator text-center">
                                         <span class="badge bg-primary">{{ receipt.creator.username }}</span>
                                     </td>
                                     <td class="text-center">
@@ -170,13 +162,13 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ url_for('outbound_receipt_detail', id=receipt.id) }}"
+                                            <a href="{{ url_for('inbound_receipt_detail', id=receipt.id) }}"
                                                class="btn btn-info btn-sm px-3"
                                                title="Xem chi tiết">
                                                 <i class="fas fa-eye me-1"></i>Chi tiết
                                             </a>
                                             {% if receipt.status == 'pending' %}
-                                            <a href="{{ url_for('outbound_receipt_edit', id=receipt.id) }}"
+                                            <a href="{{ url_for('inbound_receipt_edit', id=receipt.id) }}"
                                                class="btn btn-primary btn-sm px-3"
                                                title="Chỉnh sửa">
                                                 <i class="fas fa-edit me-1"></i>Sửa
@@ -195,16 +187,17 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr id="no-data-row">
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <i class="fas fa-file-import text-muted" style="font-size: 3rem;"></i>
-                                        <h5 class="text-muted mt-3">Chưa có phiếu xuất kho nào</h5>
-                                        <p class="text-muted">Hãy tạo phiếu xuất kho mới!</p>
+                                        <h5 class="text-muted mt-3">Chưa có phiếu nhập kho nào</h5>
+                                        <p class="text-muted">Hãy tạo phiếu nhập kho mới!</p>
                                     </td>
                                 </tr>
                                 {% endif %}
+
                                 <!-- No search results row -->
                                 <tr id="no-results-row" style="display: none;">
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
                                         <h5 class="text-muted mt-3">Không tìm thấy kết quả</h5>
                                         <p class="text-muted">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
@@ -232,12 +225,12 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="fw-bold">Bạn có chắc chắn muốn xóa phiếu xuất "{{ receipt.receipt_number }}"?</p>
+                <p class="fw-bold">Bạn có chắc chắn muốn xóa phiếu nhập "{{ receipt.receipt_number }}"?</p>
                 <p class="text-danger">Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến phiếu này sẽ bị xóa.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <form action="{{ url_for('outbound_receipt_delete', id=receipt.id) }}" method="POST">
+                <form action="{{ url_for('inbound_receipt_delete', id=receipt.id) }}" method="POST">
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-trash me-1"></i>Xác nhận xóa
                     </button>
@@ -248,9 +241,9 @@
 </div>
 {% endfor %}
 {% endif %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/outbound_receipt.css') }}">
-<script>
-  window.originalRowCount = {{ receipts|length }};
-</script>
-<script src="{{url_for('static', filename='js/outbound_receipt.js')}}"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/inbound_receipt.css') }}">
+<script src="{{url_for('static', filename='js/inbound_receipt.js')}}"></script>
+
+
 {% endblock content %}

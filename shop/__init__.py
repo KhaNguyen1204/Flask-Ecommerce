@@ -16,11 +16,9 @@ app.config['SECRET_KEY'] = 'fkshfkhwoe8ww0590fmw050'
 app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static/images/products')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16MB Limit
 
-# Cấu hình search
-# app.config['MSEARCH_BACKEND'] = 'whoosh'
-# app.config['MSEARCH_INDEX_NAME'] = 'msearch'
-
-photos = UploadSet('photos', IMAGES)
+# Thêm webp vào tuple IMAGES
+ALLOWED_IMAGE_EXTENSIONS = IMAGES + ('webp',)
+photos = UploadSet('photos', ALLOWED_IMAGE_EXTENSIONS)
 configure_uploads(app, photos)
 
 db = SQLAlchemy(app)
