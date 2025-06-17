@@ -11,44 +11,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateToFilter = document.getElementById('date-to');
     const resetButton = document.getElementById('reset-filter');
     const clearSearchButton = document.getElementById('clear-search');
-    const searchButton = document.getElementById('search-btn');
+    const searchButton = document.getElementById('filter-button'); // Sửa ID
     const searchSpinner = document.querySelector('.search-spinner');
     const searchClear = document.querySelector('.search-clear');
     const searchResultsInfo = document.getElementById('search-results-info');
     const resultsText = document.getElementById('results-text');
     const totalCount = document.getElementById('total-count');
 
+    // Kiểm tra DOM elements
+    console.log('DOM elements:', {
+        searchInput, statusFilter, warehouseFilter, dateFromFilter, dateToFilter,
+        resetButton, clearSearchButton, searchButton, searchSpinner, searchClear,
+        searchResultsInfo, resultsText, totalCount
+    });
+
     // Initialize
-    initializeSearch();
+    if (resetButton) {
+        initializeSearch();
+    } else {
+        console.error('Reset button not found');
+    }
 
     function initializeSearch() {
         // Debounced search on input
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const value = this.value.trim();
-
             if (value !== currentSearchTerm) {
                 showSearchSpinner();
-                searchTimeout = setTimeout(() => {
-                    performSearch();
-                }, 300); // 300ms debounce
+                searchTimeout = setTimeout(performSearch, 300);
             }
         });
 
         // Real-time filter changes
         [statusFilter, warehouseFilter, dateFromFilter, dateToFilter].forEach(element => {
-            element.addEventListener('change', performSearch);
+            if (element) {
+                element.addEventListener('change', performSearch);
+            }
         });
 
         // Search button click
-        searchButton.addEventListener('click', performSearch);
+        if (searchButton) {
+            searchButton.addEventListener('click', performSearch);
+        }
 
         // Clear search
-        searchClear.addEventListener('click', clearSearch);
-        clearSearchButton.addEventListener('click', clearSearch);
+        if (searchClear) {
+            searchClear.addEventListener('click', clearSearch);
+        }
+        if (clearSearchButton) {
+            clearSearchButton.addEventListener('click', clearSearch);
+        }
 
         // Reset all filters
-        resetButton.addEventListener('click', resetAllFilters);
+        resetButton.addEventListener('click', function() {
+            console.log('Reset button clicked');
+            resetAllFilters();
+        });
 
         // Enter key on search input
         searchInput.addEventListener('keydown', function(e) {
@@ -60,100 +79,71 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showSearchSpinner() {
-        searchSpinner.style.display = 'block';
-        searchClear.style.display = 'none';
+        if (searchSpinner) searchSpinner.style.display = 'block';
+        if (searchClear) searchClear.style.display = 'none';
         searchInput.classList.add('searching');
     }
 
     function hideSearchSpinner() {
-        searchSpinner.style.display = 'none';
+        if (searchSpinner) searchSpinner.style.display = 'none';
         searchInput.classList.remove('searching');
-
-        if (searchInput.value.trim()) {
+        if (searchInput.value.trim() && searchClear) {
             searchClear.style.display = 'block';
         }
     }
 
     function performSearch() {
         showSearchSpinner();
-
         setTimeout(() => {
             const searchTerm = searchInput.value.trim().toLowerCase();
             const status = statusFilter.value;
             const warehouse = warehouseFilter.value;
             const dateFrom = dateFromFilter.value;
             const dateTo = dateToFilter.value;
-
             currentSearchTerm = searchTerm;
 
-            // Clear previous highlights
             clearHighlights();
-
             const rows = document.querySelectorAll('.receipt-row');
             let visibleCount = 0;
             let hasActiveFilters = searchTerm || status || warehouse || dateFrom || dateTo;
 
+            console.log('Performing search with:', { searchTerm, status, warehouse, dateFrom, dateTo });
+
             rows.forEach((row, index) => {
                 const isVisible = checkRowVisibility(row, searchTerm, status, warehouse, dateFrom, dateTo);
-
                 if (isVisible) {
                     visibleCount++;
                     showRow(row, index);
-
-                    // Highlight search term
-                    if (searchTerm) {
-                        highlightSearchTerm(row, searchTerm);
-                    }
+                    if (searchTerm) highlightSearchTerm(row, searchTerm);
                 } else {
                     hideRow(row);
                 }
             });
 
-            // Update UI
             updateSearchResults(visibleCount, hasActiveFilters, searchTerm);
             updateRowNumbers();
             hideSearchSpinner();
-
-        }, 100); // Small delay for smooth UX
+        }, 100);
     }
 
     function checkRowVisibility(row, searchTerm, status, warehouse, dateFrom, dateTo) {
-        // Status filter
-        if (status && row.getAttribute('data-status') !== status) {
-            return false;
-        }
+        if (status && row.getAttribute('data-status') !== status) return false;
+        if (warehouse && row.getAttribute('data-warehouse') !== warehouse) return false;
 
-        // Warehouse filter
-        if (warehouse && row.getAttribute('data-warehouse') !== warehouse) {
-            return false;
-        }
-
-        // Date filters
         if (dateFrom || dateTo) {
             const dateText = row.getAttribute('data-receipt-date');
             const parts = dateText.split('/');
             const rowDate = new Date(parts[2], parts[1] - 1, parts[0]);
 
-            if (dateFrom) {
-                const from = new Date(dateFrom);
-                if (rowDate < from) return false;
-            }
-
-            if (dateTo) {
-                const to = new Date(dateTo);
-                if (rowDate > to) return false;
-            }
+            if (dateFrom && rowDate < new Date(dateFrom)) return false;
+            if (dateTo && rowDate > new Date(dateTo)) return false;
         }
 
-        // Search term filter
         if (searchTerm) {
             const receiptNumber = row.getAttribute('data-receipt-number').toLowerCase();
             const warehouseName = row.getAttribute('data-warehouse-name').toLowerCase();
             const creatorName = row.getAttribute('data-creator-name').toLowerCase();
-
             const searchableText = `${receiptNumber} ${warehouseName} ${creatorName}`;
-
-            // Support multiple search terms
             const searchTerms = searchTerm.split(' ').filter(term => term.length > 0);
             return searchTerms.every(term => searchableText.includes(term));
         }
@@ -162,11 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showRow(row, index) {
-        row.style.display = '';
+        console.log(`Showing row ${index}:`, row);
+        row.style.display = 'table-row';
         row.classList.remove('fade-out');
         row.classList.add('fade-in');
-
-        // Remove animation class after animation completes
         setTimeout(() => {
             row.classList.remove('fade-in');
         }, 500);
@@ -188,13 +177,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const textNode = element.querySelector('span') || element;
             let originalText = textNode.getAttribute('data-original-text') || textNode.textContent;
 
-            // Store original text if not already stored
             if (!textNode.getAttribute('data-original-text')) {
                 textNode.setAttribute('data-original-text', originalText);
             }
 
             let highlightedText = originalText;
-
             searchTerms.forEach(term => {
                 const regex = new RegExp(`(${escapeRegExp(term)})`, 'gi');
                 highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
@@ -218,13 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateSearchResults(visibleCount, hasActiveFilters, searchTerm) {
         if (hasActiveFilters) {
             searchResultsInfo.style.display = 'block';
-
             let message = `Hiển thị ${visibleCount} trong tổng số ${originalRowCount} phiếu`;
-            if (searchTerm) {
-                message += ` cho từ khóa "${searchTerm}"`;
-            }
+            if (searchTerm) message += ` cho từ khóa "${searchTerm}"`;
             resultsText.textContent = message;
-
             totalCount.textContent = `Hiển thị: ${visibleCount}/${originalRowCount} phiếu`;
         } else {
             searchResultsInfo.style.display = 'none';
@@ -233,52 +216,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateRowNumbers() {
-        const visibleRows = document.querySelectorAll('.receipt-row[style=""], .receipt-row:not([style])');
+        const visibleRows = document.querySelectorAll('.receipt-row[style="display: table-row;"], .receipt-row:not([style])');
         visibleRows.forEach((row, index) => {
             const numberCell = row.querySelector('.badge.bg-secondary');
-            if (numberCell) {
-                numberCell.textContent = index + 1;
-            }
+            if (numberCell) numberCell.textContent = index + 1;
         });
     }
 
     function clearSearch() {
         searchInput.value = '';
-        searchClear.style.display = 'none';
+        if (searchClear) searchClear.style.display = 'none';
         currentSearchTerm = '';
         performSearch();
         searchInput.focus();
     }
 
     function resetAllFilters() {
-        // Clear all inputs
+        console.log('Resetting all filters...');
         searchInput.value = '';
         statusFilter.value = '';
         warehouseFilter.value = '';
         dateFromFilter.value = '';
         dateToFilter.value = '';
 
-        // Hide search elements
-        searchClear.style.display = 'none';
-        searchResultsInfo.style.display = 'none';
+        if (searchClear) searchClear.style.display = 'none';
+        if (searchResultsInfo) searchResultsInfo.style.display = 'none';
 
-        // Clear highlights and reset
         clearHighlights();
         currentSearchTerm = '';
 
-        // Show all rows with animation
         const rows = document.querySelectorAll('.receipt-row');
+        console.log('Total rows to reset:', rows.length);
         rows.forEach((row, index) => {
             setTimeout(() => {
                 showRow(row, index);
-            }, index * 50); // Staggered animation
+            }, index * 50);
         });
 
-        // Update UI
         updateRowNumbers();
         totalCount.textContent = `Tổng cộng: ${originalRowCount} phiếu`;
-
-        // Focus search input
         searchInput.focus();
     }
 
@@ -288,9 +264,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize clear button visibility
     searchInput.addEventListener('input', function() {
-        if (this.value.trim()) {
+        if (this.value.trim() && searchClear) {
             searchClear.style.display = 'block';
-        } else {
+        } else if (searchClear) {
             searchClear.style.display = 'none';
         }
     });
